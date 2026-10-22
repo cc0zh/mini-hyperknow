@@ -1,0 +1,19 @@
+{
+  "name": "mini-hyperknow",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "code-harness-init": "./scripts/create-project.cjs"
+  },
+  "scripts": {
+    "ci": "node scripts/ci.cjs",
+    "test": "node --test tests/tooling.test.cjs",
+    "test:python": "python -m unittest discover -s tests -p test_agent_core.py",
+    "check:docs": "node scripts/check-docs.cjs",
+    "check:repo": "node scripts/check-repo-hygiene.cjs",
+    "check:actions": "node scripts/check-action-pinning.cjs",
+    "release-package": "node scripts/release-package.cjs"
+  }
+}
