@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 import sqlite3
+from typing import Literal
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
@@ -10,6 +11,8 @@ from pydantic import Field
 
 from .config import Settings
 from .domain import AppError, Schema
+from .lesson_domain import LessonSnapshot
+from .quiz_domain import AttemptSnapshot, MAX_ELAPSED_MS, QuizSnapshot
 from .runtime import CourseService, EventHub
 from .storage import Database
 
@@ -35,6 +38,28 @@ class Answer(Schema):
 class SubmitAnswers(ChangeRun):
     skip: bool = False
     answers: list[Answer] = Field(default_factory=list, max_length=5)
+
+
+class LessonCommand(ChangeRun):
+    script_id: str = Field(min_length=1)
+
+
+class SaveProgress(LessonCommand):
+    cursor: int = Field(ge=-1)
+    play_intent: Literal["paused", "playing"]
+
+
+class AskQuestion(LessonCommand):
+    cursor: int = Field(ge=-1)
+    question: str = Field(min_length=2, max_length=2000)
+    was_playing: bool
+
+
+class AnswerQuiz(ChangeRun):
+    question_id: str = Field(min_length=1, max_length=80)
+    option_ids: list[str] = Field(max_length=8)
+    skipped: bool = Field(strict=True)
+    elapsed_ms: int = Field(strict=True, ge=0, le=MAX_ELAPSED_MS)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -106,6 +131,67 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def course(course_id: str):
         return app.state.db.get_course(course_id)
 
+    @app.get("/api/sessions/{session_id}", response_model=LessonSnapshot)
+    @app.get("/api/sessions/{session_id}/lesson", response_model=LessonSnapshot)
+    async def lesson(session_id: str):
+        return app.state.db.get_lesson(session_id)
+
+    @app.post("/api/sessions/{session_id}/prepare", response_model=LessonSnapshot)
+    async def prepare(session_id: str, data: Command):
+        return await app.state.service.prepare(session_id, data.model_dump())
+
+    @app.put("/api/sessions/{session_id}/progress", response_model=LessonSnapshot)
+    async def progress(session_id: str, data: SaveProgress):
+        return await app.state.service.progress(session_id, data.model_dump())
+
+    @app.post("/api/sessions/{session_id}/questions", status_code=202, response_model=LessonSnapshot)
+    async def question(session_id: str, data: AskQuestion):
+        return await app.state.service.question(session_id, data.model_dump())
+
+    @app.post("/api/sessions/{session_id}/complete", response_model=LessonSnapshot)
+    async def complete(session_id: str, data: LessonCommand):
+        return await app.state.service.complete(session_id, data.model_dump())
+
+    @app.get("/api/sessions/{session_id}/practice", response_model=QuizSnapshot)
+    async def practice(session_id: str):
+        return app.state.db.get_quiz_target("practice", session_id)
+
+    @app.post("/api/sessions/{session_id}/practice/prepare", response_model=QuizSnapshot)
+    async def practice_prepare(session_id: str, data: Command):
+        return await app.state.service.quiz_prepare("practice", session_id, data.model_dump())
+
+    @app.get("/api/exams/{exam_id}", response_model=QuizSnapshot)
+    async def exam(exam_id: str):
+        return app.state.db.get_quiz_target("exam", exam_id)
+
+    @app.post("/api/exams/{exam_id}/prepare", response_model=QuizSnapshot)
+    async def exam_prepare(exam_id: str, data: Command):
+        return await app.state.service.quiz_prepare("exam", exam_id, data.model_dump())
+
+    @app.post("/api/quizzes/{quiz_id}/attempts", response_model=AttemptSnapshot)
+    async def attempt_create(quiz_id: str, data: Command):
+        return await app.state.service.attempt_create(quiz_id, data.model_dump())
+
+    @app.get("/api/quizzes/{quiz_id}/attempts")
+    async def attempts(quiz_id: str):
+        return app.state.db.list_attempts(quiz_id)
+
+    @app.get("/api/attempts/{attempt_id}", response_model=AttemptSnapshot)
+    async def attempt(attempt_id: str):
+        return app.state.db.get_attempt(attempt_id)
+
+    @app.post("/api/attempts/{attempt_id}/answers", response_model=AttemptSnapshot)
+    async def answer_quiz(attempt_id: str, data: AnswerQuiz):
+        return await app.state.service.attempt_change(attempt_id, "answers", data.model_dump())
+
+    @app.post("/api/attempts/{attempt_id}/next", response_model=AttemptSnapshot)
+    async def attempt_next(attempt_id: str, data: ChangeRun):
+        return await app.state.service.attempt_change(attempt_id, "next", data.model_dump())
+
+    @app.post("/api/attempts/{attempt_id}/submit", response_model=AttemptSnapshot)
+    async def attempt_submit(attempt_id: str, data: ChangeRun):
+        return await app.state.service.attempt_change(attempt_id, "submit", data.model_dump())
+
     @app.websocket("/api/events")
     async def events(socket: WebSocket):
         hub = app.state.hub
@@ -115,16 +201,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await hub.send(socket, {"type": "connected"})
             while True:
                 message = await socket.receive_json()
+                if not isinstance(message, dict):
+                    await hub.send(socket, {"type": "error", "message": "无效订阅请求"})
+                    continue
                 if message.get("type") == "ping":
                     await hub.send(socket, {"type": "pong"})
                     continue
                 topic = message.get("topic", "")
-                if message.get("type") != "subscribe" or not isinstance(topic, str) or not topic.startswith("run:"):
-                    await hub.send(socket, {"type": "error", "message": "仅支持订阅课程运行状态"})
+                if message.get("type") != "subscribe" or not isinstance(topic, str) or ":" not in topic:
+                    await hub.send(socket, {"type": "error", "message": "仅支持订阅运行、课时或课程状态"})
                     continue
-                run_id = topic[4:]
+                kind, resource_id = topic.split(":", 1)
+                readers = {"run": app.state.db.get_run, "session": app.state.db.get_lesson,
+                           "course": app.state.db.get_course,
+                           "quiz_target": app.state.db.get_quiz_target_key,
+                           "attempt": app.state.db.get_attempt}
+                if kind not in readers:
+                    await hub.send(socket, {"type": "error", "message": "未知订阅类型"})
+                    continue
                 try:
-                    app.state.db.get_run(run_id)
+                    readers[kind](resource_id)
                 except AppError:
                     await hub.send(socket, {"type": "error", "message": "任务不存在"})
                     continue

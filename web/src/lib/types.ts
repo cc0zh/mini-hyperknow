@@ -27,6 +27,13 @@ export interface Answer {
 export type RunStatus = 'queued' | 'clarifying' | 'awaiting_answers' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
 
 export interface Run {
+  kind?: 'course' | 'lesson' | 'question' | 'quiz'
+  quiz_id?: string | null
+  target_type?: 'practice' | 'exam' | null
+  target_id?: string | null
+  session_id?: string | null
+  script_id?: string | null
+  interaction_id?: string | null
   run_id: string
   goal: string
   status: RunStatus
@@ -43,6 +50,7 @@ export interface Run {
 }
 
 export interface Session {
+  completed?: boolean
   session_id: string
   title: string
   description: string
@@ -56,7 +64,7 @@ export interface Unit {
   title: string
   description: string
   lectures: { lecture_id: string; title: string; description: string; sessions: Session[] }[]
-  exams: { exam_id: string; title: string; goal: string }[]
+  exams: { exam_id: string; title: string; goal: string; completed?: boolean }[]
   project_stages: { stage_id: string; project_id: string; title: string; description: string; deliverable: string }[]
 }
 
@@ -77,5 +85,144 @@ export interface Course {
   unit_count: number
   exam_count: number
   progress: number
-  next_item: { type: 'lecture'; title: string; session_id: string; unit_id: string } | null
+  next_item: { type: 'lecture' | 'session' | 'project' | 'project_stage' | 'exam'; title: string; session_id?: string; unit_id: string; stage_id?: string; exam_id?: string } | null
+}
+
+export type PlayIntent = 'paused' | 'playing'
+export interface BoardOperation {
+  kind: 'text' | 'list' | 'code' | 'formula' | 'box' | 'arrow' | 'highlight' | 'mermaid'
+  content: string
+  items: string[]
+  language: string
+}
+export interface BoardStep {
+  step_id: string
+  title: string
+  narration: string
+  page: number
+  column: 1 | 2
+  operations: BoardOperation[]
+}
+export interface BoardScript {
+  script_id: string
+  session_id: string
+  course_id: string
+  content_version: number
+  schema_version: number
+  title: string
+  steps: BoardStep[]
+  created_at: string
+}
+export interface LessonProgress {
+  script_id: string | null
+  cursor: number
+  play_intent: PlayIntent
+  version: number
+  updated_at: string
+}
+export interface Interaction {
+  interaction_id: string
+  run_id: string
+  script_id: string
+  step_id: string | null
+  cursor: number
+  question: string
+  answer: string | null
+  was_playing: boolean
+  status: 'pending' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
+  error: ServiceError | null
+  created_at: string
+}
+export interface LessonSnapshot {
+  version: number
+  course_id: string
+  course_title: string
+  unit_title: string
+  lecture_title: string
+  session: Session
+  script: BoardScript | null
+  progress: LessonProgress
+  interactions: Interaction[]
+  generation_run: Run | null
+  completed: boolean
+}
+
+export type QuizTargetType = 'practice' | 'exam'
+export interface QuizQuestion {
+  question_id: string
+  kind: 'single' | 'multiple' | 'boolean'
+  prompt: string
+  options: { id: string; text: string }[]
+  correct_option_ids: string[]
+  explanation: string
+  source_refs: string[]
+}
+export interface Quiz {
+  quiz_id: string
+  course_id: string
+  unit_id: string
+  target_type: QuizTargetType
+  target_id: string
+  title: string
+  content_version: number
+  schema_version: number
+  source_refs: string[]
+  questions: QuizQuestion[]
+  created_at: string
+}
+export interface QuizAnswer {
+  question_id: string
+  option_ids: string[]
+  skipped: boolean
+  elapsed_ms: number
+  correct: boolean
+  fast: boolean
+  points: number
+  answered_at: string
+}
+export interface QuizResult {
+  total_score: number
+  max_score: number
+  correct_count: number
+  question_count: number
+  skipped_count: number
+  fast_count: number
+  best_streak: number
+  stars: number
+  total_elapsed_ms: number
+  scoring_version: number
+}
+export interface QuizAttempt {
+  attempt_id: string
+  quiz_id: string
+  course_id: string
+  target_type: QuizTargetType
+  target_id: string
+  status: 'in_progress' | 'submitted'
+  version: number
+  cursor: number
+  question_started_at: string
+  answers: QuizAnswer[]
+  result: QuizResult | null
+  created_at: string
+  updated_at: string
+  submitted_at: string | null
+}
+export interface QuizSnapshot {
+  course_id: string
+  unit_id: string
+  target_type: QuizTargetType
+  target_id: string
+  title: string
+  description: string
+  quiz: Quiz | null
+  generation_run: Run | null
+  latest_attempt: QuizAttempt | null
+  completed: boolean
+  version: number
+}
+export interface AttemptSnapshot {
+  quiz: Quiz
+  attempt: QuizAttempt
+  course: Course
 }

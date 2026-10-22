@@ -6,7 +6,11 @@ import Home from './pages/Home'
 import CourseRun from './pages/CourseRun'
 import Courses from './pages/Courses'
 import CourseOverview from './pages/CourseOverview'
+import Classroom from './pages/Classroom'
+import QuizPage from './pages/Quiz'
 import './styles/app.css'
+import './styles/classroom.css'
+import './styles/quiz.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><BrowserRouter><Routes>
@@ -15,7 +19,10 @@ createRoot(document.getElementById('root')!).render(
       <Route path="/course-runs/:runId" element={<CourseRun />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/courses/:courseId" element={<CourseOverview />} />
-      <Route path="*" element={<div className="page"><EmptyState title="没有这个页面" action={<Link className="button primary" to="/">回到首页</Link>}>当前版本提供课程创建、课程列表与目录总览。</EmptyState></div>} />
+      <Route path="/courses/:courseId/sessions/:sessionId" element={<Classroom />} />
+      <Route path="/courses/:courseId/sessions/:sessionId/practice" element={<QuizPage />} />
+      <Route path="/courses/:courseId/exams/:examId" element={<QuizPage />} />
+      <Route path="*" element={<div className="page"><EmptyState title="没有这个页面" action={<Link className="button primary" to="/">回到首页</Link>}>当前版本提供课程创建、课程目录和白板课堂。</EmptyState></div>} />
     </Route>
   </Routes></BrowserRouter></StrictMode>,
 )

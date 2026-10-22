@@ -1,15 +1,15 @@
 # 架构总览
 
-状态：2026-10-22 首个造课／课程库切片已实现，并通过真实模型与内置浏览器的切片验收；课堂、答题和项目提交仍是后续目标。
+状态：2026-10-22 造课／课程库首切片保留原真实验收证据；白板讲义、播放、课堂问答与手动完成已接入代码，本阶段课堂已完成两主题真实讲义／问答、播放／回看、手动完成及已保存状态冷重启验收。练习／考核本阶段范围已完成真实验收，见[完成计划](exec-plans/completed/20261022-real-practice-exams.md)；最终CI门禁待填写，思考题、项目提交及完整V01–V12仍未完成。
 需求边界：[产品设计](design-docs/product-design.md)；契约入口：[设计索引](design-docs/index.md)。
 
 ## 1. 当前事实
 
 - `src/agent_core/` 已有 Agent、内存 ContextManager、LLMService 协议、ToolManager、同步执行循环和 OpenAIService。
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
-- 内核上下文仍在内存；产品课程、澄清、运行、命令回执和模型调用已保存到 SQLite，课堂位置、作答和成果尚未实现。
+- 内核上下文仍在内存；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
-- `src/hyperknow/` 已有 FastAPI 服务与串行生成执行器，`web/` 已有四类 React 页面；实际启动命令见 [README](../README.md)。
+- `src/hyperknow/` 已有 FastAPI 服务与串行生成执行器，支持 course／lesson／question／quiz 四种 run；`web/` 已有首页、创建、课程库、总览、课堂及练习／考核页面。实际启动命令见 [README](../README.md)。
 
 ## 2. 已定工程选择
 
@@ -50,23 +50,28 @@ flowchart LR
 ```text
 src/
   agent_core/             已有通用模型、上下文、工具与循环
-  hyperknow/              已实现的课程生成切片
+  hyperknow/              已实现的造课、白板课堂与练习/考核切片
     config.py             本地配置，不在公开响应中包含密钥
     domain.py             课程/澄清 schema、答案规则、实体化
-    generation.py         真实模型、输入依据、结构校验和一次修复
-    storage.py            SQLite、事务、命令幂等、状态及重启
-    runtime.py            单 worker、取消门禁、提交后通知
+    lesson_domain.py      八种板书操作、讲义/问答 schema、上下文与统一进度派生
+    lesson_storage.py     讲义、确认位置、问答及手动完成事务
+    generation.py         课程/讲义/问答/出题真实模型、输入依据、结构校验和一次修复
+    quiz_domain.py        客观题结构、来源预算、个人确定性计分
+    quiz_storage.py       题组、目标版本、作答/next/submit与活动完成事务
+    storage.py            SQLite v3、升级备份、事务、命令幂等及重启
+    runtime.py            共用单worker、取消门禁、run/session/course/quiz_target/attempt通知
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
-  src/pages/              首页、创建/澄清、课程库与总览
-  src/components/         参考视觉的共用展示组件
-  src/lib/                API、WS、格式化；不独立实现第二套计分规则
+  src/pages/              首页、创建/澄清、课程库、总览、Classroom与Quiz
+  src/components/         共用展示、Board、KaTeX 与安全 Mermaid SVG
+  src/lib/                API/WS、课堂/测验快照、单播放器时钟、命令所有权及字体加载
+  public/fonts/           Excalifont／Xiaolai 原始资源、NOTICE 与各自完整 OFL 1.1 许可证
 tests/                    直接逻辑、真实存储、真实服务和浏览器验证
 data/                     本地 SQLite、运行日志和验收证据，不进入版本控制
 docs/                     产品、架构、计划与证据
 ```
 
-课堂、计分和项目等后续职责尚未加入。小切片保持上述平面模块，不要求每个职责建独立包、每张表建通用 Repository 抽象或每个工作流创建一个 Agent 类。
+本阶段新增练习／考核计分与结果保存，项目提交仍待实现。小切片保持上述平面模块，不要求每个职责建独立包、每张表建通用 Repository 抽象或每个工作流创建一个 Agent 类。
 
 ## 5. 允许的依赖方向
 
@@ -90,23 +95,25 @@ docs/                     产品、架构、计划与证据
 
 ## 7. 状态和存储归属
 
-SQLite 当前保存课程、目标与澄清、运行、命令回执和模型调用。后续再加入讲义、学习位置、问答、题目及尝试、项目成果。内存只放当前执行句柄、订阅、计时和可重建状态；前端缓存不是事实来源。
+SQLite 当前保存课程、目标与澄清、运行、命令回执、模型调用，以及不可变讲义、课堂聚合／确认位置、问答和课时完成事实。v1 → v2 升级前使用 SQLite backup 备份已有 v1 数据库，新增四张表并扩展命令回执；并非新增五表。v3在此基础上新增quizzes、quiz_states、quiz_attempts三表及每题组单个未提交尝试的部分唯一索引，升级前自动备份已有v1／v2库，保留原八表。物理结构见[数据模型](design-docs/data-model.md)；思考题及项目成果仍为后续目标。
 
-播放器只有一个前端 reducer／计时器推进，后端验证并保存步骤及版本；后端不再额外开一套自动讲课定时器。恢复重建已保存步骤的画布，并停在暂停态，不重新调用模型生成不同讲义。
+内存只放执行句柄、订阅、播放器时钟和可重建状态。前端 sessionStorage 保存待确认命令身份及本次回答的继续确认，不是业务事实来源。课堂聚合顶层 version 用于完整快照／通知排序；progress.version 只用于位置与播放意图写入的乐观锁，不能混用。
+
+播放器只有一个前端 PlaybackClock；后端不开自动讲课定时器。前端串行写入下一步，经后端确认后才展示该步骤。页栏回看只改变本地显示选择，不改变确认 cursor。GET 保留数据库中权威 play_intent，同一版本不因读取而改成 paused；恢复时前端仍创建暂停的本地时钟，不根据 GET 自动播放。进入、刷新和重连不会发起讲义生成，必须明确点击准备或重试。
 
 具体数据不变量和保存屏障见[数据模型](design-docs/data-model.md)，协议见[接口与事件](design-docs/api-and-events.md)。
 
 ## 8. 保持简单与必要底线
 
-本阶段只保留必要底线：回环监听、密钥不进浏览器或 Git、校验内容结构、不执行项目代码。生成和用户内容默认转义，不直接注入原始 HTML；代码仅展示，Mermaid 使用严格模式，可点击链接只允许 http／https。除此不扩展为权限平台、沙箱系统、审计中心或防作弊系统。
+本阶段只保留必要底线：回环监听、密钥不进浏览器或 Git、校验内容结构、不执行项目代码。生成和用户内容默认转义；代码仅展示并保留等宽缩进，公式由 KaTeX（trust=false、严格报错）排版。Mermaid 使用 strict、禁用 HTML 标签和配置指令，生成 SVG 经 DOMPurify 及样式／链接白名单清洗后才注入；失败显式显示，不以源码冒充图形。白板通过 FontFace 同时加载本地 Excalifont 与小赖 Xiaolai，字体栈为 `Excalifont, Xiaolai, sans-serif`：英文、数字与西文标点使用 Excalifont，中文与中文标点使用 Xiaolai；两者加载完成后才测量 Mermaid。白板字体与代码等宽字体、KaTeX 数学字体及界面字体隔离；资源与验收见[字体参考](references/whiteboard-font.md)。可点击外部链接只允许 http／https。除此不扩展为权限平台、沙箱系统、审计中心或防作弊系统。
 
 原仓库的脚手架／制品脚本仍存在，不是产品部署链；业务目录、锁文件、真实构建和无 Mock 验证入口已接入，不能因为 metadata 打包成功就认为产品已交付；流水线事实见[CI/CD](CICD.md)。
 
 ## 9. 实施切片顺序
 
 1. 本地课程库与真实造课，形成第一个可浏览、可持久保存的产物。
-2. 真实讲义生成、白板步骤、播放与恢复，再接入课堂问答。
-3. 练习／考核真实出题、作答结果、项目成果以及统一进度。
+2. 真实讲义生成、白板步骤、播放与恢复，再接入课堂问答：已完成本阶段真实验收，边界见[课堂计划](exec-plans/completed/20261022-real-whiteboard-classroom.md)。
+3. 练习／考核真实出题、作答结果与恢复：本阶段范围已完成，见[完成计划](exec-plans/completed/20261022-real-practice-exams.md)；之后再接思考题、项目成果以及完整活动进度。
 4. 完成真实浏览器贯通、错误／取消／重启检查，再收口展示与文档。
 
 每个切片都连接真实依赖，不先制作 Mock API 或假课程占位；具体任务和命令在实施时另建 execution plan，不在本架构中记录流水账。

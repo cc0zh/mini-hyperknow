@@ -218,6 +218,24 @@ class CourseStorageTests(unittest.TestCase):
         self.assertEqual(reopened.create_run("create-course-1", run["goal"], self.settings.model), run)
         self.assertEqual(reopened.list_records("runs"), [run])
 
+    def test_concurrent_course_retries_only_create_one_successor(self):
+        original = self.create()
+        parent = self.db.transition(original["run_id"], {"queued"}, status="failed")
+        def retry(index):
+            try:
+                return self.db.retry_run(f"retry-concurrent-{index}", parent["run_id"], parent["version"])
+            except AppError as exc:
+                return exc
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(retry, (1, 2)))
+        self.assertEqual(sum(isinstance(item, dict) for item in results), 1)
+        errors = [item for item in results if isinstance(item, AppError)]
+        self.assertEqual([item.code for item in errors], ["state_conflict"])
+        child = next(item for item in results if isinstance(item, dict))
+        command = f"retry-concurrent-{results.index(child) + 1}"
+        self.assertEqual(self.db.retry_run(command, parent["run_id"], parent["version"]), child)
+        self.assertEqual(len(self.db.list_records("runs")), 2)
+
     def test_same_command_with_different_goal_returns_409(self):
         original = self.create()
         with self.assertRaises(AppError) as raised:

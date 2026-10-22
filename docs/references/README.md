@@ -13,3 +13,4 @@
 ## 当前资料
 
 - [设计文档组织方式参考](design-document-references.md)：用户指定的 ActSpace 文档阅读范围、借鉴方法和明确不继承的架构；Hyperknow 证据入口。
+- [白板字体参考](whiteboard-font.md)：Excalifont 英文／数字与小赖 Xiaolai 中文的分工、原始资源、OFL 1.1 许可证及当前验收边界。

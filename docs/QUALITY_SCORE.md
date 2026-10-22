@@ -1,14 +1,15 @@
 # 质量评分
 
-状态：2026-10-22。只报告实际实现和验证，不把文档检查当业务质量达标；历史测试结论不能覆盖新的拒绝 Mock 要求。
+状态：2026-10-22。只报告实际实现和验证，不把文档检查当业务质量达标；历史测试结论不能覆盖新的拒绝 Mock 要求。本阶段业务范围完成，最终CI、前端测试／构建、Markdown、差异与锁文件检查通过；完整产品场景仍按实际覆盖边界报告。
 
 | 区域 | 当前状态 | 依据／证据入口 | 下一步 |
 | --- | --- | --- | --- |
-| 产品与架构 | 造课／课程库首切片完成真实浏览器验收，课堂等后续切片未实施 | [设计索引](design-docs/index.md)、[实际实现与证据](exec-plans/completed/20261022-real-course-library.md) | 实施真实讲义与白板课堂 |
-| Agent 内核 | 已用 deepseek-flash 完成真实澄清／造课，SDK 自动重试关闭 | [当前事实](ARCHITECTURE.md)、[调用依据](exec-plans/completed/20261022-real-course-library.md) | 后续教学场景与结构修复路径验收 |
-| 业务验收 | 两组真实需求、回答／跳过、课程浏览、取消／重试及冷重启通过；V01–V12 未整体通过 | [真实验收](design-docs/real-validation.md)、[切片证据](exec-plans/completed/20261022-real-course-library.md) | 继续课堂、作答和成果切片，不夸大完成范围 |
-| 测试入口 | Mock／Fake／patch 与 provider 注入替身已移除，uv 驱动真实检查 | [CI/CD](CICD.md) | 保持真实验收与本地检查分层 |
-| 数据恢复 | 真实课程冷重启前后哈希一致，澄清与版本不变，调用未增加，浏览器 WS 重连 | [数据模型](design-docs/data-model.md)、[切片证据](exec-plans/completed/20261022-real-course-library.md) | 后续讲义／学习记录恢复 |
-| 运行与基本卫生 | 本地服务、缺配置错误、真实模型与构建已验；未发布部署 | [运行底线](RELIABILITY.md)、[切片证据](exec-plans/completed/20261022-real-course-library.md) | 不扩成企业安全项目 |
+| 产品与架构 | 造课／课程库、手写白板课堂及练习／考核均完成各自切片范围的真实验收 | [设计索引](design-docs/index.md)、[练习／考核完成计划](exec-plans/completed/20261022-real-practice-exams.md) | 思考题真实保存／反馈，再接项目成果，不宣称首版整体完成 |
+| Agent 内核 | deepseek-flash真实澄清／造课／讲义／问答／出题，SDK自动重试关闭；讲义曾一次结构修复成功，本阶段三次quiz均首次校验成功 | [当前事实](ARCHITECTURE.md)、[调用与usage](exec-plans/completed/20261022-real-practice-exams.md#真实模型与成本) | quiz真实失败修复、取消晚到收费及在途硬重启仍未覆盖，不以课堂证据替代 |
+| 业务验收 | 两主题练习与一组单元考核已验三题型、反馈／显式提交／再练／旧结果，考核完成不等于通过；V01–V12未整体通过 | [真实验收](design-docs/real-validation.md)、[Q01–Q16矩阵](exec-plans/completed/20261022-real-practice-exams.md#本阶段验收矩阵) | 思考题、项目成果与完整V12仍未完成；全部跨标签及危险输入不据此盖章 |
+| 测试入口 | 无Mock／Fake／patch及provider注入替身；已有99项Python、此前21项Node、最新49项前端及TS／Vite构建通过，保留分包警告 | [CI/CD](CICD.md)、[Q16与最终门禁](exec-plans/completed/20261022-real-practice-exams.md#证据落盘与最终门禁) | 主代理重跑最终CI／Markdown／diff，填写实际命令和退出码；本地规则、HTTP与模型／浏览器证据分层 |
+| 数据恢复 | v2→v3备份迁移原八表哈希一致、新增三表；无在途生成冷重启十一表哈希一致、调用保持17，恢复两答案／起点与旧结果 | [数据模型](design-docs/data-model.md)、[迁移与冷重启](exec-plans/completed/20261022-real-practice-exams.md#迁移与冷重启) | 成果恢复与真实模型在途硬重启尚未覆盖；不回滚或清空用户并行学习数据 |
+| 教学内容 | 题组来源／结构已校验；摄影q_plant_ab忠于讲义但“转动植物改变相机相对光线方向”概念待纠正 | [教学内容债务](exec-plans/tech-debt-tracker.md)、[人工核查边界](exec-plans/completed/20261022-real-practice-exams.md#内置浏览器事实) | 纠正内容机制及可追溯记录，不手改历史题组伪造教学全部正确 |
+| 运行与基本卫生 | 实际500／断线恢复、6秒网络延迟下反馈及pending释放已有浏览器证据；本地单worker，未发布部署 | [运行底线](RELIABILITY.md)、[同步与审查边界](exec-plans/completed/20261022-real-practice-exams.md#内置浏览器事实) | 不扩成企业安全项目；精确跨页面迟到A／B时序浏览器未复现 |
 
-本表只链接权威状态和验收证据，不复制过程日志。当前 `npm run ci` 的本地通过仍不代表真实成功模型或全部业务验收通过。
+本表只链接权威状态和验收证据，不复制过程日志。CI、本地检查、模型结构有效和教学准确性分别报告；最终两份本地汇总证据由主代理补存／核对。
