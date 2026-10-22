@@ -12,6 +12,7 @@
 6. [API 与事件](api-and-events.md)：REST 命令／查询、WS 通知与客户端同步。
 7. [真实验证](real-validation.md)：拒绝 Mock、当前测试债、V01–V12 及证据要求。
 8. [参考证据与缺口](reference-and-gaps.md)：用户确认、原站局部证据、Clone 事实和必要补齐。
+9. [Agent 内核 V1](agent-core-v1.md)：通用内核调度、权限、会话、记忆、预算压缩和模型分层；与课程显式业务工作流隔离，不代表产品已接入文件或命令工具。
 
 ## 状态与维护边界
 

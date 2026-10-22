@@ -5,9 +5,9 @@
 
 ## 1. 当前事实
 
-- `src/agent_core/` 已有 Agent、内存 ContextManager、LLMService 协议、ToolManager、同步执行循环和 OpenAIService。
+- `src/agent_core/` 已升级为可选持久会话／Token 预算压缩、分层模型、工具调度与逐次审批的 V1；同步 provider 契约保留，接口和边界见[内核 V1](design-docs/agent-core-v1.md)。
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
-- 内核上下文仍在内存；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
+- 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
 - `src/hyperknow/` 已有 FastAPI 服务与串行生成执行器，支持 course／lesson／question／quiz 四种 run；`web/` 已有首页、创建、课程库、总览、课堂及练习／考核页面。实际启动命令见 [README](../README.md)。
 
@@ -50,6 +50,13 @@ flowchart LR
 ```text
 src/
   agent_core/             已有通用模型、上下文、工具与循环
+    llm/                  同步 OpenAI-compatible provider、显式 tier registry 和消息规范化
+    tools/                调度、审批、输出存档、显式工作区文件／进程工具
+    storage/              可选 JSONL 会话（单 writer、审计与 checkpoint）
+    context.py            深拷贝上下文、每次调用前预算与压缩提交
+    compression.py        完整轮摘要与失败不丢历史
+    memory.py             调用者显式维护的有界长期记忆
+    tokens.py             保守估算与真实 usage 分离
   hyperknow/              已实现的造课、白板课堂与练习/考核切片
     config.py             本地配置，不在公开响应中包含密钥
     domain.py             课程/澄清 schema、答案规则、实体化

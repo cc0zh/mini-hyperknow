@@ -6,7 +6,7 @@ from ..types import AgentContext, AssistantMessage
 
 
 class LLMService(Protocol):
-    """Minimal provider interface required by the V0 execution loop."""
+    """Synchronous provider interface; cancellation is checked at call boundaries."""
 
     def complete(self, context: AgentContext) -> AssistantMessage:
         ...

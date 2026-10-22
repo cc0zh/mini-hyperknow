@@ -60,6 +60,10 @@ uv run --frozen python scripts/verify_model.py
 
 ## 设计与交接
 
+通用 Python 内核已升级 V1：工具调度／逐次审批、有界输出与原文存档、显式工作区工具、JSONL 会话恢复、调用者维护的长期记忆、Token 预算压缩和 high／medium／low 模型分层。课程业务仍沿用 SQLite 与既有同步生成，不向浏览器开放文件／命令工具；同步网络取消不等于远端中止。接口、配置与安全边界见[内核 V1](docs/design-docs/agent-core-v1.md)。
+
+可显式执行 `uv run --frozen python scripts/verify_agent_v1.py` 验证真实模型工具循环、实际摘要及会话重开；会产生费用，证据保存在忽略的 `data/validation/agent-v1/`，不接触课程数据库。缺凭据返回 2，不冒充通过。
+
 - [设计索引](docs/design-docs/index.md)、[产品范围](docs/design-docs/product-design.md)和[架构](docs/ARCHITECTURE.md)。
 - [造课计划](docs/exec-plans/completed/20261022-real-course-library.md)、[课堂计划与验收边界](docs/exec-plans/completed/20261022-real-whiteboard-classroom.md)、[练习／考核完成计划](docs/exec-plans/completed/20261022-real-practice-exams.md)、[真实验证](docs/design-docs/real-validation.md)和[质量状态](docs/QUALITY_SCORE.md)。
 - [CI/CD](docs/CICD.md)、[Windows](docs/WINDOWS.md)和协作入口 [AGENTS.md](AGENTS.md)。

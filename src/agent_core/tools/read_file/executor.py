@@ -16,10 +16,12 @@ def read_file(arguments: dict[str, Any]) -> ToolResult:
     if max_chars is not None and (not isinstance(max_chars, int) or isinstance(max_chars, bool) or max_chars < 1):
         return ToolResult(False, error="max_chars must be a positive integer")
 
-    read_limit = max_chars or DEFAULT_MAX_CHARS
+    read_limit = min(max_chars or DEFAULT_MAX_CHARS, DEFAULT_MAX_CHARS)
     try:
         with Path(path_value).open("r", encoding="utf-8") as handle:
-            content = handle.read(read_limit)
+            content = handle.read(read_limit + 1)
     except (OSError, UnicodeError) as exc:
         return ToolResult(False, error=f"cannot read {path_value!r}: {exc}")
+    if len(content) > read_limit:
+        content = content[:read_limit] + "\n[truncated; use workspace read_file offset/limit for paging]"
     return ToolResult(True, data=content)

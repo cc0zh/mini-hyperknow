@@ -1,4 +1,4 @@
-"""OpenAI Chat Completions provider for the V0 LLM contract."""
+"""OpenAI Chat Completions provider for the synchronous LLM contract."""
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ from typing import Any
 
 from dotenv import load_dotenv
 
-from ..types import AgentContext, AssistantMessage, ToolCall, ToolResultMessage
+from ..types import AgentContext, AssistantMessage, ToolCall
+from .sanitize import sanitize_messages
 
 
 class OpenAIService:
@@ -27,9 +28,17 @@ class OpenAIService:
         base_url: str | None = None,
         timeout: float | None = None,
         max_retries: int = 0,
+        max_output_tokens: int | None = None,
     ) -> None:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        if max_output_tokens is not None and (
+            isinstance(max_output_tokens, bool)
+            or not isinstance(max_output_tokens, int)
+            or max_output_tokens < 1
+        ):
+            raise ValueError("max_output_tokens must be a positive integer")
+        self.max_output_tokens = max_output_tokens
         self.client = self._create_client(
             api_key or os.getenv("OPENAI_API_KEY"),
             base_url or os.getenv("OPENAI_BASE_URL"),
@@ -43,7 +52,10 @@ class OpenAIService:
                 model=self.model,
                 messages=to_openai_messages(context),
                 **({"tools": context.tools} if context.tools else {}),
+                **({"max_completion_tokens": self.max_output_tokens}
+                   if self.max_output_tokens is not None else {}),
             )
+
             return from_openai_response(response, model=self.model)
         except Exception as exc:  # Provider errors stay inside the agent loop.
             return AssistantMessage(
@@ -52,6 +64,15 @@ class OpenAIService:
                 provider="openai",
                 error_message=f"OpenAI request failed: {type(exc).__name__}",
             )
+
+    def close(self) -> None:
+        self.client.close()
+
+    def __enter__(self) -> "OpenAIService":
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        self.close()
 
     @staticmethod
     def _create_client(api_key: str | None, base_url: str | None, timeout: float | None,
@@ -79,7 +100,7 @@ def to_openai_messages(context: AgentContext) -> list[dict[str, Any]]:
     if context.system_prompt:
         messages.append({"role": "system", "content": context.system_prompt})
 
-    for message in context.messages:
+    for message in sanitize_messages(context.messages):
         if message.role == "user":
             messages.append({"role": "user", "content": message.content})
         elif message.role == "assistant":
@@ -137,7 +158,9 @@ def from_openai_response(response: Any, *, model: str) -> AssistantMessage:
 
     try:
         tool_calls = [_tool_call(call) for call in (_field(message, "tool_calls", []) or [])]
-    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        if len({call.id for call in tool_calls}) != len(tool_calls):
+            raise ValueError("duplicate tool call ids")
+    except (TypeError, ValueError, RecursionError) as exc:
         return AssistantMessage(
             stop_reason="error",
             model=model,
@@ -146,15 +169,26 @@ def from_openai_response(response: Any, *, model: str) -> AssistantMessage:
             usage=_usage(response),
         )
 
+    content = _field(message, "content")
+    if content is not None and not isinstance(content, str):
+        return AssistantMessage(stop_reason="error", model=model, provider="openai",
+                                error_message="OpenAI returned non-text message content", usage=_usage(response))
     finish_reason = _field(choice, "finish_reason")
-    stop_reason = "tool_use" if tool_calls else _stop_reason(finish_reason)
+    # A truncated tool call must never be executed, even if its JSON parses.
+    stop_reason = _stop_reason(finish_reason)
+    if tool_calls and stop_reason != "error":
+        stop_reason = "tool_use"
+    if finish_reason == "tool_calls" and not tool_calls:
+        stop_reason = "error"
     return AssistantMessage(
-        _field(message, "content") or "",
+        content or "",
         tool_calls=tool_calls,
         stop_reason=stop_reason,
         model=model,
         provider="openai",
         usage=_usage(response),
+        error_message=(f"OpenAI response ended with {finish_reason}"
+                       if stop_reason == "error" else None),
     )
 
 
@@ -164,22 +198,37 @@ def _tool_call(call: Any) -> ToolCall:
         raise ValueError("tool call has no function")
     arguments = _field(function, "arguments", "{}")
     if isinstance(arguments, str):
-        arguments = json.loads(arguments or "{}")
+        arguments = json.loads(arguments or "{}", parse_constant=_reject_json_constant)
     if not isinstance(arguments, dict):
         raise ValueError("tool arguments must be a JSON object")
-    return ToolCall(
-        id=str(_field(call, "id", "")),
-        name=str(_field(function, "name", "")),
-        arguments=arguments,
-    )
+    _validate_json_arguments(arguments)
+    json.dumps(arguments, allow_nan=False)
+    call_id, name = _field(call, "id"), _field(function, "name")
+    if not isinstance(call_id, str) or not call_id or not isinstance(name, str) or not name:
+        raise ValueError("tool call requires a non-empty id and function name")
+    return ToolCall(id=call_id, name=name, arguments=arguments)
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON constant is not permitted: {value}")
+
+
+def _validate_json_arguments(value: Any) -> None:
+    if isinstance(value, dict):
+        if any(not isinstance(key, str) for key in value):
+            raise ValueError("tool argument keys must be strings")
+        for item in value.values():
+            _validate_json_arguments(item)
+    elif isinstance(value, list):
+        for item in value:
+            _validate_json_arguments(item)
+    elif value is not None and type(value) not in (str, int, float, bool):
+        raise ValueError("tool arguments must contain only JSON data")
 
 
 def _stop_reason(finish_reason: str | None) -> str:
-    if finish_reason == "length":
-        return "error"
-    if finish_reason in {"content_filter", "function_call"}:
-        return "error"
-    return "stop"
+    # A missing/unknown terminal marker cannot authorize tool execution.
+    return "stop" if finish_reason in {"stop", "tool_calls"} else "error"
 
 
 def _usage(response: Any) -> dict[str, int] | None:
@@ -189,7 +238,7 @@ def _usage(response: Any) -> dict[str, int] | None:
     result: dict[str, int] = {}
     for key in ("prompt_tokens", "completion_tokens", "total_tokens"):
         value = _field(usage, key)
-        if isinstance(value, int):
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
             result[key] = value
     return result or None
 

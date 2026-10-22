@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mini-hyperknow-agent-core"
 version = "0.1.0"
-description = "Python Agent V0 kernel with an OpenAI provider"
+description = "Python Agent V1 kernel with durable context and controlled tools"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115",
