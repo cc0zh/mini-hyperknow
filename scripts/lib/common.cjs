@@ -8,10 +8,12 @@ const repoRoot = path.resolve(__dirname, '../..');
 const excludedNames = new Set([
   '.git', 'node_modules', 'dist', '.tmp', 'tmp', 'temp', 'coverage',
   '.venv', 'venv', '.cache', '.npm', '.env', '.env.local', '__pycache__',
+  '.verification', 'test-results', 'playwright-report',
 ]);
 
 function excluded(name) {
-  return excludedNames.has(name) || name.endsWith('.pyc') || name.endsWith('.pyo') || /^\.env\..+\.local$/.test(name);
+  return excludedNames.has(name) || name.endsWith('.pyc') || name.endsWith('.pyo')
+    || name.endsWith('.egg-info') || (/^\.env(?:\.|$)/.test(name) && name !== '.env.example');
 }
 
 function stat(file) {

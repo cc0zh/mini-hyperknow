@@ -1,56 +1,65 @@
 # mini-hyperknow
 
-面向 Agent-first 开发的基础模板，当前包含一个 Python Agent V0 内核和 OpenAI provider。
+基于 Hyperknow 核心课程体验重建的个人简历项目，以 hyperknow-clone2 为只读规格参考。不使用 Mock、假课程、模板降级或虚假进度。
 
-## Python Agent V0
+## 当前能力与边界
 
-内核位于 `src/agent_core/`，由四个可替换模块组成：内存上下文、LLM 服务协议、工具管理器和 Agent 执行循环。LLM 服务只需要实现 `complete(context) -> AssistantMessage`，因此可以先用 `MockLLMService` 验证工具调用链路，再使用 `OpenAIService` 接入 OpenAI 或 OpenAI-compatible endpoint。
+首个切片已实现：文字目标、真实模型澄清与目录生成的接线、课程 schema 校验、SQLite 保存、课程运行恢复、取消／手动重试，以及首页、创建／澄清、我的课程和课程总览。模型调用使用已有 Python provider，后端默认串行执行。
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests -p "test_agent_core.py" -v
-```
+**验收边界：已用内置浏览器和真实 deepseek-flash 完成两组澄清／造课、目录浏览、刷新、取消／重试和课程冷重启恢复。** 这只代表首个造课／课程库切片，不是完整学习链路通过。课堂白板、问答、练习／考核执行、项目提交和学习进度尚未实现；目录不提供假学习按钮。
 
-使用 OpenAI：先复制示例配置并填写模型凭据。`.env` 已被 Git 忽略，不要提交真实密钥。
+最终流程：文字目标 → 澄清 → 生成课程 → 课程路径 → 无语音白板与课堂问答 → 练习／考核／项目 → 保存并继续学习。不做语音、上传、知识库、独立聊天／深度学习、社区、支付或企业级权限平台。
 
-```powershell
-Copy-Item .env.example .env
-```
+## 本地安装
 
-在 `.env` 中设置 `OPENAI_API_KEY` 和可选的 `OPENAI_MODEL`；OpenAI-compatible 服务还可设置 `OPENAI_BASE_URL`。显式构造参数优先于进程环境变量，进程环境变量优先于 `.env`，最后才使用默认模型名。
-
-```python
-from agent_core import Agent, OpenAIService, ToolManager
-from agent_core.tools.read_file import read_file_tool
-
-llm = OpenAIService()
-agent = Agent(llm, tools=ToolManager([read_file_tool]))
-result = agent.run("Read README.md and summarize it.")
-print(result.response.content)
-```
-
-安装 Python 依赖（包含 OpenAI SDK 和 `.env` 加载器）：
+需要 uv、Python（仓库固定 3.13）、Node.js 22.12+（推荐 24）和 Git；完整仓库工具测试还使用系统 tar。Python 依赖只使用 uv 管理，前端使用 npm 和独立锁文件。
 
 ```powershell
-python -m pip install -e .
+uv sync --frozen
+npm.cmd --prefix web ci
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
-V0 有意保持简单：会话只保存在内存中，工具按顺序执行，工具输出做硬截断；持久化、上下文压缩、权限审批和调度属于后续 V1 范围。
+在本仓库本地 .env 设置 OPENAI_API_KEY，可选 OPENAI_MODEL、OPENAI_BASE_URL。不要覆盖已有配置、把密钥放入 web 或发到聊天。HK_DATA_DIR 默认 data，数据库为 data/hyperknow.sqlite3；HK_MODEL_TIMEOUT_SECONDS 默认 120。修改后端配置后重启后端。
 
-## 开发准备
+## 启动
 
-仓库工具需要 Node.js 22+、Git；完整测试与打包还需要 tar，无需安装 npm 依赖。
+从仓库根目录分别在两个终端运行：
+
+```powershell
+uv run --frozen uvicorn hyperknow.main:app --host 127.0.0.1 --port 8000
+```
+
+```powershell
+npm.cmd --prefix web run dev
+```
+
+前端默认 `http://127.0.0.1:5173`，开发代理将 /api 和 WebSocket 转发至 8000。若 5173 已被其他项目使用，不停止未知进程，改用 npm.cmd --prefix web run dev -- --port 5174。非 Windows 平台把 npm.cmd 换为 npm。
+
+GET /api/health 区分数据库正常、模型已配置与尚未验证；不会因检测到密钥就宣称连通。缺配置时创建返回明确错误，不生成假课程。运行历史可在“我的课程”继续；重启把在途任务标为 interrupted，等待澄清与已保存课程保留，不自动重新收费。
+
+## 验证
 
 ```powershell
 npm.cmd run ci
-npm.cmd run release-package
+npm.cmd --prefix web test
+npm.cmd run build
 ```
 
-macOS/Linux 使用 `npm`。Windows 环境问题见 [使用说明](docs/WINDOWS.md)。
+这些入口已移除历史 Mock／Fake／patch。检查包括真实文件、纯逻辑、临时磁盘 SQLite 和实际 Uvicorn HTTP／WS；公共 CI 不冒充真实模型验收。
 
-## 项目约定
+配置真实模型、启动后端后，可显式执行以下验收命令；它会产生实际模型费用：
 
-- 从 [AGENTS.md](AGENTS.md) 查阅相关规则。
-- 补齐 [架构](docs/ARCHITECTURE.md)、[产品目标](docs/PRODUCT_SENSE.md) 和 CODEOWNERS。
-- 将模板检查与打包流程替换或扩展为实际业务流程，见 [CI/CD](docs/CICD.md)。
-- 新增的计划、history 和学习记录只记本项目的事实。
+```powershell
+uv run --frozen python scripts/verify_model.py
+```
+
+脚本走真实 HTTP，默认回答每个澄清问题的第一个选项，再生成并读取课程，证据写入忽略的 data/validation/。缺配置退出码 2（blocked），失败退出码 1，不注入内容。它只验证模型／API 切片，不代替浏览器、第二组需求或重启验收。
+
+## 设计与交接
+
+- [设计索引](docs/design-docs/index.md)、[产品范围](docs/design-docs/product-design.md)和[架构](docs/ARCHITECTURE.md)。
+- [实施计划与验收边界](docs/exec-plans/completed/20261022-real-course-library.md)、[真实验证](docs/design-docs/real-validation.md)和[质量状态](docs/QUALITY_SCORE.md)。
+- [CI/CD](docs/CICD.md)、[Windows](docs/WINDOWS.md)和协作入口 [AGENTS.md](AGENTS.md)。
+
+保留的模板制品脚本不代表部署产物，本轮不发布、不提交 Git，也不修改只读参考仓库。

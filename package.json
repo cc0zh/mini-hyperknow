@@ -2,7 +2,7 @@
   "name": "mini-hyperknow",
   "private": true,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   },
   "bin": {
     "code-harness-init": "./scripts/create-project.cjs"
@@ -10,7 +10,11 @@
   "scripts": {
     "ci": "node scripts/ci.cjs",
     "test": "node --test tests/tooling.test.cjs",
-    "test:python": "python -m unittest discover -s tests -p test_agent_core.py",
+    "test:python": "uv run --frozen python -m unittest discover -s tests -p test_*.py -v",
+    "dev:api": "uv run --frozen uvicorn hyperknow.main:app --host 127.0.0.1 --port 8000",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "verify:model": "uv run --frozen python scripts/verify_model.py",
     "check:docs": "node scripts/check-docs.cjs",
     "check:repo": "node scripts/check-repo-hygiene.cjs",
     "check:actions": "node scripts/check-action-pinning.cjs",

@@ -2,7 +2,7 @@
 'use strict';
 
 const { fs, path, repoRoot, excluded, stat, run, main } = require('./lib/common.cjs');
-const { projectPath, documentOverrides } = require('./lib/scaffold.cjs');
+const { projectPath, documentOverrides, linkedDocuments } = require('./lib/scaffold.cjs');
 
 function usage() {
   console.log(`用法:
@@ -32,18 +32,18 @@ function validateName(name) {
 }
 
 // Plan first: never traverse existing links/junctions or overwrite target files.
-function planCopy(source, target, entries = [], templateRoot = source) {
+function planCopy(source, target, entries = [], templateRoot = source, linked = linkedDocuments(templateRoot)) {
   for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
     if (excluded(entry.name)) continue;
     let from = path.join(source, entry.name);
     const relative = path.relative(templateRoot, from).split(path.sep).join('/');
-    if (!projectPath(relative)) continue;
+    if (!projectPath(relative, linked)) continue;
     const to = path.join(target, entry.name);
     const existing = stat(to);
     if (entry.isDirectory()) {
       if (existing && (!existing.isDirectory() || existing.isSymbolicLink())) continue;
       entries.push({ from, to, directory: true });
-      planCopy(from, to, entries, templateRoot);
+      planCopy(from, to, entries, templateRoot, linked);
     } else if (!existing) {
       if (!entry.isFile()) throw new Error(`不支持模板中的符号链接或特殊文件: ${from}`);
       if (documentOverrides[relative]) {

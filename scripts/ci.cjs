@@ -14,9 +14,9 @@ main(() => {
     }
   }
   run(process.execPath, ['--test', 'tests/tooling.test.cjs'], { stdio: 'inherit' });
-  run('python', ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_agent_core.py'], {
+  run('uv', ['run', '--frozen', 'python', '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py', '-v'], {
     stdio: 'inherit',
     env: { ...process.env, PYTHONPATH: path.join(repoRoot, 'src') },
   });
-  console.log('基础 CI 检查通过');
+  console.log('静态、真实逻辑与本地服务检查通过；不代表真实模型或浏览器业务验收通过');
 });

@@ -3,7 +3,7 @@
 from .agent import Agent, AgentRunResult
 from .context import ContextManager
 from .engine import AgentEvent, run_agent_loop
-from .llm import LLMService, MockLLMService, OpenAIService
+from .llm import LLMService, OpenAIService
 from .types import (
     AgentContext,
     AssistantMessage,
@@ -22,7 +22,6 @@ __all__ = [
     "AssistantMessage",
     "ContextManager",
     "LLMService",
-    "MockLLMService",
     "OpenAIService",
     "ToolCall",
     "ToolDefinition",

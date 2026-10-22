@@ -15,9 +15,8 @@ from ..types import AgentContext, AssistantMessage, ToolCall, ToolResultMessage
 class OpenAIService:
     """Call an OpenAI or OpenAI-compatible Chat Completions endpoint.
 
-    The SDK client is injectable so provider conversion can be tested without
-    network access. When omitted, the official ``openai`` package is loaded
-    lazily and reads ``OPENAI_API_KEY`` from the environment or project ``.env``.
+    The official SDK reads credentials from explicit arguments, the environment
+    or the local .env. Automatic network retries are disabled by default.
     """
 
     def __init__(
@@ -27,14 +26,15 @@ class OpenAIService:
         api_key: str | None = None,
         base_url: str | None = None,
         timeout: float | None = None,
-        client: Any | None = None,
+        max_retries: int = 0,
     ) -> None:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.client = client if client is not None else self._create_client(
+        self.client = self._create_client(
             api_key or os.getenv("OPENAI_API_KEY"),
             base_url or os.getenv("OPENAI_BASE_URL"),
             timeout,
+            max_retries,
         )
 
     def complete(self, context: AgentContext) -> AssistantMessage:
@@ -50,11 +50,12 @@ class OpenAIService:
                 stop_reason="error",
                 model=self.model,
                 provider="openai",
-                error_message=f"OpenAI request failed: {type(exc).__name__}: {exc}",
+                error_message=f"OpenAI request failed: {type(exc).__name__}",
             )
 
     @staticmethod
-    def _create_client(api_key: str | None, base_url: str | None, timeout: float | None) -> Any:
+    def _create_client(api_key: str | None, base_url: str | None, timeout: float | None,
+                       max_retries: int = 0) -> Any:
         try:
             from openai import OpenAI
         except ImportError as exc:
@@ -62,7 +63,7 @@ class OpenAIService:
                 "OpenAI support requires the 'openai' package; install the project dependencies first"
             ) from exc
 
-        kwargs: dict[str, Any] = {}
+        kwargs: dict[str, Any] = {"max_retries": max_retries}
         if api_key is not None:
             kwargs["api_key"] = api_key
         if base_url is not None:
@@ -112,6 +113,7 @@ def to_openai_messages(context: AgentContext) -> list[dict[str, Any]]:
 
 def from_openai_response(response: Any, *, model: str) -> AssistantMessage:
     """Map one Chat Completions response into the provider-neutral message."""
+    model = _field(response, "model") or model
     choices = _field(response, "choices", [])
     if not choices:
         return AssistantMessage(

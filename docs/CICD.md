@@ -1,40 +1,31 @@
 # CI/CD 说明
 
-这个模板自带一套不依赖具体语言栈的 CI/CD 骨架。
+## 当前业务检查
 
-## 默认包含的内容
+Python 包由 uv.lock 锁定，统一 uv sync／uv run；前端使用 web/package-lock.json。2026-10-22 首个切片已移除 Mock provider、SDK 注入替身和 Mock／patch 测试入口。
 
-- `ci.yml`：Windows、Ubuntu、macOS 矩阵，运行文档/仓库/Action 检查、Node.js 语法检查、Python 3.10 回归测试和打包；Markdown lint 在 Ubuntu 执行。
-- `supply-chain-security.yml`：在 PR 上做依赖变更检查，并在 PR、定时任务和手动触发时运行 OSV 扫描。
-- `release.yml`：手动触发的 release 流水线，用来打包仓库级制品、生成 provenance，并创建 GitHub Release。
+从根目录执行：
 
-## 设计原则
+```powershell
+uv sync --frozen
+npm.cmd --prefix web ci
+npm.cmd run ci
+npm.cmd --prefix web test
+npm.cmd run build
+```
 
-这套默认流水线的目标，是在项目真正成形前先把交付链路搭起来，而不是假装已经知道未来项目该怎么 build 和 deploy。
+npm run ci 执行文档／仓库／Action 检查、Node 工具检查与真实 Python 函数、磁盘 SQLite、实际 Uvicorn HTTP／WS 检查。HTTP 测试刻意清空自身子进程的模型密钥，只验证缺配置的真实错误路径，不以假响应或 TestClient 替代服务器，也不修改作者数据库。
 
-当新项目的技术栈确定后，你应该把 `scripts/release-package.cjs` 里的占位打包逻辑替换成真实构建产物，而不是另起一套平行流程。
+ci.yml 在 Windows、Ubuntu、macOS 使用 Python 3.13、固定 uv 0.8.13 和 frozen 依赖运行检查，并构建和测试前端；Markdown lint 在 Ubuntu 执行。Actions 仍固定 commit SHA，本轮不新增企业治理平台。
 
-所有 GitHub Actions 都已经 pin 到 commit SHA。后续升级 action 时，也要继续保持这个约束。
+## 真实模型与浏览器
 
-## 推荐接入顺序
+公共 CI 无凭据，只能证明静态／本地检查通过。真实模型、浏览器成功课程和重启恢复单独按[真实验收](design-docs/real-validation.md)执行并报告，未执行或 blocked 不能写成通过。
 
-1. 保留 `ci.yml`，作为唯一默认常驻的仓库基础门禁。
-2. 在 `scripts/ci.cjs` 里继续叠加项目自己的验证命令。
-3. 用真实构建产物替换 `scripts/release-package.cjs`。
-4. 技术栈和环境稳定后，再补具体的部署 job。
-5. 即使交付方式变化，SBOM 和 provenance 这类供应链能力也建议保留。
+显式执行 uv run --frozen python scripts/verify_model.py 将通过运行中的真实后端产生收费调用；缺配置返回 blocked（退出码 2），无课程模板降级。它保存切片证据，不覆盖全部 V01–V12。
 
-## 默认 release 产物
+## 保留的模板工具
 
-当前 release 流水线会产出：
+create-project.cjs 与 release-package.cjs 仍保留，不是产品部署流程。分发清单已包含业务代码、前端、uv.lock 与 .python-version；排除本地数据、环境凭据、缓存和依赖目录。被保留文档链接的历史／计划一并保留，避免精简后出现断链；未引用的维护记录仍排除。
 
-- `release-manifest.json`
-- `repo-metadata.tgz`
-- `sbom.spdx.json`
-- 对 release artifact 生成的 GitHub artifact attestation
-
-也就是说，即使项目还没进入真实部署阶段，这个模板也已经把“可追溯的制品封装”这一步准备好了。
-
-本地执行 `npm run release-package`（PowerShell 用 `npm.cmd`）仅生成前两项；SBOM、attestation 和 GitHub Release 由 Ubuntu 发布任务生成。发布前先运行 `npm run ci`。本地检查和打包需要 Node.js 22+、Python 3.10+、Git、tar，无 npm 依赖安装步骤。
-
-制品与初始化使用相同的精简规则，包含点文件、CODEOWNERS、文档骨架和测试；不包含模板宣传素材、旧记录、演示页或 nono 扩展。解包后可运行 `node scripts/ci.cjs`。打包仅更新约定产物，不清空 `dist`。当前目录不是 Git 仓库时以 `unknown` 记录 SHA。
+npm run release-package 生成 repo-metadata.tgz 和 release-manifest.json，而不是前端生产托管／可安装产品。原 release.yml、供应链与 provenance 流程暂存，本轮未运行发布、外部写入或部署。今后发布需先确定实际产品包装，不把 metadata 打包成功当成交付。

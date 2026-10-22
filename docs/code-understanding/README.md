@@ -16,7 +16,7 @@ Agent 产出代码的速度已经超过人类吸收的速度。这个文件夹�
 ## 场景导航
 
 | 你想理解什么 | 用哪个文档 | 成本 |
-|---|---|---|
+| --- | --- | --- |
 | 一次具体的代码改动（diff / PR / branch） | [`explain-diff.md`](explain-diff.md) | 中：生成一份 HTML 讲解文档并通过测验 |
 | 一条业务链路怎么跑 | [`trace-path.md`](trace-path.md) | 低：一句提问模板 |
 | 整个系统 / 子系统的设计 | [`ARCHITECTURE_GRAPH_GUIDE.md`](ARCHITECTURE_GRAPH_GUIDE.md) | 高：产出讲解式单文件 HTML |
