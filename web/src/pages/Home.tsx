@@ -32,7 +32,7 @@ export default function Home() {
       {command.rejected && <button className="text-button" type="button" onClick={command.releaseRejected}>修改目标后重新提交</button>}
       {command.pending && !command.busy && <p className="inline-note" role="status">保留了上次请求的内容与编号。重试不会创建一份重复课程。</p>}
       {health.error ? <ErrorNotice message={health.error} title="无法连接本地后端" retry={health.reload} /> : health.data?.model.configured === false ? <div className="configuration-note" role="status"><b>模型尚未配置</b><p>请在后端配置真实模型服务。当前无法生成课程，不会使用示例课程或模拟内容代替。</p><button className="text-button" type="button" onClick={health.reload}>重新检查服务</button></div> : health.data ? <p className="model-note">后端模型：{health.data.model.name || '未返回名称'} <span>· 已配置，尚未验证本次调用</span></p> : null}
-      <div className="home-steps" aria-label="课程创建流程"><div><span>01</span><b>说出目标</b><p>主题、基础与期望，<br />从一段文字开始。</p></div><div><span>02</span><b>一起澄清</b><p>补充适合你的方向，<br />也可以选择跳过。</p></div><div><span>03</span><b>展开路径</b><p>浏览单元、课时与考核，<br />看见知识的完整结构。</p></div></div>
+      <div className="home-steps" aria-label="课程创建流程"><div><span>01</span><b>说出目标</b><p>主题、基础与期望，<br />从一段文字开始。</p></div><div><span>02</span><b>澄清与调研</b><p>补充学习方向，<br />结合真实网页资料规划。</p></div><div><span>03</span><b>确认蓝图</b><p>审阅整门课程方向，<br />批准后自动逐单元展开。</p></div></div>
       <div className="home-library-link">已经有自己的课程？<Link to="/courses">打开我的课程 <Arrow /></Link></div>
     </div>
   </div>

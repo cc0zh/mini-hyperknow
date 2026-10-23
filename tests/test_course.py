@@ -336,25 +336,25 @@ class GenerationAdmissionTests(unittest.TestCase):
         self.generator = Generator(Settings(data_dir=root), self.db)
         run = self.db.create_run("admission-command", "研究协程暂停", "configured-model")
         self.run_id = run["run_id"]
-        self.db.transition(self.run_id, {"queued"}, status="generating")
+        self.db.transition(self.run_id, {"queued"}, status="generating", stage="blueprint")
 
     def test_cancel_blocks_later_model_admission(self):
-        self.generator.require_active(self.run_id, "generating")
+        self.generator.require_active(self.run_id, "blueprint")
         self.db.transition(self.run_id, {"generating"}, status="cancelled")
         with self.assertRaises(AppError) as raised:
-            self.generator.require_active(self.run_id, "generating")
+            self.generator.require_active(self.run_id, "blueprint")
         self.assertEqual(raised.exception.code, "run_inactive")
 
     def test_process_shutdown_blocks_later_model_admission(self):
         self.generator.stopping.set()
         with self.assertRaises(AppError):
-            self.generator.require_active(self.run_id, "generating")
+            self.generator.require_active(self.run_id, "blueprint")
         self.assertEqual(self.db.get_run(self.run_id)["status"], "generating")
 
     def test_restart_interruption_blocks_old_generation_admission(self):
         self.db.interrupt_inflight()
         with self.assertRaises(AppError):
-            self.generator.require_active(self.run_id, "generating")
+            self.generator.require_active(self.run_id, "blueprint")
 
 
 if __name__ == "__main__":

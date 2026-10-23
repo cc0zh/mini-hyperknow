@@ -4,11 +4,13 @@
 
 ## 当前能力与边界
 
+2026-10-23新增[调研→全局蓝图确认→逐单元展开](docs/exec-plans/completed/20261023-course-blueprint-workflow.md)，已用一个真实asyncio主题验通调整、确认、局部取消／重试及等待／完成状态冷重启；不要求旧课兼容，不清空用户库。内容核查限制见完成计划，不据此宣称完整产品验收。
+
 已实现文字目标、真实模型澄清／目录生成、SQLite 课程库及运行恢复，以及按课时生成并缓存讲义、无语音手写白板、课堂插话、位置恢复和手动完成。真实练习／单元考核本阶段范围已完成：三题型出题、逐题保存与反馈、显式提交、服务端计分、结果停留／再练及恢复。页面使用真实 API，课程、讲义、问答与出题共用一个串行 worker；证据与未覆盖项见[完成计划](docs/exec-plans/completed/20261022-real-practice-exams.md)，最终CI门禁待主代理填写。
 
 **验收边界：已用内置浏览器与真实 deepseek-flash 验收两组造课、asyncio／摄影两课课堂，以及两组练习和一组单元考核；已保存作答与结果可刷新／冷重启恢复。** 普通板书按本地 Excalifont（英文／数字／西文标点）与小赖 Xiaolai（中文／中文标点）分工；代码保持等宽，公式使用 KaTeX 专用字体。原课堂字体配置已由后续替换任务取代，当前资源与验收见[字体参考](docs/references/whiteboard-font.md)。课时可手动完成，本阶段新增练习提交完成课时、考核提交记为完成，不表示掌握或通过。目录／课程库共用服务端进度与继续入口。思考题作答与项目提交仍未实现，不提供假执行按钮，也不宣称完整学习链路或V01–V12整体通过。摄影题目虽忠于讲义，人工核查仍发现光线方向概念待纠正，结构校验通过不等于教学全部正确，见[内容债务](docs/exec-plans/tech-debt-tracker.md)。
 
-最终流程：文字目标 → 澄清 → 生成课程 → 课程路径 → 无语音白板与课堂问答 → 练习／考核／项目 → 保存并继续学习。不做语音、上传、知识库、独立聊天／深度学习、社区、支付或企业级权限平台。
+创建流程：文字目标 → 澄清 → 真实网页调研 → 全局蓝图确认一次 → 自动逐单元展开 → 课程路径 → 按需讲义与白板课堂。练习／考核已有真实结果；项目只生成阶段要求，成果提交仍暂缓。不做语音、上传、知识库、独立聊天／深度学习、社区、支付或企业级权限平台。
 
 ## 本地安装
 
@@ -20,7 +22,7 @@ npm.cmd --prefix web ci
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
-在本仓库本地 .env 设置 OPENAI_API_KEY，可选 OPENAI_MODEL、OPENAI_BASE_URL。不要覆盖已有配置、把密钥放入 web 或发到聊天。HK_DATA_DIR 默认 data，数据库为 data/hyperknow.sqlite3；HK_MODEL_TIMEOUT_SECONDS 默认 120。修改后端配置后重启后端。
+在本仓库本地.env设置OPENAI_API_KEY及造课调研必需的TAVILY_API_KEY，可选OPENAI_MODEL、OPENAI_BASE_URL。不要覆盖已有配置、把密钥放入web或发到聊天。HK_DATA_DIR默认data，数据库为data/hyperknow.sqlite3；HK_MODEL_TIMEOUT_SECONDS默认120。修改配置后重启后端。
 
 ## 启动
 
@@ -56,11 +58,13 @@ npm.cmd run build
 uv run --frozen python scripts/verify_model.py
 ```
 
-脚本走真实 HTTP，默认回答每个澄清问题的第一个选项，再生成并读取课程，证据写入忽略的 data/validation/。缺配置退出码 2（blocked），失败退出码 1，不注入内容。它只验证模型／API 切片，不代替浏览器、第二组需求或重启验收。
+当前造课分为澄清、网页调研、全局蓝图、确认后逐单元展开，需同时配置本地 `TAVILY_API_KEY`。上述脚本默认停在蓝图等待确认；明确自动验收时使用 `uv run --frozen python scripts/verify_model.py --approve-blueprint`，否则在创建页审阅后点击确认。不要求旧课兼容，不主动清空已有本地数据；契约及当前验收边界见[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)。
+
+脚本走真实HTTP，默认回答每题首选项，完成真实研究后停在蓝图；只有显式--approve-blueprint才确认并连续展开。可加--data-dir指定本次后端数据目录，额外核对model_calls实际收到研究报告／摘录及预算。证据写入忽略的data/validation/；缺配置或等待确认退出2，实际失败退出1。只验证模型／API切片，不代替浏览器、第二组需求或重启验收。
 
 ## 设计与交接
 
-独立网页调研 Agent 已提供后端 `POST /api/research-runs`，复用串行worker与SQLite，支持真实 Tavily 搜索、公开网页阅读、带来源报告和取消／重试／恢复；暂未接入造课或前端，也未实现全局蓝图确认及逐单元展开。在本地 `.env` 配置 `TAVILY_API_KEY`，不要把key发到聊天或浏览器。显式运行 `uv run --frozen python scripts/verify_research.py` 做真实搜索＋模型验证，会产生费用；缺配置退出2，不冒充通过。当前验收事实与限制见[调研契约](docs/design-docs/web-research-agent.md)及其实施计划。
+独立网页调研Agent提供后端`POST /api/research-runs`，复用串行worker与SQLite，支持真实Tavily搜索、公开网页阅读、来源报告和取消／重试／恢复；造课接入与前端展示由[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)承接。显式运行`uv run --frozen python scripts/verify_research.py`仅验证独立搜索＋模型，会产生费用；缺配置退出2。独立验收边界见[调研契约](docs/design-docs/web-research-agent.md)，不能替代新造课链路验收。
 
 通用 Python 内核已升级 V1：工具调度／逐次审批、有界输出与原文存档、显式工作区工具、JSONL 会话恢复、调用者维护的长期记忆、Token 预算压缩和 high／medium／low 模型分层。课程业务仍沿用 SQLite 与既有同步生成，不向浏览器开放文件／命令工具；同步网络取消不等于远端中止。接口、配置与安全边界见[内核 V1](docs/design-docs/agent-core-v1.md)。
 
@@ -70,4 +74,4 @@ uv run --frozen python scripts/verify_model.py
 - [造课计划](docs/exec-plans/completed/20261022-real-course-library.md)、[课堂计划与验收边界](docs/exec-plans/completed/20261022-real-whiteboard-classroom.md)、[练习／考核完成计划](docs/exec-plans/completed/20261022-real-practice-exams.md)、[真实验证](docs/design-docs/real-validation.md)和[质量状态](docs/QUALITY_SCORE.md)。
 - [CI/CD](docs/CICD.md)、[Windows](docs/WINDOWS.md)和协作入口 [AGENTS.md](AGENTS.md)。
 
-保留的模板制品脚本不代表部署产物，本轮不发布、不提交 Git，也不修改只读参考仓库。
+保留的模板制品脚本不代表部署产物；不修改只读参考仓库。调研与蓝图阶段按用户授权分别提交，验收与边界见各自计划，本轮不发布。

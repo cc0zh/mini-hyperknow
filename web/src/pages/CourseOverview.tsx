@@ -1,35 +1,24 @@
 import { Link, useParams } from 'react-router-dom'
-import { ErrorNotice, Loading, difficultyLabels, dateLabel } from '../components/ui'
-import { useResource } from '../lib/use-resource'
-import type { Course, Session, Unit } from '../lib/types'
-import { progressLabel } from '../lib/format'
+import { CourseProgress, ErrorNotice, Loading, difficultyLabels, dateLabel } from '../components/ui'
+import { CourseStructure } from '../components/CourseStructure'
+import { readyUnitCount, structurePending } from '../lib/course-state'
+import { useCourse } from '../lib/use-course'
 import { nextLearningPath } from '../lib/quiz-state'
 
-function SessionRow({ session, index, courseId }: { session: Session; index: number; courseId: string }) {
-  return <li className="session-row"><span className="session-number">{String(index + 1).padStart(2, '0')}</span><div><h4><Link to={`/courses/${encodeURIComponent(courseId)}/sessions/${encodeURIComponent(session.session_id)}`}>{session.title} ↗</Link>{session.completed && <span className="session-completed">✓ 已完成</span>}</h4><p>{session.description}</p>{session.key_points.length > 0 && <div className="key-points">{session.key_points.map((point, i) => <span key={i}>{point}</span>)}</div>}{session.outline && <details className="session-outline"><summary>查看课时提纲</summary>{Array.isArray(session.outline) ? <ul>{session.outline.map((item, i) => <li key={i}>{item}</li>)}</ul> : <p>{session.outline}</p>}</details>}</div><span className="session-duration">预计 {session.estimated_minutes} 分钟</span></li>
-}
-
-function UnitSection({ unit, index, course }: { unit: Unit; index: number; course: Course }) {
-  const sessionCount = unit.lectures.reduce((sum, lecture) => sum + lecture.sessions.length, 0)
-  return <details className="unit-card" open={index === 0}>
-    <summary className="unit-summary"><span className="unit-number">{String(index + 1).padStart(2, '0')}</span><span className="unit-copy"><strong>{unit.title}</strong><small>{unit.description}</small></span><span className="unit-count">{sessionCount} 课时</span><span className="unit-caret" aria-hidden="true">⌄</span></summary>
-    <div className="unit-content">{unit.lectures.map(lecture => <section className="lecture-section" key={lecture.lecture_id}><div className="lecture-heading"><span className="kind-label">讲座</span><h3>{lecture.title}</h3></div><p className="lecture-description">{lecture.description}</p><ol className="sessions">{lecture.sessions.map((session, si) => <SessionRow key={session.session_id} session={session} index={si} courseId={course.course_id} />)}</ol></section>)}
-      {unit.project_stages.map(stage => <section className="activity-card project" key={stage.stage_id}><span className="kind-label">项目阶段</span><h3>{stage.title}</h3><p className="activity-parent">{course.projects.find(project => project.project_id === stage.project_id)?.name}</p><p>{stage.description}</p><div className="deliverable"><b>阶段交付</b><p>{stage.deliverable}</p></div><span className="activity-availability">仅展示阶段要求 · 成果提交尚未开放</span></section>)}
-      {unit.exams.map(exam => <section className="activity-card exam" key={exam.exam_id}><span className="kind-label">单元考核</span><h3>{exam.title}{exam.completed && <span className="session-completed">✓ 已完成</span>}</h3><p>{exam.goal}</p><Link className="button secondary small" to={`/courses/${encodeURIComponent(course.course_id)}/exams/${encodeURIComponent(exam.exam_id)}`}>{exam.completed ? '查看结果 / 再练一次' : '进入单元考核'} →</Link><span className="activity-availability">真实出题与作答 · 只有明确点击准备题组才调用模型</span></section>)}
-    </div>
-  </details>
-}
-
 function Overview({ courseId }: { courseId: string }) {
-  const { data: course, loading, error, reload } = useResource<Course>(`/courses/${encodeURIComponent(courseId)}`)
-  if (loading) return <div className="page"><Loading label="正在读取课程结构…" /></div>
-  if (error || !course || course.course_id !== courseId) return <div className="page"><Link className="back-link" to="/courses">← 我的课程</Link><ErrorNotice title="课程加载失败" message={error || '未收到属于当前课程的数据。'} retry={reload} /></div>
+  const { course, error, connection, reload } = useCourse(courseId)
+  const refresh = () => { void reload() }
+  if (!course) return <div className="page"><Link className="back-link" to="/courses">← 我的课程</Link>{error ? <ErrorNotice title="课程加载失败" message={error} retry={refresh} /> : <Loading label="正在读取课程结构…" />}</div>
   const next = nextLearningPath(course)
+  const partial = structurePending(course)
+  const generationPath = course.creation_run_id ? `/course-runs/${encodeURIComponent(course.creation_run_id)}` : null
   return <div className="page overview-page">
     <Link className="back-link" to="/courses">← 我的课程</Link>
-    <section className="course-hero"><div className="hero-orbit" aria-hidden="true" /><div className="hero-content"><div className="tags"><span>{difficultyLabels[course.difficulty]}</span>{course.tags.map((tag, i) => <span key={i}>{tag}</span>)}</div><span className="eyebrow">YOUR PERSONAL LEARNING PATH</span><h1>{course.title}</h1><p>{course.description}</p><div className="hero-metadata"><span>{course.unit_count} 单元</span><span>{course.session_count} 课时</span><span>{course.exam_count} 考核</span>{course.projects.length > 0 && <span>{course.projects.length} 个项目</span>}</div></div></section>
-    <div className="overview-layout"><div className="overview-main"><div className="section-heading"><div><span className="eyebrow">THE JOURNEY</span><h2>课程目录</h2></div><span>{course.unit_count} 个单元</span></div><p className="slice-note">点击课时进入白板课堂，按需准备讲义和课后练习；单元考核独立保存结果。项目成果提交尚未开放。</p><div className="unit-list">{course.units.length ? course.units.map((unit, index) => <UnitSection key={unit.unit_id} unit={unit} index={index} course={course} />) : <ErrorNotice title="课程结构不完整" message="服务器没有返回课程单元。" retry={reload} />}</div></div>
-      <aside className="course-aside"><section className="aside-card"><span className="eyebrow">LEARNING AT A GLANCE</span><h2>你的课程概况</h2><div className="progress-label"><span>课时进度</span><b>{progressLabel(course.progress)}</b></div><progress max={100} value={course.progress} aria-label="课时进度" /><p className="aside-note">按服务端保存的已完成课时计算，不代表掌握度；考核不计入课时比例。</p>{course.next_item && <div className="next-item"><span className="eyebrow">下一项学习活动</span><p>{course.next_item.title}</p>{next ? <Link className="button primary small" to={next}>继续学习 →</Link> : <small>此项目仅展示要求，成果提交尚未开放。</small>}</div>}<dl className="course-facts"><div><dt>适合人群</dt><dd>{course.target_learner}</dd></div><div><dt>原始目标</dt><dd>{course.goal}</dd></div><div><dt>创建日期</dt><dd>{dateLabel(course.created_at)}</dd></div></dl></section>
+    {error && <ErrorNotice title="暂时无法同步课程" message={error} retry={refresh} />}
+    <section className="course-hero"><div className="hero-orbit" aria-hidden="true" /><div className="hero-content"><div className="tags"><span>{difficultyLabels[course.difficulty]}</span>{course.tags.map((tag, i) => <span key={i}>{tag}</span>)}</div><span className="eyebrow">YOUR PERSONAL LEARNING PATH</span><h1>{course.title}</h1><p>{course.description}</p><div className="hero-metadata"><span>{course.unit_count} 单元</span><span>{partial ? '已生成 ' : ''}{course.session_count} 课时</span><span>{course.exam_count} 考核</span>{course.projects.length > 0 && <span>{course.projects.length} 个项目</span>}</div></div></section>
+    {partial && <section className="pending-command"><div><b>{course.structure_status === 'blueprint' ? '课程蓝图已保存 · 等待确认' : '目录逐单元完善中'}</b><p>已就绪 {readyUnitCount(course.units)} / {course.units.length} 单元。计划课时不计入已生成数量，完整目录保存前不计算整门课程进度。</p></div>{generationPath && <Link className="button secondary small" to={generationPath}>{course.structure_status === 'blueprint' ? '审阅课程蓝图' : '返回生成页'} →</Link>}</section>}
+    <div className="overview-layout"><div className="overview-main"><div className="section-heading"><div><span className="eyebrow">THE JOURNEY</span><h2>{partial ? '课程蓝图与已保存目录' : '课程目录'}</h2></div><span>{course.unit_count} 个单元</span></div><p className="slice-note">点击已生成课时进入白板课堂，按需准备讲义和课后练习；单元考核独立保存结果。项目成果提交尚未开放。</p>{course.units.length ? <CourseStructure course={course} /> : <ErrorNotice title="课程结构不完整" message="服务器没有返回课程单元。" retry={refresh} />}</div>
+      <aside className="course-aside"><section className="aside-card"><span className="eyebrow">LEARNING AT A GLANCE</span><h2>你的课程概况</h2><CourseProgress course={course} />{course.next_item && <div className="next-item"><span className="eyebrow">{course.next_item.type === 'generation' ? '继续完善课程' : '下一项学习活动'}</span><p>{course.next_item.title}</p>{next ? <Link className="button primary small" to={next}>{course.next_item.type === 'generation' ? '返回生成页' : '继续学习'} →</Link> : <small>此项目仅展示要求，成果提交尚未开放。</small>}</div>}<dl className="course-facts"><div><dt>适合人群</dt><dd>{course.target_learner}</dd></div><div><dt>原始目标</dt><dd>{course.goal}</dd></div><div><dt>创建日期</dt><dd>{dateLabel(course.created_at)}</dd></div></dl><p className="aside-note">{connection}</p></section>
       {course.projects.map(project => <section className="aside-card project-aside" key={project.project_id}><span className="eyebrow">COURSE PROJECT</span><h2>{project.name}</h2><p>{project.description}</p><div className="deliverable"><b>最终交付</b><p>{project.final_deliverable}</p></div></section>)}</aside>
     </div>
   </div>

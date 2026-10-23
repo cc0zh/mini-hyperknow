@@ -60,6 +60,8 @@ class SessionDraft(Schema):
     outline: str = Field(min_length=1, max_length=4000)
     key_points: list[str] = Field(min_length=1, max_length=8)
     estimated_minutes: int = Field(ge=1, le=180)
+    depths: list[Literal["intuition", "definition", "derivation", "theory", "practice"]] = Field(
+        default_factory=list, max_length=5)
 
 
 class LectureDraft(Schema):

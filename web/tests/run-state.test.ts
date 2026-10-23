@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { hasAnswers, isTerminal, newerRun, runLabels, toggleOption } from '../src/lib/run-state.ts'
+import { blueprintDecision, hasAnswers, isTerminal, isWorking, newerRun, runHeading, runLabels, toggleOption } from '../src/lib/run-state.ts'
 import { prepareCommand } from '../src/lib/commands.ts'
 import type { Answer, Question, Run, RunStatus } from '../src/lib/types.ts'
 
@@ -50,9 +50,42 @@ test('the first recovery snapshot is accepted', () => {
 })
 
 test('all API statuses have a label and only terminal states stop polling', () => {
-  const statuses: RunStatus[] = ['queued', 'clarifying', 'awaiting_answers', 'generating', 'ready', 'failed', 'cancelled', 'interrupted']
+  const statuses: RunStatus[] = ['queued', 'clarifying', 'awaiting_answers', 'awaiting_blueprint', 'generating', 'ready', 'failed', 'cancelled', 'interrupted']
   assert.equal(statuses.every(status => !!runLabels[status]), true)
   assert.deepEqual(statuses.filter(isTerminal), ['ready', 'failed', 'cancelled', 'interrupted'])
+})
+
+test('blueprint review is a nonterminal wait, not a working spinner', () => {
+  assert.equal(isTerminal('awaiting_blueprint'), false)
+  assert.equal(isWorking('awaiting_blueprint'), false)
+  assert.equal(isWorking('awaiting_answers'), false)
+  assert.equal(isWorking('generating'), true)
+  assert.equal(runHeading({ status: 'awaiting_blueprint', stage: 'blueprint' }), '等待确认课程蓝图')
+  assert.equal(runHeading({ status: 'failed', stage: 'units' }), '生成失败')
+})
+
+test('generation headings follow saved stages rather than pretend progress', () => {
+  assert.equal(runHeading({ status: 'generating', stage: 'clarifying' }), '需求澄清')
+  assert.equal(runHeading({ status: 'generating', stage: 'research' }), '网页调研')
+  assert.equal(runHeading({ status: 'generating', stage: 'blueprint' }), '全局蓝图')
+  assert.equal(runHeading({ status: 'generating', stage: 'units' }), '逐单元展开')
+})
+
+test('blueprint decisions use the current server version and require nonblank adjustment feedback', () => {
+  const run = { status: 'awaiting_blueprint' as const, version: 12 }
+  assert.deepEqual(blueprintDecision(run, true), { expected_version: 12, approve: true, feedback: '' })
+  assert.equal(blueprintDecision(run, false, ' \n '), null)
+  assert.deepEqual(blueprintDecision(run, false, '  增加应用实操  '), { expected_version: 12, approve: false, feedback: '增加应用实操' })
+  assert.equal(blueprintDecision(run, true, '', true), null)
+  assert.equal(blueprintDecision({ ...run, status: 'generating' }, true), null)
+  assert.equal(blueprintDecision({ ...run, status: 'ready' }, false, '调整'), null)
+})
+
+test('a pending blueprint adjustment keeps its exact approval flag, feedback, version and command ID', () => {
+  const body = blueprintDecision({ status: 'awaiting_blueprint', version: 7 }, false, '增加应用实操')!
+  const command = prepareCommand(null, '/runs/r-1/blueprint', body, 'blueprint-command')!
+  assert.equal(prepareCommand(command, '/runs/r-1/blueprint', { expected_version: 9, approve: true, feedback: '' }, 'another-id'), command)
+  assert.deepEqual(command.body, { ...body, client_command_id: 'blueprint-command' })
 })
 
 test('new commands capture a caller-provided stable ID', () => {

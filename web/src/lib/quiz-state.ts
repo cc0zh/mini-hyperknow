@@ -72,6 +72,7 @@ export function attemptTransition(attempt: QuizAttempt, questionCount: number): 
 export function nextLearningPath(course: Pick<Course, 'course_id' | 'next_item'>): string | null {
   const base = `/courses/${encodeURIComponent(course.course_id)}`
   const item = course.next_item
+  if (item?.type === 'generation' && item.run_id) return `/course-runs/${encodeURIComponent(item.run_id)}`
   if (item?.session_id && ['lecture', 'session'].includes(item.type)) return `${base}/sessions/${encodeURIComponent(item.session_id)}`
   if (item?.type === 'exam' && item.exam_id) return `${base}/exams/${encodeURIComponent(item.exam_id)}`
   return null

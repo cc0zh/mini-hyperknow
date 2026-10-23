@@ -116,3 +116,9 @@ test('continue supports a real exam without inventing a project submit route', (
   assert.equal(nextLearningPath({ ...course, next_item: { type: 'project', stage_id: 'stage-a', unit_id: 'unit-a', title: 'Project' } }), null)
   assert.equal(nextLearningPath({ ...course, next_item: null }), null)
 })
+
+test('a generation next item returns to its own run rather than an unavailable lesson', () => {
+  const course = { course_id: 'c/a', next_item: { type: 'generation' as const, run_id: 'r/a', unit_id: 'u/a', title: '继续展开课程' } }
+  assert.equal(nextLearningPath(course), '/course-runs/r%2Fa')
+  assert.equal(nextLearningPath({ ...course, next_item: { ...course.next_item, run_id: undefined } }), null)
+})

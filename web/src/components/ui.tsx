@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useResource } from '../lib/use-resource'
 import type { Course, Health } from '../lib/types'
 import { progressLabel } from '../lib/format'
+import { courseProgress, structurePending } from '../lib/course-state'
 
 const HealthContext = createContext<ReturnType<typeof useResource<Health>> | null>(null)
 export const useHealth = () => useContext(HealthContext)!
@@ -59,11 +60,16 @@ export function EmptyState({ title, children, action }: { title: string; childre
 export const difficultyLabels = { beginner: '入门', intermediate: '中级', advanced: '进阶' }
 export const dateLabel = (date: string) => new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(date))
 
+export function CourseProgress({ course }: { course: Course }) {
+  const progress = courseProgress(course)
+  return <><div className="progress-label"><span>课时进度</span><b>{progressLabel(progress)}</b></div>{progress === null ? <><div className="progress-incomplete" aria-hidden="true" /><p className="aside-note">目录尚未完整，暂不计算整门课程进度。</p></> : <><progress value={progress} max={100} aria-label={`${course.title}课时进度`} /><p className="aside-note">按服务端保存的已完成课时计算，不代表掌握度；考核不计入课时比例。</p></>}</>
+}
+
 export function CourseCard({ course, index = 0 }: { course: Course; index?: number }) {
   return <Link className={`course-card tone-${index % 3}`} to={`/courses/${encodeURIComponent(course.course_id)}`}>
     <div className="ticket-cover"><div className="cover-top"><Mark small /><span>{course.tags[0] || '学科未标注'}</span></div><div className="cover-title">{course.title}</div><span className="cover-motif" aria-hidden="true">✳</span></div>
-    <div className="ticket-body"><span className="eyebrow">专属课程 / {difficultyLabels[course.difficulty]}</span><h2>{course.title}</h2><p className="card-description">{course.description}</p><div className="structure-summary">{course.unit_count} 单元 <span>·</span> {course.session_count} 课时 <span>·</span> {course.exam_count} 考核</div>
-      <div className="progress-label"><span>课时进度</span><b>{progressLabel(course.progress)}</b></div><progress value={course.progress} max={100} aria-label={`${course.title}课时进度`} />
+    <div className="ticket-body"><span className="eyebrow">专属课程 / {difficultyLabels[course.difficulty]}</span><h2>{course.title}</h2><p className="card-description">{course.description}</p><div className="structure-summary">{course.unit_count} 单元 <span>·</span> {structurePending(course) ? '已生成 ' : ''}{course.session_count} 课时 <span>·</span> {course.exam_count} 考核</div>
+      <CourseProgress course={course} />
     </div>
     <div className="ticket-stub"><span>{dateLabel(course.created_at)} 创建</span><b>查看课程 <Arrow /></b></div>
   </Link>

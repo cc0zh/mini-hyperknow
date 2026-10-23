@@ -114,6 +114,14 @@ class ResearchLiveServerTests(unittest.TestCase):
         self.assertEqual(self.snapshot(), before)
         self.assertEqual(self.client.get("/api/courses").json(), {"courses": []})
 
+    def test_course_requires_search_configuration_before_paid_clarification(self):
+        before = self.snapshot()
+        response = self.client.post("/api/course-runs", json={
+            "client_command_id": "missing-course-search-config", "goal": "理解Python协程"})
+        self.assertEqual(response.status_code, 503, response.text)
+        self.assertEqual(response.json()["error"]["code"], self.configuration_error)
+        self.assertEqual(self.snapshot(), before)
+
     def test_invalid_input_is_422_before_configuration_and_without_writes(self):
         before = self.snapshot()
         valid = {"client_command_id": "invalid-research-input", "goal": "理解 Python 协程"}

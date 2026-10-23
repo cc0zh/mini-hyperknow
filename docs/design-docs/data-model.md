@@ -13,6 +13,8 @@
 
 ## 2. 领域对象
 
+当前分阶段课程新增结构状态、蓝图版本、当前创建run引用以及单元生成状态；部分目录允许空lectures／exams／project_stages且progress=null。蓝图确认／修改与局部保存边界见[蓝图工作流](course-blueprint-workflow.md)；不迁移旧课程，也不在run另存第二份可改目录。研究仍随run保存，既有表与PRAGMA v3不变。
+
 当前已落地 Course、BoardScript／BoardStep、LessonProgress、课堂聚合、Interaction、ActivityProgress、GenerationRun；本阶段新增Quiz、QuizAttempt、QuizResult。ProjectSubmission与思考题反馈仍为目标，不因列出对象即表示已有表或端点。
 
 | 对象 | 必需内容与不变量 |

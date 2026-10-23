@@ -9,6 +9,7 @@ import sqlite3
 from typing import Callable
 
 from .domain import AppError, CourseDraft, materialize_course, uid
+from .blueprint_storage import BlueprintStorage
 from .lesson_storage import LessonStorage
 from .quiz_storage import QuizStorage
 from .research_storage import ResearchStorage
@@ -22,7 +23,7 @@ def encode(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
-class Database(ResearchStorage, QuizStorage, LessonStorage):
+class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
     def __init__(self, path: Path):
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -124,7 +125,9 @@ class Database(ResearchStorage, QuizStorage, LessonStorage):
     def _save_run(self, conn, run: dict):
         conn.execute("INSERT INTO runs(id, data) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET data=excluded.data",
                      (run["run_id"], encode(run)))
-        if run.get("kind") == "quiz":
+        if run.get("kind", "course") == "course":
+            self._blueprint_run_changed(conn, run)
+        elif run.get("kind") == "quiz":
             self._quiz_run_changed(conn, run)
         elif run.get("kind") != "research":
             self._run_changed(conn, run)
@@ -154,10 +157,17 @@ class Database(ResearchStorage, QuizStorage, LessonStorage):
                          (command_id, fingerprint, result_id, resource_type))
             return result
 
-    def create_run(self, command_id: str, goal: str, model: str, *, configured: bool = True) -> dict:
+    def create_run(self, command_id: str, goal: str, model: str, *, configured: bool = True,
+                   search_configured: bool = True) -> dict:
         def create(conn):
             self._model_configured(configured)
+            self._search_configured(search_configured)
             run = self._new_run(goal, model)
+            run.update(workflow="blueprint-v1", stage="clarifying", blueprint_version=0,
+                       approved_blueprint_version=None, blueprint_pending=False,
+                       blueprint_feedback="", current_unit_id=None,
+                       input={"goal": goal, "context": ""},
+                       research={"steps": [], "sources": [], "report": None})
             self._save_run(conn, run)
             return run
         return self.command(command_id, {"action": "create", "goal": goal}, create)
@@ -209,6 +219,8 @@ class Database(ResearchStorage, QuizStorage, LessonStorage):
                 self._search_configured(search_configured)
                 run.update(kind="research", input=parent["input"],
                            research={"steps": [], "sources": [], "report": None})
+            elif parent.get("kind", "course") == "course":
+                self._retry_blueprint(conn, parent, run, search_configured=search_configured)
             elif parent.get("kind") == "quiz":
                 self._retry_quiz(conn, parent, run)
             elif parent.get("kind", "course") != "course":

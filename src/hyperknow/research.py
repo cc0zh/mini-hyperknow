@@ -108,7 +108,7 @@ class RecordedModel:
         started = monotonic()
         response = self.provider.complete(context)
         owner.db.record_call(owner.run["run_id"], {
-            "kind": "research", "phase": "generating", "attempt": self.attempt,
+            "kind": "research", "phase": owner.run.get("stage", "generating"), "attempt": self.attempt,
             "requested_model": owner.run["model"], "model": response.model,
             "provider": response.provider, "prompt_version": "research-v1", "schema_version": 1,
             "system_prompt": context.system_prompt,
@@ -151,7 +151,7 @@ class Researcher:
     def require_active(self):
         if self.persistence_failed:
             raise AppError("research_storage_failed", "调研事实未确认保存，已停止后续模型调用", 503, True)
-        if self.stopping.is_set() or self.db.get_run(self.run["run_id"])["status"] != "generating":
+        if self.stopping.is_set() or not self.db._research_active(self.db.get_run(self.run["run_id"])):
             raise AppError("run_inactive", "调研已取消或中断，未发起后续请求", 409)
         if monotonic() > self.deadline:
             raise AppError("research_budget_exceeded", "调研已达到五分钟执行预算，请显式重试", 422, True)

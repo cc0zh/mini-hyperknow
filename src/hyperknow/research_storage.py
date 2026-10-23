@@ -5,6 +5,13 @@ from .research_domain import ResearchReport, validate_report
 
 
 class ResearchStorage:
+    @staticmethod
+    def _research_active(run: dict) -> bool:
+        return run["status"] == "generating" and (
+            run.get("kind") == "research" or (
+                run.get("kind", "course") == "course" and run.get("workflow") == "blueprint-v1"
+                and run.get("stage") == "research"))
+
     def create_research(self, command_id: str, goal: str, context: str, model: str,
                         *, configured: bool, search_configured: bool) -> dict:
         def create(conn):
@@ -26,7 +33,7 @@ class ResearchStorage:
         from .storage import now
         with self.transaction() as conn:
             run = self._get(conn, "runs", run_id)
-            if run.get("kind") != "research" or run["status"] != "generating":
+            if not self._research_active(run):
                 raise AppError("run_inactive", "调研已取消或中断，未保存晚到结果", 409)
             source = None
             research = run["research"]
@@ -47,10 +54,14 @@ class ResearchStorage:
         from .storage import now
         with self.transaction() as conn:
             run = self._get(conn, "runs", run_id)
-            if run.get("kind") != "research" or run["status"] != "generating":
+            if not self._research_active(run):
                 return None
             validate_report(report, run["research"])
             run["research"]["report"] = report.model_dump()
-            run.update(status="ready", error=None, version=run["version"] + 1, updated_at=now())
+            if run.get("kind", "course") == "course":
+                run.update(stage="blueprint", blueprint_pending=True)
+            else:
+                run["status"] = "ready"
+            run.update(error=None, version=run["version"] + 1, updated_at=now())
             self._save_run(conn, run)
             return run

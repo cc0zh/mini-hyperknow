@@ -8,3 +8,7 @@ test('course progress is rounded only for presentation', () => {
   assert.equal(progressLabel(0), '0%')
   assert.equal(progressLabel(100), '100%')
 })
+
+test('a partial course has no fabricated percentage', () => {
+  assert.equal(progressLabel(null), '目录完善中')
+})

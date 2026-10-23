@@ -44,6 +44,11 @@ class SubmitAnswers(ChangeRun):
     answers: list[Answer] = Field(default_factory=list, max_length=5)
 
 
+class SubmitBlueprint(ChangeRun):
+    approve: bool = Field(strict=True)
+    feedback: str = Field(default="", max_length=6000)
+
+
 class LessonCommand(ChangeRun):
     script_id: str = Field(min_length=1)
 
@@ -126,6 +131,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/runs/{run_id}/cancel")
     async def cancel(run_id: str, data: ChangeRun):
         return await app.state.service.cancel(run_id, data.model_dump())
+
+    @app.post("/api/runs/{run_id}/blueprint", status_code=202)
+    async def blueprint(run_id: str, data: SubmitBlueprint):
+        return await app.state.service.blueprint(run_id, data.model_dump())
 
     @app.post("/api/runs/{run_id}/retry", status_code=202)
     async def retry(run_id: str, data: ChangeRun):

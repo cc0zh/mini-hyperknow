@@ -24,9 +24,19 @@ export interface Answer {
   custom_text: string
 }
 
-export type RunStatus = 'queued' | 'clarifying' | 'awaiting_answers' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
+export type RunStatus = 'queued' | 'clarifying' | 'awaiting_answers' | 'awaiting_blueprint' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
+
+export interface Research {
+  steps: { tool: 'web_search' | 'read_webpage'; status: 'ready' | 'failed'; arguments: { query?: string; url?: string }; error?: { code: string; message: string } | null }[]
+  sources: { source_id: string; url: string; title: string; text: string; fetched_at: string; truncated: boolean; content_sha256: string }[]
+  report: { summary: string; findings: { title: string; summary: string; source_ids: string[] }[]; suggested_sequence: string[]; limitations: string[] } | null
+}
 
 export interface Run {
+  workflow?: 'blueprint-v1'
+  blueprint_version?: number
+  stage?: 'clarifying' | 'research' | 'blueprint' | 'units'
+  research?: Research | null
   kind?: 'course' | 'lesson' | 'question' | 'quiz' | 'research'
   quiz_id?: string | null
   target_type?: 'practice' | 'exam' | null
@@ -50,6 +60,7 @@ export interface Run {
 }
 
 export interface Session {
+  depths?: SessionDepth[]
   completed?: boolean
   session_id: string
   title: string
@@ -59,7 +70,15 @@ export interface Session {
   estimated_minutes: number
 }
 
+export type SessionDepth = 'intuition' | 'definition' | 'derivation' | 'theory' | 'practice'
+export type UnitGenerationStatus = 'pending' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
+
 export interface Unit {
+  learning_objectives?: string[]
+  estimated_sessions?: number
+  project_keys?: string[]
+  exam_goal?: string
+  generation_status?: UnitGenerationStatus
   unit_id: string
   title: string
   description: string
@@ -69,6 +88,9 @@ export interface Unit {
 }
 
 export interface Course {
+  structure_status?: 'blueprint' | 'expanding' | 'ready'
+  blueprint_version?: number
+  creation_run_id?: string | null
   course_id: string
   title: string
   description: string
@@ -76,7 +98,7 @@ export interface Course {
   difficulty: 'beginner' | 'intermediate' | 'advanced'
   tags: string[]
   language: string
-  projects: { project_id: string; name: string; description: string; final_deliverable: string }[]
+  projects: { project_id: string; project_key?: string; name: string; description: string; final_deliverable: string }[]
   units: Unit[]
   goal: string
   created_at: string
@@ -84,8 +106,8 @@ export interface Course {
   session_count: number
   unit_count: number
   exam_count: number
-  progress: number
-  next_item: { type: 'lecture' | 'session' | 'project' | 'project_stage' | 'exam'; title: string; session_id?: string; unit_id: string; stage_id?: string; exam_id?: string } | null
+  progress: number | null
+  next_item: { type: 'lecture' | 'session' | 'project' | 'project_stage' | 'exam' | 'generation'; title: string; session_id?: string; unit_id: string; stage_id?: string; exam_id?: string; run_id?: string } | null
 }
 
 export type PlayIntent = 'paused' | 'playing'

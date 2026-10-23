@@ -35,10 +35,11 @@
 | 方法与路径 | 作用及保存边界 |
 | --- | --- |
 | `GET /api/health` | 服务、数据库与模型配置状态；已配置不等于真实模型连通 |
-| `POST /api/course-runs` | 保存文字目标，建立生成 run，返回 202 |
+| `POST /api/course-runs` | 保存文字目标，建立blueprint-v1生成run，返回202；缺模型或Tavily配置提前503且不建任务／回执 |
 | `GET /api/runs` | 最新 30 条运行，课程库恢复等待、失败、取消或中断的任务 |
 | `GET /api/runs/{run_id}` | 运行阶段、澄清、结果引用或错误 |
 | `POST /api/runs/{run_id}/answers` | 保存答案；`skip: true` 明确跳过，进入课程生成 |
+| `POST /api/runs/{run_id}/blueprint` | 全局蓝图待确认时保存批准或调整意见；client_command_id、expected_version、approve、feedback；批准后自动逐单元展开，不逐单元审批 |
 | `POST /api/runs/{run_id}/cancel` | 显式取消，阻止晚到结果生效 |
 | `POST /api/runs/{run_id}/retry` | 根据原输入建立新 run，不重写旧运行身份 |
 | `GET /api/courses` | 课程列表及一致的进度摘要 |
@@ -71,7 +72,7 @@ prepare／attempts使用client_command_id；answer／next／submit另带expected
 
 ### 独立网页调研
 
-独立网页调研已新增 `POST /api/research-runs`（202），输入 `client_command_id`、`goal`、可选 `context`。返回kind=research运行，查询、取消、重试及run订阅复用现有端点；`research`保存已读来源、过程和报告，缺模型／Tavily配置返回503且不建任务。不经过课程澄清，不创建课程，不向现有造课自动插入收费步骤。完整契约见[网页调研 Agent](web-research-agent.md)。
+独立网页调研提供`POST /api/research-runs`（202），输入client_command_id、goal、可选context。返回kind=research，查询、取消、重试及run订阅复用现有端点；research保存已读来源、过程和报告，缺模型／Tavily配置提前503。不经过课程澄清，不创建课程。新课程已单独接入相同研究能力，research／blueprint／units阶段及awaiting_blueprint状态见[蓝图工作流](course-blueprint-workflow.md)，不要求旧run兼容。
 
 ### 后续目标端点
 

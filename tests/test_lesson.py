@@ -414,12 +414,12 @@ class LessonRuntimeTests(unittest.IsolatedAsyncioTestCase):
             run = db.create_run("phase-create-input", "理解协程", "stored-model")
             service = CourseService(Settings(data_dir=Path(directory)), db, EventHub())
             service.enqueue(run)
-            next_phase = db.transition(run["run_id"], {"queued"}, status="generating", answers_submitted=True)
+            next_phase = db.transition(run["run_id"], {"queued"}, status="generating", stage="research", answers_submitted=True)
             service.enqueue(next_phase)
             service.enqueue(next_phase)
             self.assertEqual(service.queue.qsize(), 2)
             self.assertEqual(await service.queue.get(), (run["run_id"], "clarifying"))
-            self.assertEqual(await service.queue.get(), (run["run_id"], "generating"))
+            self.assertEqual(await service.queue.get(), (run["run_id"], "research"))
 
     async def test_replayed_queued_run_has_one_worker_entry_and_restart_does_not_charge(self):
         with tempfile.TemporaryDirectory() as directory:

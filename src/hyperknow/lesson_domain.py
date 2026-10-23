@@ -162,6 +162,7 @@ def derive_course(course: dict, completed: set[str]) -> dict:
     for unit in course["units"]:
         for lecture in unit["lectures"]:
             for session in lecture["sessions"]:
+                session.setdefault("depths", [])
                 session["completed"] = session["session_id"] in completed
                 total += 1
                 done += int(session["completed"])
@@ -175,5 +176,11 @@ def derive_course(course: dict, completed: set[str]) -> dict:
                 if next_item is None and not activity["completed"]:
                     next_item = {"type": kind, "title": activity["title"],
                                  id_key: activity[id_key], "unit_id": unit["unit_id"]}
-    course.update(progress=done * 100 / total if total else 0, next_item=next_item)
+    partial = course.get("structure_status", "ready") != "ready"
+    if partial:
+        pending = next((unit for unit in course["units"] if unit["generation_status"] != "ready"), None)
+        if pending:
+            next_item = {"type": "generation", "run_id": course["creation_run_id"],
+                         "unit_id": pending["unit_id"], "title": pending["title"]}
+    course.update(progress=None if partial else (done * 100 / total if total else 0), next_item=next_item)
     return course
