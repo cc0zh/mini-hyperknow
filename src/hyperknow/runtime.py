@@ -9,6 +9,7 @@ from fastapi import WebSocket
 from .config import Settings
 from .domain import AppError, resolve_answers
 from .generation import Generator
+from .research import Researcher
 from .storage import Database
 
 logger = logging.getLogger(__name__)
@@ -160,6 +161,14 @@ class CourseService:
         self.enqueue(run)
         return run
 
+    async def research(self, goal: str, context: str, command_id: str):
+        Researcher(self.settings, self.db, self.generator.stopping).validate_input(goal, context)
+        run = self.db.create_research(command_id, goal, context, self.settings.model,
+                                      configured=bool(self.settings.api_key),
+                                      search_configured=bool(self.settings.tavily_api_key))
+        self.enqueue(run)
+        return run
+
     async def answers(self, run_id: str, data: dict):
         def submit(run):
             if run.get("kind", "course") != "course" or run["status"] != "awaiting_answers":
@@ -187,7 +196,8 @@ class CourseService:
 
     async def retry(self, run_id: str, data: dict):
         run = self.db.retry_run(data["client_command_id"], run_id, data["expected_version"],
-                                configured=bool(self.settings.api_key))
+                                configured=bool(self.settings.api_key),
+                                search_configured=bool(self.settings.tavily_api_key))
         self.enqueue(run)
         await self.notify_run(run)
         return run
@@ -203,7 +213,16 @@ class CourseService:
                     continue
                 await self.notify_run(run)
                 # The worker remains occupied until this real network call returns.
-                result = await asyncio.to_thread(self.generator.generate, run, phase)
+                if run.get("kind") == "research":
+                    loop = asyncio.get_running_loop()
+
+                    def changed(snapshot):
+                        loop.call_soon_threadsafe(asyncio.create_task, self.notify_run(snapshot))
+
+                    researcher = Researcher(self.settings, self.db, self.generator.stopping, changed)
+                    result = await asyncio.to_thread(researcher.generate, run)
+                else:
+                    result = await asyncio.to_thread(self.generator.generate, run, phase)
                 if not self.accepting:
                     continue
                 if phase == "clarifying":
@@ -211,6 +230,8 @@ class CourseService:
                                                  questions=result.model_dump()["questions"])
                 elif run.get("kind", "course") == "course":
                     updated = self.db.finish_course(run_id, result)
+                elif run.get("kind") == "research":
+                    updated = self.db.finish_research(run_id, result)
                 elif run.get("kind") == "quiz":
                     updated = self.db.finish_quiz(run_id, result)
                 else:

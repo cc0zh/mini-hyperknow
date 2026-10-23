@@ -14,6 +14,7 @@ class Settings:
     model: str = "gpt-4o-mini"
     base_url: str | None = None
     timeout: float = 120
+    tavily_api_key: str = field(default="", repr=False)
 
     @classmethod
     def load(cls) -> "Settings":
@@ -27,4 +28,5 @@ class Settings:
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             base_url=os.getenv("OPENAI_BASE_URL") or None,
             timeout=float(os.getenv("HK_MODEL_TIMEOUT_SECONDS", "120")),
+            tavily_api_key=os.getenv("TAVILY_API_KEY", "").strip(),
         )

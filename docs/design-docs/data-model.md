@@ -5,6 +5,8 @@
 
 ## 1. 唯一事实来源
 
+新增独立网页调研沿用现有v3表：kind=research的run在input保存goal/context，在research保存steps/sources/report；来源URL、摘录及抓取元数据随运行持久化，实际模型轮次仍写model_calls。不自动创建或修改课程，不为本轮改变PRAGMA版本；完整来源／重试契约见[网页调研 Agent](web-research-agent.md)。
+
 业务事实保存到单个本地 SQLite 文件，默认 `data/hyperknow.sqlite3`，已支持 `HK_DATA_DIR` 改变本地数据根。
 
 当前小型 course/run、讲义、课堂状态、问答及完成事实以主键加完整 JSON 保存；讲义／问答另有 session_id 列，版本与状态在真实事务中检查。命令回执保存输入指纹、资源类型和引用。后续有明确查询需求再细化普通列，不先引入 ORM、独立文档存储、向量库或 JSONL 事件溯源。SQLite 是权威业务数据，不是可删除查询缓存。

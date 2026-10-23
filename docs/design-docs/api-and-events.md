@@ -69,6 +69,10 @@
 
 prepare／attempts使用client_command_id；answer／next／submit另带expected_version，answer含question_id、option_ids、skipped、elapsed_ms。用时为0至86,400,000的整数毫秒，不能传浮点、布尔、字符串或前端总分；刷新沿用已保存起点，超过24小时由界面明确提示按24小时截断，不假称可信考试计时。QuizSnapshot按目标version合并，AttemptSnapshot按attempt.version排序；course有独立version，不能用旧课程数据覆盖新课程状态。
 
+### 独立网页调研
+
+独立网页调研已新增 `POST /api/research-runs`（202），输入 `client_command_id`、`goal`、可选 `context`。返回kind=research运行，查询、取消、重试及run订阅复用现有端点；`research`保存已读来源、过程和报告，缺模型／Tavily配置返回503且不建任务。不经过课程澄清，不创建课程，不向现有造课自动插入收费步骤。完整契约见[网页调研 Agent](web-research-agent.md)。
+
 ### 后续目标端点
 
 下列路由尚未注册，当前请求返回 404；长期范围保留，不当作已交付能力。

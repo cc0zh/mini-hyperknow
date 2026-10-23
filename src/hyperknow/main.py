@@ -25,6 +25,10 @@ class CreateRun(Command):
     goal: str = Field(min_length=2, max_length=4000)
 
 
+class CreateResearch(CreateRun):
+    context: str = Field(default="", max_length=6000)
+
+
 class ChangeRun(Command):
     expected_version: int = Field(ge=1)
 
@@ -102,6 +106,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/course-runs", status_code=202)
     async def create_run(data: CreateRun):
         return await app.state.service.create(data.goal, data.client_command_id)
+
+    @app.post("/api/research-runs", status_code=202)
+    async def research_run(data: CreateResearch):
+        return await app.state.service.research(data.goal, data.context, data.client_command_id)
 
     @app.get("/api/runs")
     async def runs():

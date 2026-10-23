@@ -11,6 +11,7 @@ from typing import Callable
 from .domain import AppError, CourseDraft, materialize_course, uid
 from .lesson_storage import LessonStorage
 from .quiz_storage import QuizStorage
+from .research_storage import ResearchStorage
 
 
 def now() -> str:
@@ -21,7 +22,7 @@ def encode(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
-class Database(QuizStorage, LessonStorage):
+class Database(ResearchStorage, QuizStorage, LessonStorage):
     def __init__(self, path: Path):
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -125,7 +126,7 @@ class Database(QuizStorage, LessonStorage):
                      (run["run_id"], encode(run)))
         if run.get("kind") == "quiz":
             self._quiz_run_changed(conn, run)
-        else:
+        elif run.get("kind") != "research":
             self._run_changed(conn, run)
 
     def command(self, command_id: str, payload: dict, action: Callable, *, resource_type: str = "run") -> dict:
@@ -185,7 +186,8 @@ class Database(QuizStorage, LessonStorage):
             return result
         return self.command(command_id, {"run_id": run_id, "version": expected_version, **payload}, update)
 
-    def retry_run(self, command_id: str, run_id: str, expected_version: int, *, configured: bool = True) -> dict:
+    def retry_run(self, command_id: str, run_id: str, expected_version: int, *, configured: bool = True,
+                  search_configured: bool = False) -> dict:
         def retry(conn):
             parent = self._get(conn, "runs", run_id)
             if parent["version"] != expected_version:
@@ -193,7 +195,7 @@ class Database(QuizStorage, LessonStorage):
                                latest_version=parent["version"])
             if parent["status"] not in {"failed", "cancelled", "interrupted"}:
                 raise AppError("state_conflict", "只有失败、取消或中断的任务可以重试", 409)
-            if parent.get("kind", "course") == "course" and any(
+            if parent.get("kind", "course") in {"course", "research"} and any(
                 json.loads(row["data"]).get("parent_run_id") == run_id
                 for row in conn.execute("SELECT data FROM runs")
             ):
@@ -203,7 +205,11 @@ class Database(QuizStorage, LessonStorage):
             for key in ("questions", "answers", "skipped", "answers_submitted"):
                 run[key] = parent[key]
             run["parent_run_id"] = run_id
-            if parent.get("kind") == "quiz":
+            if parent.get("kind") == "research":
+                self._search_configured(search_configured)
+                run.update(kind="research", input=parent["input"],
+                           research={"steps": [], "sources": [], "report": None})
+            elif parent.get("kind") == "quiz":
                 self._retry_quiz(conn, parent, run)
             elif parent.get("kind", "course") != "course":
                 self._retry_lesson(conn, parent, run)

@@ -60,6 +60,8 @@ uv run --frozen python scripts/verify_model.py
 
 ## 设计与交接
 
+独立网页调研 Agent 已提供后端 `POST /api/research-runs`，复用串行worker与SQLite，支持真实 Tavily 搜索、公开网页阅读、带来源报告和取消／重试／恢复；暂未接入造课或前端，也未实现全局蓝图确认及逐单元展开。在本地 `.env` 配置 `TAVILY_API_KEY`，不要把key发到聊天或浏览器。显式运行 `uv run --frozen python scripts/verify_research.py` 做真实搜索＋模型验证，会产生费用；缺配置退出2，不冒充通过。当前验收事实与限制见[调研契约](docs/design-docs/web-research-agent.md)及其实施计划。
+
 通用 Python 内核已升级 V1：工具调度／逐次审批、有界输出与原文存档、显式工作区工具、JSONL 会话恢复、调用者维护的长期记忆、Token 预算压缩和 high／medium／low 模型分层。课程业务仍沿用 SQLite 与既有同步生成，不向浏览器开放文件／命令工具；同步网络取消不等于远端中止。接口、配置与安全边界见[内核 V1](docs/design-docs/agent-core-v1.md)。
 
 可显式执行 `uv run --frozen python scripts/verify_agent_v1.py` 验证真实模型工具循环、实际摘要及会话重开；会产生费用，证据保存在忽略的 `data/validation/agent-v1/`，不接触课程数据库。缺凭据返回 2，不冒充通过。

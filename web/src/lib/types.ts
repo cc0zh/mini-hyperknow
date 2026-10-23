@@ -27,7 +27,7 @@ export interface Answer {
 export type RunStatus = 'queued' | 'clarifying' | 'awaiting_answers' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
 
 export interface Run {
-  kind?: 'course' | 'lesson' | 'question' | 'quiz'
+  kind?: 'course' | 'lesson' | 'question' | 'quiz' | 'research'
   quiz_id?: string | null
   target_type?: 'practice' | 'exam' | null
   target_id?: string | null

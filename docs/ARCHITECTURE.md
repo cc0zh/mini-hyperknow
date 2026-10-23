@@ -9,7 +9,7 @@
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
 - 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
-- `src/hyperknow/` 已有 FastAPI 服务与串行生成执行器，支持 course／lesson／question／quiz 四种 run；`web/` 已有首页、创建、课程库、总览、课堂及练习／考核页面。实际启动命令见 [README](../README.md)。
+- `src/hyperknow/` 已有 FastAPI 服务与串行生成执行器，支持 course／lesson／question／quiz，以及新增独立 research run；后者真实搜索配置及验收边界见[网页调研 Agent](design-docs/web-research-agent.md)，尚未接入造课或前端。`web/` 已有首页、创建、课程库、总览、课堂及练习／考核页面。实际启动命令见 [README](../README.md)。
 
 ## 2. 已定工程选择
 
@@ -67,6 +67,10 @@ src/
     quiz_storage.py       题组、目标版本、作答/next/submit与活动完成事务
     storage.py            SQLite v3、升级备份、事务、命令幂等及重启
     runtime.py            共用单worker、取消门禁、run/session/course/quiz_target/attempt通知
+    research.py           只读网页Agent、每次模型调用记录、有限报告修复
+    research_domain.py    带来源调研报告与实际已读引用校验
+    research_storage.py   独立research run、来源／过程／报告事务
+    research_web.py       Tavily真实搜索、公网固定连接及有界网页提取
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
   src/pages/              首页、创建/澄清、课程库、总览、Classroom与Quiz
