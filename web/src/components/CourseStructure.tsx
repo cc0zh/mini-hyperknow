@@ -32,9 +32,3 @@ function UnitSection({ unit, index, course }: { unit: Unit; index: number; cours
 export function CourseStructure({ course }: { course: Course }) {
   return <div className="unit-list">{course.units.map((unit, index) => <UnitSection key={unit.unit_id} unit={unit} index={index} course={course} />)}</div>
 }
-
-export function CourseGoals({ course }: { course: Course }) {
-  return <div className="blueprint-goals"><span className="eyebrow">COURSE BLUEPRINT</span><h2>{course.title}</h2><p>{course.description}</p><dl className="course-facts"><div><dt>课程目标</dt><dd>{course.goal}</dd></div><div><dt>适合人群</dt><dd>{course.target_learner}</dd></div></dl>
-    <div className="blueprint-projects"><h3>全局项目</h3>{course.projects.length ? course.projects.map(project => <section className="activity-card project" key={project.project_id}><h4>{project.name}</h4><p>{project.description}</p><div className="deliverable"><b>最终交付</b><p>{project.final_deliverable}</p></div></section>) : <p className="inline-note">这份蓝图没有安排全局项目。</p>}</div>
-  </div>
-}

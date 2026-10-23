@@ -172,16 +172,6 @@ progress::-moz-progress-bar { background: #8da27d; border-radius: 9px; }
 /* Course run. The stage is the progress indicator: no pretend percentage. */
 .run-page-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .connection-label { color: #a2a99b; font-size: 9px; padding-top: 4px; }
-.run-heading { margin: 18px 0 30px; }
-.run-heading h1 { font-size: 28px; letter-spacing: -.6px; margin: 10px 0; }
-.goal-bubble { padding: 22px 25px; border: 1px solid #e3e7de; border-radius: 16px; background: #f0f3ec; }
-.goal-bubble p { font-size: 13px; line-height: 1.9; white-space: pre-wrap; overflow-wrap: anywhere; margin: 10px 0 0; }
-.run-status { display: flex; gap: 17px; padding: 27px 4px; align-items: flex-start; }
-.status-symbol { display: grid; place-items: center; color: #859779; font-size: 25px; width: 28px; line-height: 1.5; flex-shrink: 0; }
-.status-symbol.working { animation: spin 8s linear infinite; }
-.run-status h2 { font-size: 15px; margin: 5px 0 8px; }
-.run-status p { color: #7c896f; font-size: 13px; line-height: 1.9; margin: 0; }
-.status-failed .status-symbol, .status-interrupted .status-symbol { color: #b38d70; }
 .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin: 22px 0; }
 .section-heading h2 { font-size: 17px; margin: 0; }
 .section-heading .eyebrow { margin-bottom: 8px; }
@@ -202,11 +192,6 @@ progress::-moz-progress-bar { background: #8da27d; border-radius: 9px; }
 fieldset:disabled .answer-option { cursor: default; opacity: .7; }
 .form-actions { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--line); padding-top: 20px; }
 .form-hint { text-align: right; }
-.run-bottom-actions { display: flex; align-items: center; gap: 22px; margin: 26px 0; }
-.run-bottom-actions > :last-child { margin-left: auto; }
-.ready-card { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px; border: 1px solid #dbe4cf; background: #edf2e5; border-radius: 16px; }
-.ready-card h2 { font-size: 18px; margin: 10px 0; }
-.ready-card p { color: #8d987e; font-size: 11px; margin: 0; }
 .run-details { font-size: 10px; border-top: 1px solid var(--line); padding: 18px 0; color: #9ca393; }
 .run-details summary { cursor: pointer; }
 .run-details dl { display: grid; gap: 12px; margin: 18px 0; }
@@ -216,15 +201,6 @@ fieldset:disabled .answer-option { cursor: default; opacity: .7; }
 .run-details h3 { font-size: 10px; color: #8e9783; }
 .run-details pre { white-space: pre-wrap; }
 
-/* The creation workspace uses the same saved structure as the course overview. */
-.run-page { max-width: 1510px; }
-.run-workspace { display: grid; grid-template-columns: minmax(290px, .85fr) minmax(0, 1.15fr); gap: 28px; align-items: start; }
-.run-activity, .run-structure { min-width: 0; }
-.run-structure { border: 1px solid #e2e6dc; border-radius: 18px; padding: 22px; background: #f5f7f1; }
-.run-stage { margin-top: 12px !important; font-size: 10px !important; color: #929f83 !important; }
-.run-activity .form-actions, .blueprint-review .form-actions { flex-wrap: wrap; }
-.run-activity .run-bottom-actions { flex-wrap: wrap; gap: 15px; }
-.run-activity .ready-card { flex-direction: column; align-items: flex-start; padding: 22px; }
 .run-research { border-top: 1px solid var(--line); padding-top: 5px; }
 .run-research h3 { font-size: 14px; margin: 18px 0 12px; }
 .run-research h4 { font-size: 12px; margin: 15px 0 6px; }
@@ -244,22 +220,6 @@ fieldset:disabled .answer-option { cursor: default; opacity: .7; }
 .research-source .source-meta { font-size: 9px; color: #a0aa95; }
 .source-text { white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 .source-hash { color: #a6ad9e; font-size: 8px; overflow-wrap: anywhere; }
-.run-blueprint > .section-heading { margin-top: 0; }
-.run-blueprint > .connection-label { margin-bottom: 23px; }
-.blueprint-goals h2, .blueprint-placeholder h2 { font-size: 21px; line-height: 1.7; margin: 10px 0; }
-.blueprint-goals > p, .blueprint-placeholder p { font-size: 13px; color: #7c896f; line-height: 1.9; }
-.blueprint-goals .course-facts { grid-template-columns: 1fr 1fr; gap: 16px; }
-.blueprint-projects { margin: 22px 0; }
-.blueprint-projects h3 { font-size: 14px; font-weight: 500; }
-.blueprint-projects h4 { font-size: 13px; margin: 0 0 8px; }
-.blueprint-projects .activity-card { border: 1px solid #e1e6d9; background: #fff; margin-top: 10px; }
-.blueprint-review { border-top: 1px solid #dfe5d7; margin: 24px 0; padding-top: 22px; }
-.blueprint-review h3 { font-size: 16px; margin-bottom: 10px; }
-.blueprint-review > p, .blueprint-saved-note { font-size: 12px; color: #879576; line-height: 1.9; }
-.blueprint-review .form-actions { margin-top: 20px; gap: 10px; }
-.blueprint-review .button { white-space: normal; }
-.blueprint-saved-note { border: 1px solid #dce5cf; border-radius: 10px; background: #ecf2e5; padding: 15px; margin: 20px 0; }
-.blueprint-placeholder { padding: 12px 5px; }
 
 /* Read-only learning path. Only the disclosure controls are interactive. */
 .course-hero { position: relative; overflow: hidden; background: #e8e2f1; border-radius: 20px; padding: 33px 36px; margin-bottom: 30px; }
@@ -358,12 +318,9 @@ fieldset:disabled .answer-option { cursor: default; opacity: .7; }
   .session-duration { margin-left: 20px; }
 }
 @media (max-width: 1000px) {
-  .run-workspace { grid-template-columns: 1fr; }
-  .run-structure { padding: 22px; }
   .overview-layout { grid-template-columns: 1fr; }
   .course-aside { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-content { padding-right: 35px; padding-left: 35px; }
-  .ready-card { flex-direction: column; align-items: flex-start; }
   .topbar { padding-right: 30px; padding-left: 30px; }
   .topbar > span { font-size: 8px; letter-spacing: 1px; }
 }

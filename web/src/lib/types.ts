@@ -35,6 +35,10 @@ export interface Research {
 export interface Run {
   workflow?: 'blueprint-v1'
   blueprint_version?: number
+  current_unit_id?: string | null
+  answers_submitted?: boolean
+  skipped?: boolean
+  blueprint_feedback?: string
   stage?: 'clarifying' | 'research' | 'blueprint' | 'units'
   research?: Research | null
   kind?: 'course' | 'lesson' | 'question' | 'quiz' | 'research'

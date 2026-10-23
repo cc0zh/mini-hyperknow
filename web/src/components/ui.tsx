@@ -20,10 +20,12 @@ export function Arrow() { return <span aria-hidden="true">↗</span> }
 export function Shell() {
   const health = useResource<Health>('/health')
   const { pathname } = useLocation()
+  const isCreation = /^\/course-runs\/[^/]+\/?$/.test(pathname)
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return <HealthContext.Provider value={health}>
     <a className="skip-link" href="#main">跳到主要内容</a>
-    <div className="app-shell">
+    <div className={`app-shell${isCreation ? ' creation-shell' : ''}`}>
+      {!isCreation && <>
       <aside className="sidebar">
         <Link to="/" className="brand" aria-label="Hyperknow 首页"><Mark /><span>Hyperknow<small>让知识，成为你的。</small></span></Link>
         <div className="sidebar-label">我的学习空间</div>
@@ -33,13 +35,13 @@ export function Shell() {
         </nav>
         <div className="sidebar-note"><span className="note-line" /><p>每一个问题，<br />都可以是一段学习的开始。</p></div>
         <div className="sidebar-footer"><span className="avatar">我</span><div><b>个人学习空间</b><small>本地 · 单用户</small></div></div>
-      </aside>
+      </aside></>}
       <div className="workspace">
-        <header className="topbar"><span>LEARN SOMETHING THAT MATTERS</span><div className={`service-pill ${health.error || health.data?.model.configured === false ? 'warning' : ''}`}>
+        {!isCreation && <header className="topbar"><span>LEARN SOMETHING THAT MATTERS</span><div className={`service-pill ${health.error || health.data?.model.configured === false ? 'warning' : ''}`}>
           <i aria-hidden="true" />{health.loading ? '正在连接本地服务' : health.error ? '本地服务不可用' : health.data?.model.configured ? '本地服务已连接' : '模型尚未配置'}
-        </div></header>
+        </div></header>}
         <main id="main" tabIndex={-1}><Outlet /></main>
-        <footer className="page-footer">Hyperknow <span>·</span> 从好奇开始，循路径深入</footer>
+        {!isCreation && <footer className="page-footer">Hyperknow <span>·</span> 从好奇开始，循路径深入</footer>}
       </div>
     </div>
   </HealthContext.Provider>
