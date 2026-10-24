@@ -1,3 +1,4 @@
+﻿import { IconArrowRight } from './icons'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { blueprintNodes, blueprintStats, resolveBlueprintSelection } from '../lib/blueprint-view'
@@ -25,7 +26,7 @@ function NodeDetails({ node, course, nodes, select }: { node: BlueprintNode; cou
       return <>
         <Field title="课程简介" text={node.data.description} /><Field title="课程目标" text={node.data.goal} /><Field title="适合人群" text={node.data.target_learner} />
         <section className="bx-field"><h4>全局项目 · 仅展示要求</h4>
-          {nodes.filter(item => item.kind === 'project').map(project => <button className="bx-project-link" type="button" aria-pressed={node.key === project.key} key={project.key} onClick={() => select(project.key)}>{project.title} →</button>)}
+          {nodes.filter(item => item.kind === 'project').map(project => <button className="bx-project-link" type="button" aria-pressed={node.key === project.key} key={project.key} onClick={() => select(project.key)}>{project.title} <IconArrowRight size={13} /></button>)}
           {!course.projects.length && <p>蓝图未安排全局项目。</p>}
         </section>
       </>
@@ -45,7 +46,7 @@ function NodeDetails({ node, course, nodes, select }: { node: BlueprintNode; cou
         <TextList title="学习要点" items={node.data.key_points} />
         {Array.isArray(node.data.outline) ? <TextList title="完整提纲" items={node.data.outline} /> : <Field title="完整提纲" text={node.data.outline} />}
         <p className="bx-note">预计 {node.data.estimated_minutes} 分钟{node.data.completed ? ' · 已完成' : ''}</p>
-        <Link className="bx-route" to={`${coursePath}/sessions/${encodeURIComponent(node.data.session_id)}`}>进入课堂 →</Link>
+        <Link className="bx-route" to={`${coursePath}/sessions/${encodeURIComponent(node.data.session_id)}`}>进入课堂 <IconArrowRight size={13} /></Link>
         <p className="bx-note">进入课堂只读取已保存内容，准备讲义需另行确认。</p>
       </>
     case 'project':
@@ -53,7 +54,7 @@ function NodeDetails({ node, course, nodes, select }: { node: BlueprintNode; cou
     case 'stage':
       return <><Field title="所属全局项目" text={course.projects.find(project => project.project_id === node.data.project_id)?.name} /><Field title="阶段要求" text={node.data.description} /><Field title="阶段交付要求" text={node.data.deliverable} /><p className="bx-note">仅展示项目要求，成果提交尚未开放。</p></>
     case 'exam':
-      return <><Field title="考核目标与范围" text={node.data.goal} /><Link className="bx-route" to={`${coursePath}/exams/${encodeURIComponent(node.data.exam_id)}`}>{node.data.completed ? '查看结果 / 再练一次' : '进入单元考核'} →</Link><p className="bx-note">仅在明确准备题组时调用模型。</p></>
+      return <><Field title="考核目标与范围" text={node.data.goal} /><Link className="bx-route" to={`${coursePath}/exams/${encodeURIComponent(node.data.exam_id)}`}>{node.data.completed ? '查看结果 / 再练一次' : '进入单元考核'} <IconArrowRight size={13} /></Link><p className="bx-note">仅在明确准备题组时调用模型。</p></>
   }
 }
 

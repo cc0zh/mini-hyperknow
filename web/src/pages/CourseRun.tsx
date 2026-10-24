@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ErrorNotice, Loading, Mark, dateLabel } from '../components/ui'
+import { BackLink, ErrorNotice, Loading, Mark, dateLabel } from '../components/ui'
+import { IconArrowRight, IconBoard, IconCheck, IconChevronLeft } from '../components/icons'
 import { BlueprintExplorer } from '../components/BlueprintExplorer'
 import { RunResearch } from '../components/RunResearch'
 import { blueprintDecision, hasAnswers, isTerminal, isWorking, toggleOption } from '../lib/run-state'
@@ -10,6 +11,7 @@ import { savedPreferences, savedStructureCounts, workbenchStatus, workbenchSteps
 import { useRun } from '../lib/use-run'
 import { useCourse } from '../lib/use-course'
 import { useCommand } from '../lib/use-command'
+import { useMediaQuery } from '../lib/use-media-query'
 import { readPending } from '../lib/commands'
 import type { Answer, Course, Question, Run } from '../lib/types'
 import '../styles/workbench.css'
@@ -59,6 +61,8 @@ interface WorkspaceProps {
 
 function Workspace({ run, command, error, reload, connection, draft, setDraft, feedback, setFeedback,
   course, courseError, courseConnection, reloadCourse }: WorkspaceProps & { course: Course | null; courseError: string | null; courseConnection: string; reloadCourse: () => void }) {
+  // The research list lives in the right rail, or inline when that rail is hidden.
+  const narrowRail = useMediaQuery('(max-width: 1100px)')
   const [adjusting, setAdjusting] = useState(false)
   const adjustButton = useRef<HTMLButtonElement>(null)
   const locked = command.busy || !!command.pending
@@ -87,11 +91,11 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
       isTerminal(run.status) ? '已保存的内容不会丢失，可继续未完成部分。' : '内容会持续保存，你可以稍后回来查看。'
 
   return <div className="creation-workbench">
-    <header className="wb-header"><Link to="/courses" className="wb-back">← 我的课程</Link><Link to="/" className="wb-brand" aria-label="Hyperknow 首页"><Mark small /><span>Hyperknow</span></Link><h1>{course?.title ?? '设计你的课程'}</h1><span className="wb-header-state">{run.status === 'ready' ? '课程已保存' : run.status === 'awaiting_blueprint' ? '等待你确认' : isTerminal(run.status) ? '生成已停止' : '课程设计'}</span></header>
+    <header className="wb-header"><Link to="/courses" className="wb-back"><IconChevronLeft size={15} />我的课程</Link><Link to="/" className="wb-brand" aria-label="Hyperknow 首页"><Mark small /><span>Hyperknow</span></Link><h1>{course?.title ?? '设计你的课程'}</h1><span className="wb-header-state">{run.status === 'ready' ? '课程已保存' : run.status === 'awaiting_blueprint' ? '等待你确认' : isTerminal(run.status) ? '生成已停止' : '课程设计'}</span></header>
     <div className="wb-body">
       <aside className="wb-context" aria-label="学习需求与生成进展">
         <Preferences run={run} />
-        <section className="wb-progress" aria-labelledby="progress-title"><h2 id="progress-title">课程设计进展</h2><ol>{workbenchSteps(run).map((step, i) => <li className={`wb-step is-${step.state}`} key={step.stage} aria-current={step.state === 'active' || step.state === 'waiting' ? 'step' : undefined}><span aria-hidden="true">{step.state === 'done' ? '✓' : String(i + 1).padStart(2, '0')}</span><span>{step.label}</span><small>{({ done: '已完成', pending: '待开始', waiting: '待确认', active: '进行中', stopped: '已停止' } as Record<string, string>)[step.state]}</small></li>)}</ol>
+        <section className="wb-progress" aria-labelledby="progress-title"><h2 id="progress-title">课程设计进展</h2><ol>{workbenchSteps(run).map((step, i) => <li className={`wb-step is-${step.state}`} key={step.stage} aria-current={step.state === 'active' || step.state === 'waiting' ? 'step' : undefined}><span aria-hidden="true">{step.state === 'done' ? <IconCheck size={13} /> : String(i + 1).padStart(2, '0')}</span><span>{step.label}</span><small>{({ done: '已完成', pending: '待开始', waiting: '待确认', active: '进行中', stopped: '已停止' } as Record<string, string>)[step.state]}</small></li>)}</ol>
           <div className="wb-current" role="status"><h3>{isWorking(run.status) && <span className="wb-busy-dot" aria-hidden="true" />}{status.title}</h3><p>{status.description}</p></div>
           {course && <p className="wb-saved-counts">已保存 <b>{counts.units}</b> / {course.units.length} 单元 · <b>{counts.lectures}</b> 讲次 · <b>{counts.sessions}</b> 小节</p>}
         </section>
@@ -99,19 +103,24 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
         {run.error && <ErrorNotice title="生成需要处理" message={run.error.message} />}
         {command.error && <ErrorNotice title="上次操作尚未确认" message={command.error} />}
         {run.status === 'awaiting_answers' && <form id="course-preferences" className="wb-questions" onSubmit={submitAnswers}><h2>补充你的偏好</h2>{run.questions.map((question, index) => <QuestionField key={question.id} question={question} index={index} answer={answers[index]} disabled={locked} change={answer => setDraft({ ...draft, [question.id]: answer })} />)}</form>}
-        <RunResearch research={run.research} />
-        <details className="run-details"><summary>运行详情</summary><p>{connection} · {courseConnection}</p><dl><div><dt>运行编号</dt><dd>{run.run_id}</dd></div><div><dt>模型</dt><dd>{run.model}</dd></div><div><dt>创建时间</dt><dd>{dateLabel(run.created_at)}</dd></div><div><dt>状态版本</dt><dd>{run.version}</dd></div>{course?.blueprint_version != null && <div><dt>蓝图版本</dt><dd>{course.blueprint_version}</dd></div>}{run.parent_run_id && <div><dt>重试来源</dt><dd><Link to={`/course-runs/${encodeURIComponent(run.parent_run_id)}`}>查看上次运行</Link></dd></div>}</dl>{run.usage && <pre>{JSON.stringify(run.usage, null, 2)}</pre>}<button className="text-button" type="button" onClick={() => { reload(); reloadCourse() }}>刷新状态</button></details>
+        {narrowRail && <div className="wb-research-inline"><RunResearch research={run.research} /></div>}
       </aside>
       <section className="wb-result" aria-label="课程蓝图工作区"><div className="wb-result-heading"><h2>课程蓝图</h2><span>{course ? `${course.units.length} 单元 · ${counts.sessions} 已生成小节` : '单元顺序与学习路径'}</span></div>
         {courseError && <ErrorNotice title="课程结构暂时无法同步" message={courseError} retry={reloadCourse} />}
-        {course ? <BlueprintExplorer course={course} currentUnitId={isWorking(run.status) && run.stage === 'units' ? run.current_unit_id : null} /> : run.course_id ? !courseError && <Loading label="正在读取已保存的课程方向…" /> : <div className="wb-empty-blueprint"><span aria-hidden="true">⌘</span><h3>先定方向，再安排每一步</h3><p>{run.status === 'awaiting_answers' ? '补充左侧偏好后，我们会结合参考资料设计课程。' : '完成需求与资料调研后，全部单元会一起出现在这里。'}</p><div><span>你的目标</span><i aria-hidden="true" /><span>单元路径</span><i aria-hidden="true" /><span>讲次与小节</span></div><small>这是流程说明，尚未生成课程内容。</small></div>}
+        {course ? <BlueprintExplorer course={course} currentUnitId={isWorking(run.status) && run.stage === 'units' ? run.current_unit_id : null} /> : run.course_id ? !courseError && <Loading label="正在读取已保存的课程方向…" /> : <div className="wb-empty-blueprint"><span aria-hidden="true"><IconBoard size={38} strokeWidth={1.2} /></span><h3>先定方向，再安排每一步</h3><p>{run.status === 'awaiting_answers' ? '补充左侧偏好后，我们会结合参考资料设计课程。' : '完成需求与资料调研后，全部单元会一起出现在这里。'}</p><div><span>你的目标</span><i aria-hidden="true" /><span>单元路径</span><i aria-hidden="true" /><span>讲次与小节</span></div><small>这是流程说明，尚未生成课程内容。</small></div>}
       </section>
+      <aside className="wb-rail" aria-label="资料调研与运行详情">
+        <h2>资料与依据</h2>
+        <p className="wb-rail-note">课程设计实际使用的网页资料与限制。</p>
+        <RunResearch research={run.research} />
+        <details className="run-details"><summary>运行详情</summary><p>{connection} · {courseConnection}</p><dl><div><dt>运行编号</dt><dd>{run.run_id}</dd></div><div><dt>模型</dt><dd>{run.model}</dd></div><div><dt>创建时间</dt><dd>{dateLabel(run.created_at)}</dd></div><div><dt>状态版本</dt><dd>{run.version}</dd></div>{course?.blueprint_version != null && <div><dt>蓝图版本</dt><dd>{course.blueprint_version}</dd></div>}{run.parent_run_id && <div><dt>重试来源</dt><dd><Link to={`/course-runs/${encodeURIComponent(run.parent_run_id)}`}>查看上次运行</Link></dd></div>}</dl>{run.usage && <pre>{JSON.stringify(run.usage, null, 2)}</pre>}<button className="text-button" type="button" onClick={() => { reload(); reloadCourse() }}>刷新状态</button></details>
+      </aside>
     </div>
     <footer className="wb-actionbar" role="region" aria-label="当前阶段操作"><div className="wb-action-caption"><strong>{status.title}</strong><p>{actionNote}</p></div><div className="wb-action-buttons">
       {command.pending ? command.conflict ? <button className="button primary" disabled={command.busy} onClick={() => { command.releaseConflict(); reload(); reloadCourse() }}>同步最新状态</button> : command.rejected ? <button className="button primary" disabled={command.busy} onClick={command.releaseRejected}>修改后重新提交</button> : <button className="button primary" disabled={command.busy} onClick={() => { void command.execute() }}>{command.busy ? '正在确认…' : '确认上次操作'}</button> : ownerChanged ? <Link className="button primary" to={`/course-runs/${encodeURIComponent(course.creation_run_id!)}`}>查看最新生成状态</Link> : <>
       {run.status === 'awaiting_answers' && <><button className="button secondary" disabled={locked} onClick={() => { void command.execute(`/runs/${encodeURIComponent(run.run_id)}/answers`, { expected_version: run.version, skip: true, answers: [] }) }}>跳过补充</button><button className="button primary" type="submit" form="course-preferences" disabled={locked || !hasAnswers(run.questions, answers)}>提交偏好并继续</button></>}
       {run.status === 'awaiting_blueprint' && <><button ref={adjustButton} className="button secondary" disabled={locked || !reviewable} onClick={() => setAdjusting(true)}>调整方向</button><button className="button primary" disabled={locked || !reviewable} onClick={() => decide(true)}>确认并完善课程</button></>}
-      {run.status === 'ready' && course && <><Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>查看课程总览</Link>{nextPath && <Link className="button primary" to={nextPath}>开始学习 →</Link>}</>}
+      {run.status === 'ready' && course && <><Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>查看课程总览</Link>{nextPath && <Link className="button primary" to={nextPath}>开始学习 <IconArrowRight size={13} /></Link>}</>}
       {['failed', 'cancelled', 'interrupted'].includes(run.status) && <>{course && <Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>查看已保存内容</Link>}<button className="button primary" disabled={locked} onClick={() => mutate('retry')}>继续生成剩余内容</button></>}
       {!isTerminal(run.status) && run.status !== 'awaiting_answers' && run.status !== 'awaiting_blueprint' && <button className="button secondary" disabled={locked} onClick={() => mutate('cancel')}>停止生成</button>}
       </>}
@@ -138,7 +147,7 @@ function RunContent({ runId }: { runId: string }) {
     if (value.run_id !== runId) navigate(`/course-runs/${encodeURIComponent(value.run_id)}`)
     else { accept(value); reload() }
   })
-  if (!run) return <div className="wb-loading"><Link className="back-link" to="/courses">← 我的课程</Link>{error ? <ErrorNotice title="运行加载失败" message={error} retry={reload} /> : <Loading label="正在恢复课程设计状态…" />}</div>
+  if (!run) return <div className="wb-loading"><BackLink to="/courses">我的课程</BackLink>{error ? <ErrorNotice title="运行加载失败" message={error} retry={reload} /> : <Loading label="正在恢复课程设计状态…" />}</div>
   const props = { run, error, reload, connection, command, draft, setDraft, feedback, setFeedback }
   return run.course_id ? <WithCourse key={run.course_id} {...props} /> : <Workspace {...props} course={null} courseError={null} courseConnection="尚未创建课程结构" reloadCourse={() => {}} />
 }

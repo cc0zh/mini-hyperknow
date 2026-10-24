@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+﻿import { useEffect, useId, useRef, useState } from 'react'
 import DOMPurify from 'dompurify'
 import katex from 'katex'
 import { boardPrefix } from '../lib/lesson-state'

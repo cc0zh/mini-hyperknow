@@ -1,3 +1,5 @@
+﻿import { IconArrowUpRight } from './icons'
+
 import type { Research } from '../lib/types'
 import { dateLabel } from './ui'
 
@@ -14,7 +16,7 @@ export function RunResearch({ research }: { research: Research | null | undefine
     {!research?.steps.length ? <p className="inline-note">尚无已保存的搜索或阅读记录。这里不展示模拟活动。</p> : <ol className="research-steps">{research.steps.map((step, index) => <li key={index}><span className="kind-label">{step.tool === 'web_search' ? '网页搜索' : '网页阅读'}</span><span className={`research-step-status ${step.status}`}>{step.status === 'ready' ? '已完成' : '失败'}</span><p>{step.arguments.query ?? step.arguments.url}</p>{step.error && <p className="research-error">{step.error.code} · {step.error.message}</p>}</li>)}</ol>}
     {research?.report && <section className="research-report"><h3>调研结论</h3><p>{research.report.summary}</p>{research.report.findings.map((finding, index) => <div key={index}><h4>{finding.title}</h4><p>{finding.summary}</p><div className="finding-sources">{finding.source_ids.map(id => <a key={id} href={`#source-${encodeURIComponent(id)}`} onClick={() => { const source = document.getElementById(`source-${encodeURIComponent(id)}`); if (source instanceof HTMLDetailsElement) source.open = true }}>来源 {id}</a>)}</div></div>)}{!!research.report.suggested_sequence.length && <><h4>建议学习顺序</h4><ol>{research.report.suggested_sequence.map((item, i) => <li key={i}>{item}</li>)}</ol></>}</section>}
     <div className="section-heading"><h2>已保存资料</h2><span>{research?.sources.length ?? 0} 篇</span></div>
-    {!research?.sources.length ? <p className="inline-note">尚未保存网页资料。已抓取正文将随真实调研结果显示。</p> : <div className="research-sources">{research.sources.map(source => <details className="research-source" id={`source-${encodeURIComponent(source.source_id)}`} key={source.source_id}><summary>{source.title || source.url}</summary><a href={source.url} target="_blank" rel="noreferrer">打开原网页 ↗</a><p className="source-meta">{source.source_id} · {dateLabel(source.fetched_at)}{source.truncated ? ' · 正文已截断' : ''}</p><p className="source-text">{source.text}</p><small className="source-hash">SHA-256 · {source.content_sha256}</small></details>)}</div>}
+    {!research?.sources.length ? <p className="inline-note">尚未保存网页资料。已抓取正文将随真实调研结果显示。</p> : <div className="research-sources">{research.sources.map(source => <details className="research-source" id={`source-${encodeURIComponent(source.source_id)}`} key={source.source_id}><summary>{source.title || source.url}</summary><a href={source.url} target="_blank" rel="noreferrer">打开原网页 <IconArrowUpRight size={12} /></a><p className="source-meta">{source.source_id} · {dateLabel(source.fetched_at)}{source.truncated ? ' · 正文已截断' : ''}</p><p className="source-text">{source.text}</p><small className="source-hash">SHA-256 · {source.content_sha256}</small></details>)}</div>}
     </details>
   </section>
 }

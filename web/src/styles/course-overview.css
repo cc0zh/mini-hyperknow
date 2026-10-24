@@ -1,0 +1,145 @@
+.page.overview-page {
+  --ov-ink: var(--ink-900);
+  --ov-muted: var(--text-muted);
+  --ov-line: var(--line);
+  --ov-sage: var(--sage-50);
+  --ov-lavender: var(--lav-100);
+  --ov-blue: var(--accent);
+  --ov-surface: var(--surface);
+  max-width: 1250px;
+  padding: 12px 44px 56px;
+  color: var(--ov-ink);
+}
+.ov-topline { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 0 0 22px; }
+.ov-topline .back-link { color: var(--ov-muted); margin: 0; min-height: 44px; display: inline-flex; align-items: center; font-size: var(--fs-2xs); }
+.ov-topline > span { font-size: var(--fs-2xs); color: var(--ov-muted); }
+.ov-topline > span span { padding: 0 9px; color: var(--ink-200); }
+.ov-workspace { display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: 48px; align-items: start; }
+.ov-sidebar, .ov-main { min-width: 0; }
+.ov-sidebar { position: sticky; top: 24px; max-height: calc(100dvh - 48px); overflow-y: auto; scrollbar-width: thin; padding-right: 6px; margin-right: -6px; }
+.ov-cover { overflow: hidden; background: var(--lav-100); border: 1px solid var(--lav-200); border-radius: var(--r-lg); padding: 18px 18px 16px; color: var(--lav-500); }
+.ov-cover > span { font-family: var(--font-serif); font-size: var(--fs-2xs); letter-spacing: 1.4px; }
+.ov-cover svg { display: block; width: 100%; height: 88px; margin: 4px 0 2px; }
+.ov-cover > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: var(--fs-2xs); }
+.ov-cover > div > span:first-child { background: var(--paper-1); border-radius: var(--r-xs); padding: 4px 8px; }
+.ov-course-heading { margin-top: 22px; }
+.ov-overline { display: block; color: var(--ov-muted); font-size: var(--fs-xs); letter-spacing: .4px; }
+.ov-course-heading h1 { font-size: var(--fs-xl); line-height: 1.5; margin: 8px 0 12px; letter-spacing: -.3px; overflow-wrap: anywhere; color: var(--ov-ink); }
+.ov-description p { color: var(--ov-muted); font-size: var(--fs-xs); line-height: 1.85; margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; }
+.ov-description p.is-expanded { display: block; }
+.ov-text-button { border: 0; padding: 8px 0; min-height: 44px; background: transparent; color: var(--accent); font-size: var(--fs-xs); }
+.ov-text-button:hover { color: var(--ov-ink); }
+.ov-text-button span { margin-left: 6px; }
+.ov-course-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; color: var(--ov-muted); font-size: var(--fs-xs); padding: 8px 0 18px; border-bottom: 1px solid var(--ov-line); }
+.ov-progress { margin: 18px 0 24px; }
+.ov-progress .progress-label { color: var(--ov-muted); margin-top: 0; font-size: var(--fs-xs); }
+.ov-progress .progress-label b { color: var(--ov-ink); }
+.ov-progress .aside-note { font-size: var(--fs-2xs); color: var(--ov-muted); line-height: 1.8; margin: 8px 0 0; }
+.ov-nav-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+.ov-nav-heading h2 { margin: 0; font-size: var(--fs-sm); color: var(--ov-ink); }
+.ov-nav-heading > span { font-size: var(--fs-2xs); color: var(--ov-muted); }
+.ov-unit-picker { display: none; }
+.ov-units ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ov-unit-link { display: flex; align-items: flex-start; gap: 10px; padding: 12px 10px; border: 1px solid transparent; border-left: 3px solid transparent; border-radius: var(--r-md); color: var(--ov-muted); min-height: 56px; }
+.ov-unit-link:hover { background: var(--sage-50); color: var(--ov-ink); }
+.ov-unit-link[aria-current] { background: var(--sage-50); border-left-color: var(--accent); color: var(--ov-ink); }
+.ov-unit-number { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: var(--r-sm); background: var(--paper-3); color: var(--ov-muted); font-family: var(--font-serif); font-size: var(--fs-2xs); font-variant-numeric: tabular-nums; }
+.ov-unit-link[aria-current] .ov-unit-number { background: var(--ov-ink); color: var(--paper-1); }
+.ov-unit-copy { min-width: 0; flex: 1; }
+.ov-unit-copy strong { display: block; font-size: var(--fs-xs); font-weight: 500; line-height: 1.65; overflow-wrap: anywhere; }
+.ov-unit-copy small { display: block; font-size: var(--fs-2xs); color: var(--ov-muted); margin-top: 4px; }
+.ov-unit-link > svg { width: 14px; height: 14px; margin-top: 5px; flex-shrink: 0; opacity: 0; }
+.ov-unit-link[aria-current] > svg { opacity: 1; }
+.ov-course-details { border-top: 1px solid var(--ov-line); margin-top: 22px; padding-top: 10px; color: var(--ov-muted); font-size: var(--fs-2xs); }
+.ov-course-details summary, .ov-objectives summary { cursor: pointer; min-height: 44px; padding: 8px 0; line-height: 1.8; }
+.ov-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 18px; }
+.ov-tags span { background: var(--ov-lavender); color: var(--lav-700); padding: 4px 8px; border-radius: var(--r-xs); font-size: var(--fs-2xs); overflow-wrap: anywhere; max-width: 100%; }
+.ov-course-details dl { margin: 0; }
+.ov-course-details dl > div + div { margin-top: 16px; }
+.ov-course-details dt { font-size: var(--fs-2xs); margin-bottom: 5px; }
+.ov-course-details dd { margin: 0; color: var(--ov-ink); line-height: 1.9; overflow-wrap: anywhere; }
+.ov-connection { font-size: var(--fs-2xs); line-height: 1.8; margin: 16px 0 0; color: var(--ov-muted); }
+.ov-unit-kicker { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: var(--fs-xs); color: var(--ov-muted); }
+.ov-unit-kicker > span:first-child { color: var(--lav-700); background: var(--lav-100); padding: 5px 10px; border-radius: var(--r-xs); }
+.ov-unit-kicker > span:first-child span { margin: 0 6px; opacity: .5; }
+.ov-status { display: inline-flex; align-items: center; gap: 6px; }
+.ov-status::before { content: ''; width: 6px; height: 6px; background: var(--sage-500); border-radius: 50%; }
+.ov-status.is-pending::before { background: var(--amber-400); }
+.ov-unit-header > h2 { font-size: var(--fs-2xl); line-height: 1.45; letter-spacing: -.5px; color: var(--ov-ink); margin: 18px 0 12px; overflow-wrap: anywhere; text-wrap: balance; }
+.ov-unit-description { font-size: var(--fs-base); line-height: 1.9; color: var(--ov-muted); margin: 0 0 14px; overflow-wrap: anywhere; }
+.ov-unit-metadata { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--ov-muted); font-size: var(--fs-xs); padding-bottom: 14px; border-bottom: 1px solid var(--ov-line); font-variant-numeric: tabular-nums; }
+.ov-objectives { color: var(--ov-muted); font-size: var(--fs-xs); margin: 2px 0 8px; }
+.ov-objectives summary { color: var(--accent); font-size: var(--fs-xs); }
+.ov-objectives ul { padding-left: 20px; margin: 10px 0 14px; line-height: 1.9; }
+.ov-objectives p { margin: 8px 0; overflow-wrap: anywhere; }
+.ov-objectives b { color: var(--ov-ink); font-weight: 500; }
+.ov-command { display: flex; align-items: center; justify-content: space-between; gap: 20px; border: 1px solid var(--sage-200); border-radius: var(--r-md); background: var(--sage-50); padding: 16px 18px; margin: 18px 0 24px; }
+.ov-command > div { min-width: 0; }
+.ov-command .ov-overline { margin-bottom: 5px; font-size: var(--fs-2xs); }
+.ov-command p { font-size: var(--fs-xs); line-height: 1.8; color: var(--text-muted); margin: 6px 0 0; }
+.ov-command.is-pending { background: var(--sand-50); border-color: var(--sand-300); }
+.ov-command.is-pending b { color: var(--sand-700); }
+.ov-command .button { flex-shrink: 0; min-height: 44px; }
+.ov-path-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 24px 0 18px; }
+.ov-path-heading h3 { font-size: var(--fs-sm); font-weight: 500; color: var(--ov-ink); margin: 0; }
+.ov-path-heading > span { font-size: var(--fs-2xs); color: var(--ov-muted); }
+.ov-unit-pagination { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; margin-top: 30px; border-top: 1px solid var(--ov-line); padding-top: 20px; }
+.ov-unit-pagination a { min-width: 0; color: var(--ov-muted); padding: 4px 0; }
+.ov-unit-pagination a:nth-child(2) { text-align: right; }
+.ov-unit-pagination span { display: block; font-size: var(--fs-xs); line-height: 1.6; }
+.ov-unit-pagination strong { display: block; font-size: var(--fs-xs); font-weight: 500; line-height: 1.8; margin-top: 6px; color: var(--ov-ink); overflow-wrap: anywhere; }
+.ov-unit-pagination a:hover strong { color: var(--ov-blue); }
+
+@media (max-width: 1200px) {
+  .page.overview-page { padding: 12px 28px 48px; }
+  .ov-workspace { grid-template-columns: 220px minmax(0, 1fr); gap: 28px; }
+  .ov-cover { padding: 14px; }
+  .ov-course-heading h1 { font-size: var(--fs-lg); }
+  .ov-command { flex-wrap: wrap; gap: 12px; }
+}
+@media (max-width: 1000px) {
+  .page.overview-page { padding: 12px 24px 40px; }
+  .ov-workspace { grid-template-columns: 190px minmax(0, 1fr); gap: 22px; }
+  .ov-cover svg { height: 76px; }
+  .ov-cover > div { flex-wrap: wrap; }
+  .ov-path-heading > span { display: none; }
+}
+/* The shared shell already folds at 860px (see app.css), so this route only
+   has to reflow its own two-column workspace. */
+@media (max-width: 860px) {
+  .ov-workspace { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .ov-sidebar { position: static; max-height: none; overflow: visible; padding-right: 0; margin-right: 0; }
+  .ov-cover { float: left; width: 138px; margin: 0 18px 12px 0; }
+  .ov-cover > span { letter-spacing: .8px; }
+  .ov-cover svg { height: 88px; }
+  .ov-course-heading { margin-top: 0; }
+  .ov-course-heading h1 { font-size: var(--fs-lg); }
+  .ov-course-meta { clear: both; padding-top: 8px; }
+  .ov-progress { margin-bottom: 18px; }
+  .ov-units { display: none; }
+  .ov-unit-picker { display: grid; gap: 8px; }
+  .ov-unit-picker label { color: var(--ov-ink); font-size: var(--fs-xs); font-weight: 500; }
+  .ov-unit-picker select { width: 100%; min-width: 0; min-height: 44px; padding: 10px; font: inherit; font-size: var(--fs-xs); color: var(--ov-ink); background: var(--surface); border: 1px solid var(--ov-line); border-radius: var(--r-md); }
+  .ov-unit-picker select:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+  .ov-unit-link { padding: 10px 8px; }
+  .ov-unit-link > svg { display: none; }
+  .ov-course-details { margin-top: 14px; }
+}
+@media (max-width: 560px) {
+  .page.overview-page { padding: 0 16px 32px; }
+  .ov-topline { margin-bottom: 16px; }
+  .ov-workspace { gap: 24px; }
+  .ov-cover { width: 120px; margin-right: 14px; padding: 12px; }
+  .ov-cover svg { height: 76px; }
+  .ov-cover > div > span:last-child { display: none; }
+  .ov-course-heading h1 { font-size: var(--fs-md); }
+  .ov-description { display: flow-root; }
+  .ov-description p { -webkit-line-clamp: 2; }
+  .ov-units ol { grid-template-columns: minmax(0, 1fr); }
+  .ov-unit-link { min-height: 44px; padding: 9px 10px; }
+  .ov-unit-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 8px; }
+  .ov-unit-copy small { margin: 0; }
+  .ov-unit-header > h2 { font-size: var(--fs-xl); }
+  .ov-unit-description { font-size: var(--fs-sm); }
+  .ov-unit-pagination { gap: 16px; }
+}

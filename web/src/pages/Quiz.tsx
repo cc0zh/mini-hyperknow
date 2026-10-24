@@ -1,3 +1,4 @@
+﻿import { IconArrowRight, IconCheck, IconChevronLeft, IconStar } from '../components/icons'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { EmptyState, ErrorNotice, Loading, dateLabel, useHealth } from '../components/ui'
@@ -55,10 +56,10 @@ function Results({ snapshot }: { snapshot: AttemptSnapshot }) {
   if (!result) return <ErrorNotice title="结果数据不完整" message="服务端已提交，但没有返回结果，请重新读取。" />
   const next = nextLearningPath(course)
   return <>
-    <section className="aside-card quiz-result" aria-labelledby="quiz-result-title"><span className="eyebrow">YOUR SAVED RESULT</span><h2 id="quiz-result-title">本次结果已保存</h2><div className="quiz-stars" aria-label={`${result.stars} 颗星`}>{'★'.repeat(result.stars)}{'☆'.repeat(Math.max(0, 3 - result.stars))}</div><p className="quiz-score">{result.total_score}<small> / {result.max_score} 分</small></p>
+    <section className="aside-card quiz-result" aria-labelledby="quiz-result-title"><span className="eyebrow">YOUR SAVED RESULT</span><h2 id="quiz-result-title">本次结果已保存</h2><div className="quiz-stars" aria-label={`${result.stars} 颗星`} style={{ animationDelay: '60ms' }}>{Array.from({ length: 3 }, (_, i) => <IconStar key={i} size={20} filled={i < result.stars} />)}</div><p className="quiz-score">{result.total_score}<small> / {result.max_score} 分</small></p>
       <dl className="quiz-statistics"><div><dt>答对</dt><dd>{result.correct_count} / {result.question_count}</dd></div><div><dt>跳过</dt><dd>{result.skipped_count}</dd></div><div><dt>快答</dt><dd>{result.fast_count}</dd></div><div><dt>最高连击</dt><dd>{result.best_streak}</dd></div><div><dt>总用时</dt><dd>{elapsedLabel(result.total_elapsed_ms)}</dd></div></dl>
       <p className="aside-note">结果由服务端计分并保存，不设通过线。{attempt.target_type === 'practice' ? '所属课时完成情况' : '考核完成情况'}由后端提交事务确认；课程进度仍只计算课时。</p>
-      <div className="quiz-actions"><Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>返回课程目录</Link>{next && <Link className="button primary" to={next}>继续：{course.next_item?.title} →</Link>}</div>
+      <div className="quiz-actions"><Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>返回课程目录</Link>{next && <Link className="button primary" to={next}>继续：{course.next_item?.title} <IconArrowRight size={13} /></Link>}</div>
       {course.next_item && !next && <p className="form-hint">下一项：{course.next_item.title} · 项目成果提交尚未开放。</p>}
     </section>
     <section className="quiz-review"><div className="section-heading"><h2>本次作答回顾</h2><span>历史结果只读</span></div>{quiz.questions.map((question, index) => {
@@ -151,14 +152,14 @@ function TargetQuiz(scope: QuizScope) {
     void command.execute(make(`/attempts/${encodeURIComponent(current.attempt.attempt_id)}/${action}`, { expected_version: current.attempt.version }))
   }
 
-  if (!snapshot) return <div className="page"><Link className="back-link" to={back}>← 返回课程</Link>{target.error ? <ErrorNotice title="测验读取失败" message={target.error} retry={() => { void target.reload() }} /> : <Loading label="正在读取已保存题组…" />}</div>
+  if (!snapshot) return <div className="page"><Link className="back-link" to={back}><IconChevronLeft size={15} />返回课程</Link>{target.error ? <ErrorNotice title="测验读取失败" message={target.error} retry={() => { void target.reload() }} /> : <Loading label="正在读取已保存题组…" />}</div>
   const generation = snapshot.generation_run
   const modelUnavailable = health.data?.model.configured === false
   const transitionType = liveAttempt ? attemptTransition(liveAttempt.attempt, liveAttempt.quiz.questions.length) : null
 
   return <div className="page quiz-page">
-    <div className="run-page-top"><Link className="back-link" to={back}>← 返回课程</Link><span className="connection-label">{target.connection}</span></div>
-    <header className="page-heading"><div><span className="eyebrow">{targetType === 'practice' ? 'PRACTICE AFTER CLASS' : 'UNIT EXAM'}</span><h1>{snapshot.title}</h1><p>{snapshot.description}</p></div><span className="completion-label">{targetType === 'practice' ? (snapshot.completed ? '✓ 课时已完成' : '课时尚未完成') : (snapshot.completed ? '✓ 考核已提交' : '考核尚未提交')}</span></header>
+    <div className="run-page-top"><Link className="back-link" to={back}><IconChevronLeft size={15} />返回课程</Link><span className="connection-label">{target.connection}</span></div>
+    <header className="page-heading"><div><span className="eyebrow">{targetType === 'practice' ? 'PRACTICE AFTER CLASS' : 'UNIT EXAM'}</span><h1>{snapshot.title}</h1><p>{snapshot.description}</p></div><span className="completion-label">{targetType === 'practice' ? (snapshot.completed ? <><IconCheck size={14} />课时已完成</> : '课时尚未完成') : (snapshot.completed ? <><IconCheck size={14} />考核已提交</> : '考核尚未提交')}</span></header>
     {target.error && <ErrorNotice title="活动同步失败" message={target.error} retry={() => { void target.reload() }} />}
     {!command.online && <ErrorNotice title="网络已断开" message="保留最后确认状态与原命令；联网不会自动出题、作答或提交。" />}
     {command.pending && <div className="pending-command" role="status"><div><b>{command.busy ? '正在保存，请稍候…' : '上次命令结果待确认'}</b><p>保留原方法、路径、请求体、用时和命令编号；不会自动重试或新建另一份请求。</p></div><button type="button" className="button secondary small" disabled={command.busy || !command.online} onClick={() => { void command.execute() }}>重试同一命令</button></div>}
@@ -172,9 +173,12 @@ function TargetQuiz(scope: QuizScope) {
     </section> : <>
       <details className="quiz-sources aside-card"><summary>本题组实际来源 · {snapshot.quiz.source_refs.length} 项</summary><ul>{snapshot.quiz.source_refs.map(ref => <li key={ref}>{ref}</li>)}</ul></details>
       {selectedId ? attempt.error ? <ErrorNotice title="作答读取失败" message={attempt.error} retry={() => { void attempt.reload() }} /> : !liveAttempt || liveAttempt.attempt.attempt_id !== selectedId ? <Loading label="正在读取所选作答与持久题目起点…" /> : liveAttempt.attempt.status === 'submitted' ? <Results snapshot={liveAttempt} /> : <>
-        <div className="section-heading"><h2>第 {liveAttempt.attempt.cursor + 1} / {liveAttempt.quiz.questions.length} 题</h2><span>已保存 {liveAttempt.attempt.answers.length} 题</span></div><progress className="quiz-progress" max={liveAttempt.quiz.questions.length} value={liveAttempt.attempt.answers.length} aria-label="已保存作答进度" />
+        <div className="section-heading"><h2>第 {liveAttempt.attempt.cursor + 1} / {liveAttempt.quiz.questions.length} 题</h2><span>已保存 {liveAttempt.attempt.answers.length} 题</span></div>
+        <div className="quiz-progress" role="progressbar" aria-valuemin={0} aria-valuemax={liveAttempt.quiz.questions.length} aria-valuenow={liveAttempt.attempt.answers.length} aria-label="已保存作答进度">
+          <div className="quiz-progress-track">{liveAttempt.quiz.questions.map((question, index) => <i key={question.question_id} className={index < liveAttempt.attempt.answers.length ? 'is-done' : index === liveAttempt.attempt.cursor ? 'is-current' : ''} />)}</div>
+        </div>
         <AnswerCard key={`${liveAttempt.attempt.attempt_id}:${liveAttempt.attempt.cursor}`} snapshot={liveAttempt} locked={locked || !!attempt.error} send={sendAnswer} />
-        {transitionType === 'next' && <div className="quiz-actions"><button type="button" className="button primary" disabled={locked || !!attempt.error} onClick={() => transition('next')}>下一题 →</button></div>}
+        {transitionType === 'next' && <div className="quiz-actions"><button type="button" className="button primary" disabled={locked || !!attempt.error} onClick={() => transition('next')}>下一题 <IconArrowRight size={13} /></button></div>}
         {transitionType === 'submit' && <div className="quiz-actions"><p className="form-hint">全部作答已保存。点击后提交结果并更新完成情况。</p><button type="button" className="button primary" disabled={locked || !!attempt.error} onClick={() => transition('submit')}>看结果 · 提交本次作答</button></div>}
       </> : <EmptyState title="题组已保存，准备好了吗？" action={<button type="button" className="button primary" disabled={locked} onClick={() => { void command.execute(make(`/quizzes/${encodeURIComponent(snapshot.quiz!.quiz_id)}/attempts`)) }}>开始作答</button>}>开始后才创建本次作答并记录第一题起点。进入或刷新页面不会创建尝试。</EmptyState>}
       {liveAttempt?.attempt.status === 'submitted' && <div className="quiz-actions"><button type="button" className="button primary" disabled={locked} onClick={() => { void command.execute(make(`/quizzes/${encodeURIComponent(snapshot.quiz!.quiz_id)}/attempts`)) }}>再练一次 · 复用本题组</button></div>}

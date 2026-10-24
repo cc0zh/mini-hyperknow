@@ -12,7 +12,7 @@
 
 | 区域 | 当前状态 | 依据／证据入口 | 下一步 |
 | --- | --- | --- | --- |
-| 产品与架构 | 造课／课程库、手写白板课堂及练习／考核均完成各自切片范围的真实验收 | [设计索引](design-docs/index.md)、[练习／考核完成计划](exec-plans/completed/20261022-real-practice-exams.md) | 思考题真实保存／反馈，再接项目成果，不宣称首版整体完成 |
+| 产品与架构 | 造课／课程库、手写白板课堂及练习／考核均完成各自切片范围的真实验收 | [设计索引](design-docs/index.md)、[练习／考核完成计划](exec-plans/completed/20261022-real-practice-exams.md) | 项目按用户决定暂缓；下一候选为思考题保存／反馈及不含项目的链路验证，不宣称首版整体完成 |
 | Agent 内核 | deepseek-flash真实澄清／造课／讲义／问答／出题，SDK自动重试关闭；讲义曾一次结构修复成功，本阶段三次quiz均首次校验成功 | [当前事实](ARCHITECTURE.md)、[调用与usage](exec-plans/completed/20261022-real-practice-exams.md#真实模型与成本) | quiz真实失败修复、取消晚到收费及在途硬重启仍未覆盖，不以课堂证据替代 |
 | 通用内核 V1 | 调度／逐次审批、原文存档、工作区工具、独立 JSONL／显式记忆、完整轮预算压缩和显式 tier 已实现；67 项直接内核检查及真实模型工具循环／摘要／重开通过 | [V1 契约](design-docs/agent-core-v1.md)、[升级验收](exec-plans/completed/20261022-agent-core-v1.md) | 保留同步网络不能远端取消、命令非 OS 沙箱、POSIX 与不同厂商 tier 未验边界；不改变课程工作流 |
 | 网页调研 Agent | 独立research run、来源报告及恢复已实现；51项调研检查、213项Python／21项Node CI通过；用户补齐配置后真实7次模型调用、2次搜索、1次阅读和报告恢复通过 | [调研契约](design-docs/web-research-agent.md)、[完成与证据](exec-plans/completed/20261023-web-research-agent.md) | 下一步接入造课和全局蓝图；内容准确性、外网在途取消／硬重启和全部重定向故障仍非全覆盖 |
