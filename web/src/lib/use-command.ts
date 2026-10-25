@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ApiError, describeError, isInputRejection, post } from './api'
-import { prepareCommand, readPending, savePending } from './commands'
+import { ownsCommand, prepareCommand, readPending, savePending } from './commands'
 import type { PendingCommand } from './commands'
 
 // A failed command retains the exact body and ID, including across page refresh.
@@ -20,6 +20,17 @@ export function useCommand<T>(scope: string, onSuccess: (value: T) => void) {
     return () => { mounted.current = false }
   }, [])
 
+  function clearOwned(command: PendingCommand) {
+    // A response from an unmounted library must not erase a later page's
+    // deletion. Retaining the receipt identity also makes refresh safe.
+    if (!mounted.current) return
+    if (ownsCommand(readPending(scope), command)) savePending(scope, null)
+    if (ownsCommand(pendingRef.current, command)) {
+      pendingRef.current = null
+      setPending(null)
+    }
+  }
+
   async function execute(path?: string, body?: Record<string, unknown>) {
     if (busyRef.current) return
     const command = prepareCommand(pendingRef.current, path, body, crypto.randomUUID())
@@ -34,34 +45,30 @@ export function useCommand<T>(scope: string, onSuccess: (value: T) => void) {
     setRejected(false)
     try {
       const value = await post<T>(command.path, command.body)
-      savePending(scope, null)
-      pendingRef.current = null
-      setPending(null)
+      clearOwned(command)
       if (mounted.current) onSuccess(value)
     } catch (cause) {
-      setError(describeError(cause))
-      setConflict(cause instanceof ApiError && cause.status === 409)
-      setRejected(isInputRejection(cause))
+      if (mounted.current) {
+        setError(describeError(cause))
+        setConflict(cause instanceof ApiError && cause.status === 409)
+        setRejected(isInputRejection(cause))
+      }
     } finally {
       busyRef.current = false
-      setBusy(false)
+      if (mounted.current) setBusy(false)
     }
   }
 
   function releaseConflict() {
     if (!conflict || busyRef.current) return
-    savePending(scope, null)
-    pendingRef.current = null
-    setPending(null)
+    if (pendingRef.current) clearOwned(pendingRef.current)
     setConflict(false)
     setError(null)
   }
 
   function releaseRejected() {
     if (!rejected || busyRef.current) return
-    savePending(scope, null)
-    pendingRef.current = null
-    setPending(null)
+    if (pendingRef.current) clearOwned(pendingRef.current)
     setRejected(false)
     setError(null)
   }

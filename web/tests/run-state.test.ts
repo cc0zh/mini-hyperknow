@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { blueprintDecision, hasAnswers, isTerminal, isWorking, newerRun, runHeading, runLabels, toggleOption } from '../src/lib/run-state.ts'
+import { blueprintDecision, hasAnswers, isTerminal, isWorking, newerRun, recoverableCourseRuns, runHeading, runLabels, supersedingCourseRunId, toggleOption } from '../src/lib/run-state.ts'
 import { prepareCommand } from '../src/lib/commands.ts'
 import type { Answer, Question, Run, RunStatus } from '../src/lib/types.ts'
 
@@ -102,4 +102,49 @@ test('a retry reuses its original path, version, ID and answers verbatim', () =>
 
 test('an empty retry does not manufacture a request', () => {
   assert.equal(prepareCommand(null, undefined, undefined, 'unused'), null)
+})
+
+test('a completed retry replaces the failed attempt in the course library without changing history', () => {
+  const failed: Run = { ...state(45), run_id: 'original', status: 'failed', course_id: 'course-a' }
+  const ready: Run = { ...failed, run_id: 'retry', parent_run_id: failed.run_id, status: 'ready' }
+  const courses = [{ course_id: 'course-a', creation_run_id: ready.run_id }]
+  assert.deepEqual(recoverableCourseRuns([ready, failed], courses), [])
+  assert.equal(failed.status, 'failed')
+  assert.equal(supersedingCourseRunId(failed, courses[0]), ready.run_id)
+})
+
+test('only the latest unfinished retry remains recoverable across multiple attempts', () => {
+  const first: Run = { ...state(1), run_id: 'first', status: 'failed', course_id: 'course-a' }
+  const second: Run = { ...first, run_id: 'second', parent_run_id: first.run_id, status: 'cancelled' }
+  const third: Run = { ...first, run_id: 'third', parent_run_id: second.run_id, status: 'generating' }
+  assert.deepEqual(recoverableCourseRuns([first, third, second], [{ course_id: 'course-a', creation_run_id: third.run_id }]), [third])
+  // A course read that preceded the retry must not hide the newer descendant.
+  assert.deepEqual(recoverableCourseRuns([first, third, second], [{ course_id: 'course-a', creation_run_id: first.run_id }]), [third])
+})
+
+test('the course owner excludes obsolete failures even when the current run falls outside the recent list', () => {
+  const old: Run = { ...state(1), status: 'failed', course_id: 'course-a' }
+  assert.deepEqual(recoverableCourseRuns([old], [{ course_id: 'course-a', creation_run_id: 'not-in-recent-list' }]), [])
+})
+
+test('retry ancestry supersedes attempts that failed before a course was saved', () => {
+  const first: Run = { ...state(1), run_id: 'first', status: 'failed' }
+  const next: Run = { ...first, run_id: 'next', parent_run_id: first.run_id, course_id: 'course-a' }
+  assert.deepEqual(recoverableCourseRuns([next, first], []), [next])
+})
+
+test('unrelated courses with identical goals and non-superseded cancellations remain visible', () => {
+  const first: Run = { ...state(1), run_id: 'first', status: 'failed', course_id: 'course-a', goal: '相同目标' }
+  const other: Run = { ...first, run_id: 'other', course_id: 'course-b', status: 'cancelled' }
+  const lesson: Run = { ...first, run_id: 'lesson', kind: 'lesson', parent_run_id: first.run_id }
+  assert.deepEqual(recoverableCourseRuns([first, other, lesson], []), [first, other])
+})
+
+test('a redirect requires a different owner of the same course, not just any saved course', () => {
+  const run: Run = { ...state(1), course_id: 'course-a' }
+  assert.equal(supersedingCourseRunId(run, { course_id: 'course-a', creation_run_id: run.run_id }), null)
+  assert.equal(supersedingCourseRunId(run, { course_id: 'course-b', creation_run_id: 'other' }), null)
+  assert.equal(supersedingCourseRunId(run, { course_id: 'course-a' }), null)
+  assert.equal(supersedingCourseRunId({ ...run, kind: 'lesson' }, { course_id: 'course-a', creation_run_id: 'other' }), null)
+  assert.equal(supersedingCourseRunId(run, null), null)
 })

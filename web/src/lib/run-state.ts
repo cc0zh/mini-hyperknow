@@ -1,4 +1,4 @@
-import type { Answer, Question, Run, RunStatus } from './types'
+import type { Answer, Course, Question, Run, RunStatus } from './types'
 
 export const runLabels: Record<RunStatus, string> = {
   queued: '等待执行', clarifying: '正在理解目标', awaiting_answers: '等待你的补充', awaiting_blueprint: '等待确认课程蓝图',
@@ -22,6 +22,43 @@ export function blueprintDecision(run: Pick<Run, 'status' | 'version'>, approve:
 // Notifications only invalidate a snapshot; their partial state never becomes a Run.
 export function newerRun(current: Run | null, incoming: Run): Run {
   return !current || current.run_id !== incoming.run_id || incoming.version > current.version ? incoming : current
+}
+
+function isCourseRun(run: Pick<Run, 'kind'>) { return !run.kind || run.kind === 'course' }
+
+export function supersedingCourseRunId(run: Pick<Run, 'run_id' | 'kind' | 'course_id'>,
+  course: Pick<Course, 'course_id' | 'creation_run_id'> | null): string | null {
+  if (!isCourseRun(run) || !course || !run.course_id || run.course_id !== course.course_id ||
+    !course.creation_run_id || course.creation_run_id === run.run_id) return null
+  return course.creation_run_id
+}
+
+export function recoverableCourseRuns(runs: Run[], courses: Pick<Course, 'course_id' | 'creation_run_id'>[]): Run[] {
+  const owners = new Map(courses.map(course => [course.course_id, course.creation_run_id]))
+  const byId = new Map(runs.map(run => [run.run_id, run]))
+  const superseded = new Set<string>()
+  for (const child of runs) {
+    if (!isCourseRun(child) || !child.parent_run_id) continue
+    let parent = byId.get(child.parent_run_id)
+    const seen = new Set<string>()
+    while (parent && !seen.has(parent.run_id)) {
+      superseded.add(parent.run_id)
+      seen.add(parent.run_id)
+      parent = parent.parent_run_id ? byId.get(parent.parent_run_id) : undefined
+    }
+  }
+  const descendsFromOwner = (run: Run) => {
+    let parent = run.parent_run_id ? byId.get(run.parent_run_id) : undefined
+    const seen = new Set<string>()
+    while (parent && !seen.has(parent.run_id)) {
+      if (parent.course_id && owners.get(parent.course_id) === parent.run_id) return true
+      seen.add(parent.run_id)
+      parent = parent.parent_run_id ? byId.get(parent.parent_run_id) : undefined
+    }
+    return false
+  }
+  return runs.filter(run => isCourseRun(run) && run.status !== 'ready' &&
+    (!run.course_id || !owners.get(run.course_id) || owners.get(run.course_id) === run.run_id || descendsFromOwner(run)) && !superseded.has(run.run_id))
 }
 
 export function toggleOption(question: Question, answer: Answer, optionId: string): Answer {

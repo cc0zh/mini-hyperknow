@@ -5,6 +5,10 @@ export interface PendingCommand {
 
 const prefix = 'hyperknow.command.'
 
+export function ownsCommand(stored: PendingCommand | null, completed: PendingCommand): boolean {
+  return stored?.path === completed.path && stored.body.client_command_id === completed.body.client_command_id
+}
+
 export function prepareCommand(pending: PendingCommand | null, path: string | undefined, body: Record<string, unknown> | undefined, commandId: string): PendingCommand | null {
   if (pending) return pending
   return path && body ? { path, body: { ...body, client_command_id: commandId } } : null
