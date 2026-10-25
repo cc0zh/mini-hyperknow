@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from pydantic import Field
 
 from .config import Settings
+from .assistance_api import router as assistance_router
 from .domain import AppError, Schema
 from .lesson_domain import LessonSnapshot
 from .quiz_domain import AttemptSnapshot, MAX_ELAPSED_MS, QuizSnapshot
@@ -86,6 +87,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await service.close()
 
     app = FastAPI(title="mini-hyperknow", lifespan=lifespan)
+    app.include_router(assistance_router)
 
     @app.exception_handler(AppError)
     async def app_error(_request: Request, exc: AppError):
@@ -147,6 +149,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/courses/{course_id}")
     async def course(course_id: str):
         return app.state.db.get_course(course_id)
+
+    @app.post("/api/courses/{course_id}/delete")
+    async def delete_course(course_id: str, data: ChangeRun):
+        return await app.state.service.delete_course(course_id, data.model_dump())
 
     @app.get("/api/sessions/{session_id}", response_model=LessonSnapshot)
     @app.get("/api/sessions/{session_id}/lesson", response_model=LessonSnapshot)
@@ -232,6 +238,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 readers = {"run": app.state.db.get_run, "session": app.state.db.get_lesson,
                            "course": app.state.db.get_course,
                            "quiz_target": app.state.db.get_quiz_target_key,
+                           "conversation": app.state.db.get_assistance_conversation,
+                           "artifact": app.state.db.get_assistance_artifact,
                            "attempt": app.state.db.get_attempt}
                 if kind not in readers:
                     await hub.send(socket, {"type": "error", "message": "未知订阅类型"})

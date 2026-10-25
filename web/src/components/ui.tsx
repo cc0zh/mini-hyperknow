@@ -5,8 +5,9 @@ import { useResource } from '../lib/use-resource'
 import type { Course, Health } from '../lib/types'
 import { progressLabel } from '../lib/format'
 import { courseProgress, structurePending } from '../lib/course-state'
+import { nextLearningPath } from '../lib/quiz-state'
 import {
-  IconArrowUpRight, IconBook, IconChevronLeft, IconHome, IconLibrary, IconSidebar, IconSpark,
+  IconArrowRight, IconArrowUpRight, IconBook, IconChevronLeft, IconHome, IconLibrary, IconSidebar, IconSpark, IconTrash,
 } from './icons'
 
 const HealthContext = createContext<ReturnType<typeof useResource<Health>> | null>(null)
@@ -71,6 +72,7 @@ export function Shell() {
         <div className="sidebar-label">我的学习空间</div>
         <nav aria-label="主导航">
           <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} title="首页"><span className="nav-icon"><IconHome /></span><span className="nav-text">首页</span></NavLink>
+          <NavLink to="/assistance" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} title="即时协助"><span className="nav-icon"><IconSpark /></span><span className="nav-text">即时协助</span></NavLink>
           <NavLink to="/courses" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} title="我的课程"><span className="nav-icon"><IconLibrary /></span><span className="nav-text">我的课程</span></NavLink>
         </nav>
         <div className="sidebar-note"><span className="note-line" /><p>每一个问题，<br />都可以是一段学习的开始。</p></div>
@@ -94,6 +96,7 @@ export function Shell() {
       </div>
       {!isCreation && <nav className="tabbar" aria-label="底部导航">
         <NavLink to="/" end className={({ isActive }) => `tab-link ${isActive ? 'active' : ''}`}><IconHome size={21} /><span>首页</span></NavLink>
+        <NavLink to="/assistance" className={({ isActive }) => `tab-link ${isActive ? 'active' : ''}`}><IconSpark size={21} /><span>协助</span></NavLink>
         <NavLink to="/courses" className={({ isActive }) => `tab-link ${isActive ? 'active' : ''}`}><IconLibrary size={21} /><span>课程</span></NavLink>
       </nav>}
     </div>
@@ -115,9 +118,9 @@ export function EmptyState({ title, children, action }: { title: string; childre
 export const difficultyLabels = { beginner: '入门', intermediate: '中级', advanced: '进阶' }
 export const dateLabel = (date: string) => new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(date))
 
-export function CourseProgress({ course }: { course: Course }) {
+export function CourseProgress({ course, compact = false }: { course: Course; compact?: boolean }) {
   const progress = courseProgress(course)
-  return <><div className="progress-label"><span>课时进度</span><b>{progressLabel(progress)}</b></div>{progress === null ? <><div className="progress-incomplete" aria-hidden="true" /><p className="aside-note">目录尚未完整，暂不计算整门课程进度。</p></> : <><progress value={progress} max={100} aria-label={`${course.title}课时进度`} /><p className="aside-note">按服务端保存的已完成课时计算，不代表掌握度；考核不计入课时比例。</p></>}</>
+  return <><div className="progress-label"><span>课时进度</span><b>{progressLabel(progress)}</b></div>{progress === null ? <><div className="progress-incomplete" aria-hidden="true" /><p className="aside-note">目录尚未完整，暂不计算整门课程进度。</p></> : <><progress value={progress} max={100} aria-label={`${course.title}课时进度`} /><p className="aside-note">{compact ? '按已完成课时计算，不代表掌握度。' : '按服务端保存的已完成课时计算，不代表掌握度；考核不计入课时比例。'}</p></>}</>
 }
 
 // Cover art is deterministic per course_id: the same course always draws the
@@ -142,12 +145,23 @@ function CoverArt({ id }: { id: string }) {
   </svg>
 }
 
-export function CourseCard({ course, index = 0 }: { course: Course; index?: number }) {
-  return <Link className={`course-card tone-${index % 3}`} to={`/courses/${encodeURIComponent(course.course_id)}`}>
+export function CourseCard({ course, index = 0, onDelete, deleteDisabled = false }: {
+  course: Course; index?: number; onDelete: (course: Course, trigger: HTMLButtonElement) => void; deleteDisabled?: boolean
+}) {
+  const overview = `/courses/${encodeURIComponent(course.course_id)}`
+  const next = nextLearningPath(course)
+  const nextLabel = next ? `继续：${course.next_item!.title}` : '查看学习安排'
+  return <article className={`course-card tone-${index % 3}`} aria-label={course.title}>
+    <Link className="course-card-content" to={overview} aria-label={`查看课程：${course.title}`}>
     <div className="ticket-cover"><CoverArt id={course.course_id} /><div className="cover-top"><Mark small /><span>{course.tags[0] || '学科未标注'}</span></div><div className="cover-title">{course.title}</div><span className="cover-motif" aria-hidden="true"><IconSpark size={56} strokeWidth={1.1} /></span></div>
-    <div className="ticket-body"><span className="eyebrow">专属课程 / {difficultyLabels[course.difficulty]}</span><h2>{course.title}</h2><p className="card-description">{course.description}</p><div className="structure-summary">{course.unit_count} 单元 <span>·</span> {structurePending(course) ? '已生成 ' : ''}{course.session_count} 课时 <span>·</span> {course.exam_count} 考核</div>
-      <CourseProgress course={course} />
+    <div className="ticket-body"><span className="eyebrow">专属课程 / {difficultyLabels[course.difficulty]}</span><h2 title={course.title}>{course.title}</h2><p className="card-description">{course.description}</p><div className="structure-summary">{course.unit_count} 单元 <span>·</span> {structurePending(course) ? '已生成 ' : ''}{course.session_count} 课时 <span>·</span> {course.exam_count} 考核</div>
+      <div className="course-card-progress"><CourseProgress course={course} compact /></div>
     </div>
-    <div className="ticket-stub"><span>{dateLabel(course.created_at)} 创建</span><b>查看课程 <Arrow /></b></div>
-  </Link>
+    </Link>
+    <div className="ticket-stub"><span>{dateLabel(course.created_at)} 创建</span><Link to={overview}>查看课程 <Arrow /></Link></div>
+    <div className="course-card-actions">
+      <Link className="button secondary small course-continue" to={next ?? overview} title={nextLabel}><span>{nextLabel}</span><IconArrowRight size={14} /></Link>
+      <button type="button" className="course-delete" disabled={deleteDisabled} aria-label={`删除课程：${course.title}`} onClick={event => onDelete(course, event.currentTarget)}><IconTrash size={16} /><span>删除</span></button>
+    </div>
+  </article>
 }

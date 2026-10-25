@@ -13,6 +13,8 @@
 
 ## 2. 已定工程选择
 
+2026-10-24新增独立[即时协助](design-docs/instant-assistance.md)：assistance run复用同一串行worker，独立会话／产物表不依附课程。通用SkillRegistry只加载显式可信目录快照；产品Agent只得到get_skills与四种create工具，不装配开发工作区／搜索权限。教学会话与课程各自独立上下文，生成不承诺秒回。实施／验收状态见该契约关联计划。
+
 | 决策 | 选择 | 原因／边界 |
 | --- | --- | --- |
 | D01 | Python 后端，FastAPI + Uvicorn + Pydantic | 复用已有内核和真实 provider；不把 Clone 的 Node 后端原样搬入 |
@@ -57,6 +59,7 @@ src/
     compression.py        完整轮摘要与失败不丢历史
     memory.py             调用者显式维护的有界长期记忆
     tokens.py             保守估算与真实 usage 分离
+    skills.py             显式可信Skill目录、正文按需披露、版本与摘要校验
   hyperknow/              已实现的造课、白板课堂与练习/考核切片
     config.py             本地配置，不在公开响应中包含密钥
     domain.py             课程/澄清 schema、答案规则、实体化
@@ -73,6 +76,11 @@ src/
     research_domain.py    带来源调研报告与实际已读引用校验
     research_storage.py   独立research run、来源／过程／报告事务
     research_web.py       Tavily真实搜索、公网固定连接及有界网页提取
+    assistance_domain.py  教学回复和四类独立产物校验，不含course_id
+    assistance_storage.py 会话/轮次、原子产物提交、白板位置与迟到保存屏障
+    assistance_generation.py 有界教学Agent、Skill激活与逐次真实调用记录
+    assistance_api.py     独立教学命令与查询
+    skills/               两个受版本管理的可信产品SKILL.md，不是开发助手权限
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
   src/pages/              首页、创建/澄清、课程库、总览、Classroom与Quiz
@@ -111,6 +119,8 @@ docs/                     产品、架构、计划与证据
 SQLite 当前保存课程、目标与澄清、运行、命令回执、模型调用，以及不可变讲义、课堂聚合／确认位置、问答和课时完成事实。v1 → v2 升级前使用 SQLite backup 备份已有 v1 数据库，新增四张表并扩展命令回执；并非新增五表。v3在此基础上新增quizzes、quiz_states、quiz_attempts三表及每题组单个未提交尝试的部分唯一索引，升级前自动备份已有v1／v2库，保留原八表。物理结构见[数据模型](design-docs/data-model.md)；思考题及项目成果仍为后续目标。
 
 内存只放执行句柄、订阅、播放器时钟和可重建状态。前端 sessionStorage 保存待确认命令身份及本次回答的继续确认，不是业务事实来源。课堂聚合顶层 version 用于完整快照／通知排序；progress.version 只用于位置与播放意图写入的乐观锁，不能混用。
+
+即时协助另以幂等DDL新增assistance_conversations(id,data)和assistance_artifacts(id,conversation_id,data)，保持user_version=3；原表及升级备份不变。产物生成暂存于单run内，回复／全部产物／ready通过事务同时提交；白板cursor独立使用artifact.version。闪卡位置、即时测验选择和HTML内部状态仅为浏览器现场，不与课程成绩混用。
 
 播放器只有一个前端 PlaybackClock；后端不开自动讲课定时器。前端串行写入下一步，经后端确认后才展示该步骤。页栏回看只改变本地显示选择，不改变确认 cursor。GET 保留数据库中权威 play_intent，同一版本不因读取而改成 paused；恢复时前端仍创建暂停的本地时钟，不根据 GET 自动播放。进入、刷新和重连不会发起讲义生成，必须明确点击准备或重试。
 

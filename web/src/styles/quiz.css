@@ -50,8 +50,5 @@
 .quiz-history b { font-size: var(--fs-xs); font-weight: 500; display: block; }
 .quiz-history small { color: var(--text-faint); font-size: var(--fs-2xs); display: block; margin-top: 7px; }
 .quiz-options legend.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
-.course-card-wrap { min-width: 0; }
-.course-card-wrap > .course-card { height: auto; }
-.course-continue { margin-top: 10px; display: flex; justify-content: flex-end; }
 .quiz-stars { animation: stars-in var(--dur-slow) var(--ease-back) both; }
 @keyframes stars-in { from { opacity: 0; transform: scale(.86); } }

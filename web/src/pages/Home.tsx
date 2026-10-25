@@ -41,7 +41,7 @@ export default function Home() {
       {command.pending && !command.busy && <p className="inline-note" role="status">保留了上次请求的内容与编号。重试不会创建一份重复课程。</p>}
       {health.error ? <ErrorNotice message={health.error} title="无法连接本地后端" retry={health.reload} /> : health.data?.model.configured === false ? <div className="configuration-note" role="status"><b>模型尚未配置</b><p>请在后端配置真实模型服务。当前无法生成课程，不会使用示例课程或模拟内容代替。</p><button className="text-button" type="button" onClick={health.reload}>重新检查服务</button></div> : health.data ? <p className="model-note">后端模型：{health.data.model.name || '未返回名称'} <span>· 已配置，尚未验证本次调用</span></p> : null}
       <div className="home-steps" aria-label="课程创建流程"><div><span>01</span><b>说出目标</b><p>主题、基础与期望，从一段文字开始。</p></div><div><span>02</span><b>澄清与调研</b><p>补充学习方向，结合真实网页资料规划。</p></div><div><span>03</span><b>确认蓝图</b><p>审阅整门课程方向，批准后自动逐单元展开。</p></div></div>
-      <div className="home-library-link">已经有自己的课程？<Link to="/courses">打开我的课程 <Arrow /></Link></div>
+      <div className="home-library-link">想先解决一个具体问题？<Link to="/assistance">即时协助 <Arrow /></Link><span> · </span><Link to="/courses">打开我的课程 <Arrow /></Link></div>
       {recent.length > 0 && <section className="home-recent" aria-label="最近课程">
         <div className="home-recent-heading"><span>继续上次的进度</span><Link to="/courses">全部课程 <IconArrowRight size={13} /></Link></div>
         <ul>{recent.map(course => {

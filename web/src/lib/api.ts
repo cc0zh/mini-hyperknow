@@ -16,7 +16,7 @@ export class ApiError extends Error {
 
 // These statuses explicitly reject input before the write commits.
 export function isInputRejection(error: unknown): boolean {
-  return error instanceof ApiError && (error.status === 400 || error.status === 422)
+  return error instanceof ApiError && (error.status === 400 || error.status === 404 || error.status === 422)
 }
 
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

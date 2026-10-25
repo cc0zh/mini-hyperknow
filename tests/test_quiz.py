@@ -500,14 +500,24 @@ class QuizMigrationTests(unittest.TestCase):
                 self.assertEqual(backup.execute("PRAGMA user_version").fetchone()[0], 2)
                 copied = {table: backup.execute(f"SELECT * FROM {table} ORDER BY id").fetchall() for table in tables}
                 self.assertEqual(copied, before)
+                self.assertEqual({r[0] for r in backup.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'")}, set(tables))
                 self.assertEqual(backup.execute("PRAGMA integrity_check").fetchone()[0], "ok")
             with db.transaction() as conn:
                 self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
                 after = {table: [tuple(r) for r in conn.execute(f"SELECT * FROM {table} ORDER BY id")] for table in tables}
+                self.assertEqual(after, before)
                 self.assertEqual(hashlib.sha256(repr(after).encode()).hexdigest(), digest)
                 self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0], "ok")
                 actual_tables = {r["name"] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-                self.assertEqual(actual_tables, {*tables, "quizzes", "quiz_states", "quiz_attempts"})
+                self.assertEqual(actual_tables, {*tables, "quizzes", "quiz_states", "quiz_attempts",
+                                                  "assistance_conversations", "assistance_artifacts"})
+                for table, columns in (
+                    ("assistance_conversations", ["id", "data"]),
+                    ("assistance_artifacts", ["id", "conversation_id", "data"]),
+                ):
+                    self.assertEqual([r["name"] for r in conn.execute(f"PRAGMA table_info({table})")], columns)
+                    self.assertEqual(conn.execute(f"SELECT count(*) FROM {table}").fetchone()[0], 0)
                 index = conn.execute("SELECT sql FROM sqlite_master WHERE name='one_open_attempt'").fetchone()["sql"]
                 self.assertIn("UNIQUE INDEX", index)
                 self.assertIn("WHERE status='in_progress'", index)

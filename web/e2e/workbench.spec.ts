@@ -70,7 +70,7 @@ test('real stopped runs preserve the reason and guide readers away from a supers
   const writes: string[] = []
   page.on('request', request => { if (request.method() !== 'GET' && request.url().includes('/api/')) writes.push(request.url()) })
   for (const run of stopped) {
-    await page.goto(`/course-runs/${run.run_id}`)
+    await page.goto(`/course-runs/${run.run_id}?history=1`)
     await expect(page.locator('.wb-current')).toContainText(/没有完成|已停止|已中断/)
     await expect(page.locator('.bx-generating')).toHaveCount(0)
     if (run.error) await expect(page.locator('.error-notice')).toContainText(run.error.message)

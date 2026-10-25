@@ -1,5 +1,7 @@
 # API、事件与客户端同步契约
 
+独立教学新增`/api/assistance/conversations`、会话`/{id}/turns`、`/api/assistance/artifacts/{id}`、`/progress`及`/feedback`；完整字段、202返回和版本约束见[即时协助契约](instant-assistance.md)。取消／重试仍复用`/api/runs/{id}`，事件增加`conversation:{id}`及`artifact:{id}`，不引入第二套WebSocket。快照读取与恢复不自动触发模型收费。
+
 状态：2026-10-22 造课与课堂保留既有真实验收；练习／考核出题、作答、显式提交与结果查询本阶段范围已完成真实验收。thought-answers 与成果提交仍为目标；证据及未覆盖时序见[完成计划](../exec-plans/completed/20261022-real-practice-exams.md)。
 关联：[架构](../ARCHITECTURE.md)、[数据](data-model.md)、[交互](learning-experience.md)。
 
@@ -44,6 +46,7 @@
 | `POST /api/runs/{run_id}/retry` | 根据原输入建立新 run，不重写旧运行身份 |
 | `GET /api/courses` | 课程列表及一致的进度摘要 |
 | `GET /api/courses/{course_id}` | 完整目录、完成情况、课时比例和 next_item |
+| `POST /api/courses/{course_id}/delete` | client_command_id、expected_version（课程 version）；200 返回 `{course_id, deleted:true}`。事务内检查版本并删除课程及其课堂、练习、作答、运行与调研证据；关联任务 queued／clarifying／generating／awaiting_answers／awaiting_blueprint 时返回 409 course_active，需先停止相关任务。未知课程 404；同命令／输入重试在删除后仍返回成功，异输入 409 |
 | `GET /api/sessions/{session_id}` | LessonSnapshot：课时元数据、完整脚本、progress、interactions、generation_run、completed 及顶层 version；不触发模型 |
 | `POST /api/sessions/{session_id}/prepare` | 200；无讲义及历史生成记录时建立 lesson run，已有脚本／记录复用；失败等状态由显式 run retry 处理 |
 | `GET /api/sessions/{session_id}/lesson` | 与课时 GET 相同的已保存快照，不另造暂停版本 |
@@ -121,5 +124,7 @@ prepare／attempts使用client_command_id；answer／next／submit另带expected
 当前 prepare 对已有脚本或任一该课时讲义 run 返回当前快照，不另启模型调用；failed／cancelled／interrupted 由显式 retry 建立新 run，保留旧 run 与模型／输入依据。题组prepare也复用既有题组或最近运行，失败由显式run retry处理；再练复用原题组版本，不重新出题。
 
 取消与模型完成竞争以事务内状态为准，已取消结果不提交；ready 后取消返回明确冲突，不删除课程。单进程事务和版本检查足够，不引入分布式锁。
+
+删除课程与清理关联数据、保存删除回执在同一事务中提交；版本冲突为409 version_conflict并含latest_version。提交后course通知state=deleted、version=删除前版本+1，后续GET返回404。旧创建、准备、重试等命令回执保留，其资源已删除时重放返回404，不能重新生成；只有成功删除命令的同输入重放返回既有删除确认。
 
 内核 emit 不是本协议。当前本地检查覆盖实际函数、SQLite 与本地 HTTP／WS；真实 deepseek-flash 已生成 asyncio／摄影两课讲义和两条问答，并完成播放、回看、显式继续、手动完成及已保存状态冷重启验收，证据见[课堂计划](../exec-plans/completed/20261022-real-whiteboard-classroom.md)。没有凭据不能证明生成成功，未来目标端点仍不可调用；生成 OpenAPI 不代表接口验收完成。

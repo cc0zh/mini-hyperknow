@@ -84,7 +84,7 @@ function cleanSvg(svg: string): string {
 }
 
 let mermaidQueue: Promise<unknown> = Promise.resolve()
-function Mermaid({ content, fontReady }: { content: string; fontReady: boolean }) {
+export function Mermaid({ content, fontReady }: { content: string; fontReady: boolean }) {
   const id = `board-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const [attempt, setAttempt] = useState(0)
   const [svg, setSvg] = useState('')

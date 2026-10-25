@@ -176,8 +176,11 @@ textarea::placeholder, input::placeholder { color: var(--ink-300); }
 .tone-0 .cover-art { color: var(--lav-500); }
 .tone-1 .cover-art { color: var(--sage-600); }
 .tone-2 .cover-art { color: var(--sand-500); }
-.course-card { display: block; position: relative; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-lg); color: var(--text); box-shadow: var(--shadow-0); transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
-.course-card:hover { transform: translateY(-2px); border-color: var(--sage-300); box-shadow: var(--shadow-3); }
+.course-card { display: flex; flex-direction: column; position: relative; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-lg); color: var(--text); box-shadow: var(--shadow-0); transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+.course-card:hover, .course-card:focus-within { border-color: var(--sage-300); box-shadow: var(--shadow-3); }
+.course-card-content { display: flex; flex-direction: column; flex: 1; min-width: 0; color: inherit; border-radius: var(--r-lg); }
+.course-card-content:hover { color: inherit; }
+.course-card .ticket-cover { flex-shrink: 0; }
 .ticket-cover { height: 164px; margin: 9px; border-radius: var(--r-sm); padding: 16px; background: var(--lav-100); position: relative; overflow: hidden; }
 .tone-1 .ticket-cover { background: var(--sage-100); }
 .tone-2 .ticket-cover { background: var(--sand-100); }
@@ -191,9 +194,13 @@ textarea::placeholder, input::placeholder { color: var(--ink-300); }
 .cover-motif { position: absolute; right: -15px; bottom: -48px; font-size: 140px; line-height: 1; color: var(--lav-200); opacity: .55; transform: rotate(-15deg); }
 .tone-1 .cover-motif { color: var(--sage-200); }
 .tone-2 .cover-motif { color: var(--sand-300); }
-.ticket-body { padding: 15px 19px 20px; }
+.ticket-body { padding: 15px 19px 20px; display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .ticket-body .eyebrow { font-size: var(--fs-2xs); letter-spacing: .4px; }
-.ticket-body h2 { font-size: var(--fs-md); line-height: 1.6; margin: 8px 0 8px; }
+.ticket-body h2 { font-size: var(--fs-md); line-height: 1.6; margin: 8px 0 8px; min-height: 3.2em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.course-card .card-description { min-height: 3.7em; }
+.course-card .structure-summary { min-height: 1.85em; }
+.course-card-progress { margin-top: auto; }
+.course-card-progress .aside-note { min-height: 3.8em; }
 .card-description { color: var(--text-muted); font-size: var(--fs-xs); line-height: var(--lh-base); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 46px; margin: 0 0 18px; }
 .structure-summary { display: flex; gap: 5px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: 20px; }
 .structure-summary > span { color: var(--ink-200); }
@@ -209,8 +216,30 @@ progress::-moz-progress-bar { background: var(--sage-500); border-radius: var(--
 .ticket-stub::before { left: -7px; border-right: 1px solid var(--line); }
 .ticket-stub::after { right: -7px; border-left: 1px solid var(--line); }
 .ticket-stub > span { color: var(--text-faint); font-size: var(--fs-2xs); }
-.ticket-stub > b { color: var(--accent); font-size: var(--fs-xs); font-weight: 500; }
-.ticket-stub > b > span { margin-left: 8px; font-size: var(--fs-sm); }
+.ticket-stub > a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); font-size: var(--fs-xs); font-weight: 500; }
+.course-card-actions { display: flex; align-items: center; gap: 12px; padding: 0 18px 16px; }
+.course-card-actions .course-continue { flex: 1; min-width: 0; justify-content: space-between; gap: 8px; padding: 9px 12px; min-height: 44px; }
+.course-continue > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.course-continue > svg { flex-shrink: 0; }
+.course-delete { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; min-height: 44px; padding: 8px; border: 0; border-radius: var(--r-md); background: transparent; color: var(--text-muted); font-size: var(--fs-xs); }
+.course-delete:hover:not(:disabled) { color: var(--clay-700); background: var(--clay-50); }
+
+.library-notice { color: var(--accent); font-size: var(--fs-sm); }
+.library-notice:empty { margin: 0; }
+.deletion-recovery { display: flex; align-items: center; gap: 20px; justify-content: space-between; border: 1px solid var(--sand-300); background: var(--sand-50); border-radius: var(--r-lg); padding: 18px; margin-bottom: 22px; }
+.deletion-recovery b { font-size: var(--fs-sm); }
+.deletion-recovery p { margin: 6px 0 0; font-size: var(--fs-xs); color: var(--text-muted); overflow-wrap: anywhere; }
+.deletion-recovery .button { flex-shrink: 0; }
+.course-delete-dialog { width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; margin: auto; padding: 30px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--r-xl); box-shadow: var(--shadow-4); }
+.course-delete-dialog::backdrop { background: color-mix(in srgb, var(--slate-900) 40%, transparent); backdrop-filter: blur(3px); }
+.delete-dialog-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--r-lg); background: var(--clay-50); color: var(--clay-700); margin-bottom: 20px; }
+.course-delete-dialog h2 { margin: 0 0 14px; font-size: var(--fs-xl); }
+.delete-course-name { padding: 14px; border: 1px solid var(--line-soft); background: var(--surface-sunk); border-radius: var(--r-md); font-size: var(--fs-sm); font-weight: 600; overflow-wrap: anywhere; }
+#delete-course-description { color: var(--text-muted); font-size: var(--fs-sm); }
+.delete-course-hint { color: var(--text-muted); font-size: var(--fs-xs); }
+.delete-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.button.danger { background: var(--clay-700); color: var(--paper-1); }
+.button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--clay-700) 85%, var(--ink-900)); }
 
 /* Honest loading, empty, error, and command recovery states. */
 .loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 72px 20px; color: var(--text-muted); font-size: var(--fs-sm); }
@@ -337,6 +366,8 @@ fieldset:disabled .answer-option { cursor: default; opacity: .7; }
   .composer-bottom { flex-wrap: wrap; }
   .recoverable-run { flex-wrap: wrap; }
   .button { min-height: 44px; }
+  .deletion-recovery { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .course-delete-dialog { padding: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

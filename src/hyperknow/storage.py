@@ -13,6 +13,7 @@ from .blueprint_storage import BlueprintStorage
 from .lesson_storage import LessonStorage
 from .quiz_storage import QuizStorage
 from .research_storage import ResearchStorage
+from .assistance_storage import AssistanceStorage
 
 
 def now() -> str:
@@ -23,7 +24,7 @@ def encode(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
-class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
+class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage, AssistanceStorage):
     def __init__(self, path: Path):
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,6 +82,8 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
                 ):
                     conn.execute(sql)
                 conn.execute("PRAGMA user_version = 3")
+            conn.execute("CREATE TABLE IF NOT EXISTS assistance_conversations(id TEXT PRIMARY KEY,data TEXT NOT NULL)")
+            conn.execute("CREATE TABLE IF NOT EXISTS assistance_artifacts(id TEXT PRIMARY KEY,conversation_id TEXT NOT NULL,data TEXT NOT NULL)")
 
     @contextmanager
     def transaction(self):
@@ -129,6 +132,8 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
             self._blueprint_run_changed(conn, run)
         elif run.get("kind") == "quiz":
             self._quiz_run_changed(conn, run)
+        elif run.get("kind") == "assistance":
+            self._assistance_run_changed(conn, run)
         elif run.get("kind") != "research":
             self._run_changed(conn, run)
 
@@ -140,6 +145,9 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
                 if old["fingerprint"] != fingerprint:
                     raise AppError("command_conflict", "相同命令标识不能提交不同内容", 409)
                 readers = {"session": lambda: self._lesson(conn, old["run_id"]),
+                           "conversation": lambda: self._conversation(conn, old["run_id"]),
+                           "artifact": lambda: self._get(conn, "assistance_artifacts", old["run_id"]),
+                           "course_deletion": lambda: {"course_id": old["run_id"], "deleted": True},
                            "quiz_target": lambda: self._quiz_target(conn, *old["run_id"].split(":", 1)),
                            "attempt": lambda: self._attempt_snapshot(conn, old["run_id"]),
                            "run": lambda: self._get(conn, "runs", old["run_id"])}
@@ -151,11 +159,70 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
                 result_id = self._target_key(result["target_type"], result["target_id"])
             elif resource_type == "attempt":
                 result_id = result["attempt"]["attempt_id"]
+            elif resource_type == "course_deletion":
+                result_id = result["course_id"]
+            elif resource_type == "conversation":
+                result_id = result["conversation_id"]
+            elif resource_type == "artifact":
+                result_id = result["artifact_id"]
             else:
                 result_id = result["run_id"]
             conn.execute("INSERT INTO command_receipts VALUES (?, ?, ?, ?)",
                          (command_id, fingerprint, result_id, resource_type))
             return result
+
+    def delete_course(self, course_id: str, data: dict) -> dict:
+        def delete(conn):
+            course = self._get(conn, "courses", course_id)
+            if course["version"] != data["expected_version"]:
+                raise AppError("version_conflict", "课程已更新，请刷新后再删除", 409, True,
+                               latest_version=course["version"])
+            sessions = {s["session_id"] for unit in course["units"]
+                        for lecture in unit["lectures"] for s in lecture["sessions"]}
+            exams = {exam["exam_id"] for unit in course["units"] for exam in unit["exams"]}
+            targets = {self._target_key("practice", sid) for sid in sessions}
+            targets.update(self._target_key("exam", eid) for eid in exams)
+            runs = {row["id"]: json.loads(row["data"]) for row in conn.execute("SELECT * FROM runs")}
+            related = {rid for rid, run in runs.items() if run.get("course_id") == course_id
+                       or run.get("session_id") in sessions
+                       or self._target_key(run.get("target_type"), run.get("target_id")) in targets
+                       or rid == course.get("creation_run_id")}
+            # Include pre-blueprint ancestors and retries: replaying their create
+            # commands must never recreate a deleted course.
+            while True:
+                family = related | {run["parent_run_id"] for rid, run in runs.items()
+                                    if rid in related and run.get("parent_run_id") in runs}
+                family.update(rid for rid, run in runs.items() if run.get("parent_run_id") in related)
+                if family == related:
+                    break
+                related = family
+            if any(runs[rid].get("course_id") not in {None, course_id} for rid in related):
+                raise AppError("course_shared_runs", "关联任务还属于其他课程，不能安全删除", 409)
+            active = {"queued", "clarifying", "generating", "awaiting_answers", "awaiting_blueprint"}
+            if any(runs[rid]["status"] in active for rid in related):
+                raise AppError("course_active", "课程仍有关联任务进行中或等待确认，请先停止相关任务，再刷新删除", 409)
+            quizzes = {row["id"] for row in conn.execute("SELECT * FROM quizzes")
+                       if json.loads(row["data"]).get("course_id") == course_id
+                       or self._target_key(row["target_type"], row["target_id"]) in targets}
+            attempts = {row["id"] for row in conn.execute("SELECT * FROM quiz_attempts")
+                        if row["quiz_id"] in quizzes or json.loads(row["data"]).get("course_id") == course_id}
+            progress = {row["id"] for row in conn.execute("SELECT * FROM activity_progress")
+                        if json.loads(row["data"]).get("course_id") == course_id}
+            for table, column, ids in (
+                ("model_calls", "run_id", related), ("runs", "id", related),
+                ("lesson_scripts", "session_id", sessions), ("lesson_states", "id", sessions),
+                ("lesson_interactions", "session_id", sessions),
+                ("activity_progress", "id", progress), ("quiz_states", "id", targets),
+                ("quiz_attempts", "id", attempts), ("quizzes", "id", quizzes),
+            ):
+                conn.executemany(f"DELETE FROM {table} WHERE {column}=?", ((key,) for key in ids))
+            conn.execute("DELETE FROM courses WHERE id=?", (course_id,))
+            # Keep receipts, including resource references now returning 404.
+            # Removing them would admit old create/prepare/retry commands again.
+            return {"course_id": course_id, "deleted": True}
+        return self.command(data["client_command_id"], {"action": "delete_course",
+                            "course_id": course_id, "version": data["expected_version"]},
+                            delete, resource_type="course_deletion")
 
     def create_run(self, command_id: str, goal: str, model: str, *, configured: bool = True,
                    search_configured: bool = True) -> dict:
@@ -223,6 +290,8 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
                 self._retry_blueprint(conn, parent, run, search_configured=search_configured)
             elif parent.get("kind") == "quiz":
                 self._retry_quiz(conn, parent, run)
+            elif parent.get("kind") == "assistance":
+                self._retry_assistance(conn, parent, run)
             elif parent.get("kind", "course") != "course":
                 self._retry_lesson(conn, parent, run)
             self._save_run(conn, run)
@@ -263,7 +332,9 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage):
 
     def record_call(self, run_id: str, record: dict):
         with self.transaction() as conn:
-            conn.execute("INSERT INTO model_calls VALUES (?, ?, ?)", (uid("call"), run_id, encode(record)))
+            # A cancelled worker may finish after the course and its runs were deleted.
+            conn.execute("INSERT INTO model_calls SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM runs WHERE id=?)",
+                         (uid("call"), run_id, encode(record), run_id))
 
     def calls(self, run_id: str) -> list[dict]:
         with self.transaction() as conn:

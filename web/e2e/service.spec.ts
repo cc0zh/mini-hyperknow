@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { recoverableCourseRuns } from '../src/lib/run-state'
 
 const diagnostics = new Map<string, { console: string[]; errors: string[]; failedResponses: string[] }>()
 test.beforeEach(({ page }, testInfo) => {
@@ -41,7 +42,7 @@ test('home and course library read the real local service', async ({ page }, tes
   await expect(page).toHaveTitle('Hyperknow · 你的学习路径')
   await expect(page.getByRole('heading', { name: /让一个学习目标/ })).toBeVisible()
   await expect(page.getByRole('button', { name: '打造课程' })).toBeDisabled()
-  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link')).toHaveCount(2)
+  await expect(page.getByRole('navigation', { name: '主导航' }).getByRole('link')).toHaveCount(3)
   await page.screenshot({ path: testInfo.outputPath('home-unconfigured.png'), fullPage: true })
   await page.getByRole('navigation').getByRole('link', { name: '我的课程' }).click()
   await expect(page.getByRole('heading', { name: '我的课程.' })).toBeVisible()
@@ -49,7 +50,7 @@ test('home and course library read the real local service', async ({ page }, tes
   const courses = await (await page.request.get('/api/courses')).json()
   const runs = await (await page.request.get('/api/runs')).json()
   await expect(page.locator('.course-card')).toHaveCount(courses.courses.length)
-  await expect(page.locator('.recoverable-run')).toHaveCount(runs.runs.filter((run: { status: string }) => run.status !== 'ready').length)
+  await expect(page.locator('.recoverable-run')).toHaveCount(recoverableCourseRuns(runs.runs, courses.courses).length)
   if (courses.courses.length === 0) await expect(page.getByRole('heading', { name: '你的学习旅程，尚待启程' })).toBeVisible()
   await page.screenshot({ path: testInfo.outputPath('courses-real-list.png'), fullPage: true })
   await testInfo.attach('browser-errors', { body: JSON.stringify(consoleErrors), contentType: 'application/json' })

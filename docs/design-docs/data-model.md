@@ -1,5 +1,7 @@
 # 领域对象、持久化与恢复
 
+独立即时协助的数据、事务与恢复另见[即时协助契约](instant-assistance.md)：新增assistance_conversations与assistance_artifacts两表，保持SQLite user_version=3，不将course_id改为可空或创建假课程。会话、轮次、Skill快照、生成产物及白板cursor持久化，临时作答不进入课程成绩。
+
 状态：2026-10-22 既有造课／课堂记录与验收保留；v3题组、尝试、目标版本及确定性计分已完成本阶段范围的真实验收，见[完成计划](../exec-plans/completed/20261022-real-practice-exams.md)。思考题与成果提交仍为后续目标。
 关联：[产品设计](product-design.md)、[交互状态](learning-experience.md)、[接口](api-and-events.md)。
 
@@ -130,6 +132,10 @@ Attempt绑定固定quiz_id与scoring_version，保存cursor、question_started_a
 算法直接调用真实score_answers检查实际数值与边界，不使用Mock结论；题目结构与存储测试不能代替真实出题成功。
 
 ## 7. 恢复与数据维护
+
+课程支持显式硬删除：以课程version检查并在单个事务内清理courses、所属lesson_scripts／lesson_states／lesson_interactions、activity_progress、quizzes／quiz_states／quiz_attempts、关联runs及model_calls。关联运行包含创建run的父重试链及后继，课程研究来源／过程／报告随run一起清除；独立调研和其他课程保留。仍在排队、生成或等待答案／蓝图确认的关联任务必须先取消。已取消线程的晚到结果因run不存在不能提交，model_calls也仅在run仍存在时保存，避免删除后重建孤立证据。
+
+command_receipts保留输入指纹与资源引用，阻止旧命令重放重新创建数据；资源已删除的旧命令返回404。删除命令使用resource_type=course_deletion，run_id列存course_id，允许同ID／输入在删除后及重启后返回`{course_id, deleted:true}`，同ID异输入仍409；新命令删除不存在的课程返回404，不写成功回执。不增加表或改变PRAGMA版本。
 
 刷新恢复读取数据库快照；进程重启将 queued、clarifying、generating 的未终结运行标为 interrupted，不自动再发模型请求。awaiting_answers 可重新展示并由用户继续；ready 读取已保存结果。
 

@@ -132,3 +132,7 @@ export function IconStar({ filled = false, ...props }: IconProps & { filled?: bo
     <path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z" />
   </Icon>
 }
+
+export function IconTrash(props: IconProps) {
+  return <Icon {...props}><path d="M4.5 6.5h15M9 6.5V4h6v2.5M6.5 6.5l.8 13h9.4l.8-13M10 10v6M14 10v6" /></Icon>
+}

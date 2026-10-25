@@ -84,13 +84,30 @@ class CourseService:
 
     async def notify_run(self, run: dict):
         await self.hub.changed(run)
-        if run.get("kind") == "quiz":
+        if run.get("kind") == "assistance":
+            await self.notify_assistance(self.db.get_assistance_conversation(run["conversation_id"]))
+        elif run.get("kind") == "quiz":
             await self.notify_quiz_target(self.db.get_quiz_target(run["target_type"], run["target_id"]))
         elif run.get("session_id"):
             await self.notify_lesson(self.db.get_lesson(run["session_id"]))
         if run.get("course_id") and (run.get("kind", "course") == "course" or run["status"] == "ready"):
             course = self.db.get_course(run["course_id"])
             await self.hub.resource_changed("course", course["course_id"], course["version"])
+
+    async def notify_assistance(self, snapshot: dict):
+        await self.hub.resource_changed("conversation", snapshot["conversation_id"], snapshot["version"])
+        for turn in snapshot["turns"]:
+            for artifact in turn["artifacts"]:
+                await self.hub.resource_changed("artifact", artifact["artifact_id"], artifact["version"])
+
+    async def assistance_turn(self, conversation_id: str, data: dict):
+        from .assistance_generation import build_skill_snapshots
+        snapshot = self.db.assistance_turn(conversation_id, data, self.settings.model,
+                                           bool(self.settings.api_key), build_skill_snapshots)
+        if snapshot["active_run"]:
+            self.enqueue(snapshot["active_run"])
+        await self.notify_assistance(snapshot)
+        return snapshot
 
     async def prepare(self, session_id: str, data: dict):
         snapshot = self.db.prepare_lesson(session_id, data["client_command_id"], self.settings.model,
@@ -99,6 +116,11 @@ class CourseService:
             self.enqueue(snapshot["generation_run"])
         await self.notify_lesson(snapshot)
         return snapshot
+
+    async def delete_course(self, course_id: str, data: dict):
+        result = self.db.delete_course(course_id, data)
+        await self.hub.resource_changed("course", course_id, data["expected_version"] + 1, "deleted")
+        return result
 
     async def progress(self, session_id: str, data: dict):
         snapshot = self.db.save_progress(session_id, data)
@@ -216,7 +238,12 @@ class CourseService:
             run_id, phase = await self.queue.get()
             committed = False
             try:
-                run = self.db.get_run(run_id)
+                try:
+                    run = self.db.get_run(run_id)
+                except AppError as exc:
+                    if exc.code == "not_found":
+                        continue  # A cancelled course can be deleted while still queued.
+                    raise
                 allowed = {"queued"} if phase == "clarifying" else {"queued", "generating"}
                 if run.get("kind", "course") == "course" and run["stage"] != phase:
                     continue
@@ -230,7 +257,16 @@ class CourseService:
                         continue
                 await self.notify_run(run)
                 # The worker remains occupied until this real network call returns.
-                if run.get("kind") == "research" or phase == "research":
+                if run.get("kind") == "assistance":
+                    from .assistance_generation import AssistantGenerator
+                    loop = asyncio.get_running_loop()
+
+                    def changed(snapshot):
+                        loop.call_soon_threadsafe(asyncio.create_task, self.notify_run(snapshot))
+
+                    generator = AssistantGenerator(self.settings, self.db, self.generator.stopping, changed)
+                    result = await asyncio.to_thread(generator.generate, run)
+                elif run.get("kind") == "research" or phase == "research":
                     loop = asyncio.get_running_loop()
 
                     def changed(snapshot):
@@ -253,6 +289,8 @@ class CourseService:
                     updated = self.db.finish_unit(run_id, run["current_unit_id"], result)
                 elif run.get("kind") == "quiz":
                     updated = self.db.finish_quiz(run_id, result)
+                elif run.get("kind") == "assistance":
+                    updated = self.db.finish_assistance(run_id, result)
                 else:
                     updated = self.db.finish_lesson(run_id, result)
                 committed = updated is not None
