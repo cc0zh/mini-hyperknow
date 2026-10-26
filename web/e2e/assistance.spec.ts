@@ -66,7 +66,7 @@ test('restored turn command stays read-only until explicit retry and preserves i
   const response = await request.post('/api/assistance/conversations', { data: { client_command_id: crypto.randomUUID() } })
   expect(response.ok()).toBe(true)
   const conversation = await response.json() as AssistanceConversation
-  const command = { method: 'POST', path: `/assistance/conversations/${conversation.conversation_id}/turns`, conversationId: conversation.conversation_id, body: { client_command_id: crypto.randomUUID(), expected_version: conversation.version + 1, text: '保留这条真实冲突请求', action: 'message', skill_hint: 'auto' } }
+  const command = { method: 'POST', path: `/assistance/conversations/${conversation.conversation_id}/turns`, conversationId: conversation.conversation_id, body: { client_command_id: crypto.randomUUID(), expected_version: conversation.version + 1, text: '保留这条真实冲突请求', action: 'message' } }
   await page.goto('/assistance')
   await page.evaluate(value => sessionStorage.setItem(`hyperknow.assistance.command.conversation:${value.conversationId}`, JSON.stringify(value)), command)
   const sent: unknown[] = []

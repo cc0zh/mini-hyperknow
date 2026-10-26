@@ -13,7 +13,8 @@
 
 ## 2. 已定工程选择
 
-2026-10-24新增独立[即时协助](design-docs/instant-assistance.md)：assistance run复用同一串行worker，独立会话／产物表不依附课程。通用SkillRegistry只加载显式可信目录快照；产品Agent只得到get_skills与四种create工具，不装配开发工作区／搜索权限。教学会话与课程各自独立上下文，生成不承诺秒回。实施／验收状态见该契约关联计划。
+2026-10-27起仅桌面浏览器属于适配与验收范围，不再维护移动端/平板专项适配；现有响应式样式保留作桌面窗口缩放降级，不新增设备识别或访问限制。见[产品边界](design-docs/product-design.md#4-明确不做)。
+2026-10-24新增独立[即时协助](design-docs/instant-assistance.md)：assistance run复用同一串行worker，独立会话／产物表不依附课程。通用SkillRegistry保留显式可信目录/空快照、版本及摘要校验；2026-10-26取消两个基础教学Skill及强制加载，产品Agent获得五种create工具，非空可信目录才提供可选get_skills，不装配开发工作区／搜索权限。教学会话与课程各自独立上下文，生成不承诺秒回。新教学边界和验证范围见[重构计划](exec-plans/completed/20261026-teaching-boundaries-refactor.md)。
 
 | 决策 | 选择 | 原因／边界 |
 | --- | --- | --- |
@@ -68,6 +69,7 @@ src/
     lesson_domain.py      八种板书操作、讲义/问答 schema、上下文与统一进度派生
     lesson_storage.py     讲义、确认位置、问答及手动完成事务
     generation.py         课程/讲义/问答/出题真实模型、输入依据、结构校验和一次修复
+    prompts/              课程/课堂/题组/调研/协助提示；不负责工具执行、上下文裁剪或持久化
     quiz_domain.py        客观题结构、来源预算、个人确定性计分
     quiz_storage.py       题组、目标版本、作答/next/submit与活动完成事务
     storage.py            SQLite v3、升级备份、事务、命令幂等及重启
@@ -76,11 +78,15 @@ src/
     research_domain.py    带来源调研报告与实际已读引用校验
     research_storage.py   独立research run、来源／过程／报告事务
     research_web.py       Tavily真实搜索、公网固定连接及有界网页提取
-    assistance_domain.py  教学回复和四类独立产物校验，不含course_id
+    assistance_domain.py  教学回复、显式建议动作和五类独立产物校验，不含course_id
     assistance_storage.py 会话/轮次、原子产物提交、白板位置与迟到保存屏障
     assistance_generation.py 有界教学Agent、Skill激活与逐次真实调用记录
     assistance_api.py     独立教学命令与查询
-    skills/               两个受版本管理的可信产品SKILL.md，不是开发助手权限
+    eval_cases.py         本地Case／Rubric校验、内容寻址和自动开发样本关联
+    eval_atif.py          固定ATIF-v1.7文字轨迹出口与严格子集校验
+    eval_grading.py       独立无工具Grader、单请求预算及分项输出校验
+    evaluation.py         真实HTTP评测、只读SQLite证据、恢复与普通规则
+    skills/               可选可信产品Skill目录；当前无内置Skill，不是开发助手权限
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
   src/pages/              首页、创建/澄清、课程库、总览、Classroom与Quiz
@@ -88,6 +94,7 @@ web/                      已实现的 React 应用
   src/lib/                API/WS、课堂/测验快照、单播放器时钟、命令所有权及字体加载
   public/fonts/           Excalifont／Xiaolai 原始资源、NOTICE 与各自完整 OFL 1.1 许可证
 tests/                    直接逻辑、真实存储、真实服务和浏览器验证
+evals/                    版本化脱敏Case／Rubric与轻量评测命令说明
 data/                     本地 SQLite、运行日志和验收证据，不进入版本控制
 docs/                     产品、架构、计划与证据
 ```
@@ -102,6 +109,7 @@ docs/                     产品、架构、计划与证据
 - `domain` 不依赖 FastAPI、React、SDK 或数据库；同一计分和 nextItem 规则服务所有活动。
 - `agent_core` 不反向依赖课程对象、HTTP 或产品存储。
 - 前端只读 API／WS，不接触模型密钥、SDK、SQLite 文件或内核可变对象。
+- 评测脚本依赖普通eval模块、真实业务HTTP及只读SQLite；产品运行时和agent_core不反向调用评测模块。health仅追加非敏感storage_id路径指纹，供写请求前防误连，不是权限或业务成功证明。命令及真实验收见[评测入口](../evals/README.md)。
 
 ## 6. 同步内核接入与任务生命周期
 

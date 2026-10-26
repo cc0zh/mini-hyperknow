@@ -14,3 +14,5 @@
 
 - [设计文档组织方式参考](design-document-references.md)：用户指定的 ActSpace 文档阅读范围、借鉴方法和明确不继承的架构；Hyperknow 证据入口。
 - [白板字体参考](whiteboard-font.md)：Excalifont 英文／数字与小赖 Xiaolai 中文的分工、原始资源、OFL 1.1 许可证及当前验收边界。
+- [Agent／教学eval论文调研](agent-evaluation-research.md)：九篇论文的阅读范围与局限、DeepSeek Harness／Comet固定源码参考，以及面向当前项目的评测颗粒度、证据、校准和比较建议；尚未实施。
+- [ATIF轨迹固定版本](atif-trajectory-format.md)：ATIF-v1.7的固定Harbor来源、本地文字子集出口／校验及AgentLoop适配边界；首份真实轨迹已校验，未运行上游完整校验器或接入云端。

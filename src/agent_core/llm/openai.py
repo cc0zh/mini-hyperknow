@@ -6,11 +6,22 @@ import json
 import os
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 
 from ..types import AgentContext, AssistantMessage, ToolCall
 from .sanitize import sanitize_messages
+
+
+def completion_parameters(max_output_tokens: int | None, base_url: str | None) -> dict:
+    """Use the documented token-limit key for a known provider, never both keys."""
+    if max_output_tokens is None:
+        return {}
+    if type(max_output_tokens) is not int or max_output_tokens < 1:
+        raise ValueError("max_output_tokens must be a positive integer")
+    parameter = "max_tokens" if urlsplit(base_url or "").hostname == "api.deepseek.com" else "max_completion_tokens"
+    return {parameter: max_output_tokens}
 
 
 class OpenAIService:
@@ -32,6 +43,7 @@ class OpenAIService:
     ) -> None:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False)
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        self.base_url = base_url or os.getenv("OPENAI_BASE_URL")
         if max_output_tokens is not None and (
             isinstance(max_output_tokens, bool)
             or not isinstance(max_output_tokens, int)
@@ -41,7 +53,7 @@ class OpenAIService:
         self.max_output_tokens = max_output_tokens
         self.client = self._create_client(
             api_key or os.getenv("OPENAI_API_KEY"),
-            base_url or os.getenv("OPENAI_BASE_URL"),
+            self.base_url,
             timeout,
             max_retries,
         )
@@ -52,8 +64,7 @@ class OpenAIService:
                 model=self.model,
                 messages=to_openai_messages(context),
                 **({"tools": context.tools} if context.tools else {}),
-                **({"max_completion_tokens": self.max_output_tokens}
-                   if self.max_output_tokens is not None else {}),
+                **completion_parameters(self.max_output_tokens, self.base_url),
             )
 
             return from_openai_response(response, model=self.model)

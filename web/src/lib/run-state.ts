@@ -8,6 +8,7 @@ export const runLabels: Record<RunStatus, string> = {
 
 export const isTerminal = (status: RunStatus) => ['ready', 'failed', 'cancelled', 'interrupted'].includes(status)
 export const isWorking = (status: RunStatus) => ['queued', 'clarifying', 'generating'].includes(status)
+export const needsClarificationAnswers = (run: Pick<Run, 'status' | 'questions'>) => run.status === 'awaiting_answers' && run.questions.length > 0
 
 export const stageLabels = { clarifying: '需求澄清', research: '网页调研', blueprint: '全局蓝图', units: '逐单元展开' }
 export function runHeading(run: Pick<Run, 'status' | 'stage'>): string {

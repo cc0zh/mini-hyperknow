@@ -65,7 +65,7 @@ function TraceList({ steps, running }: { steps: AssistanceStep[]; running: boole
 // wait is legible: skill load and artifact creation each resolve to a tick.
 export function AssistanceTimeline({ run }: { run: AssistanceRun }) {
   const steps = run.steps ?? []
-  return <TraceList steps={steps.length ? steps : [{ tool: 'get_skills', status: 'running' }]} running />
+  return <TraceList steps={steps} running />
 }
 
 // The same trace stays on a finished turn. The reply is legible as the steps
@@ -105,8 +105,8 @@ function Clarification({ questions, disabled, onAnswer }: { questions: Assistanc
   </form>
 }
 
-// One-click next actions from the model. Clicking sends the suggestion's own
-// message text; it never selects a turn action or a new capability.
+// Suggestions carry an explicit turn intent; their wording never decides
+// whether to advance the saved plan or send an ordinary teaching message.
 function Suggestions({ suggestions, disabled, onSuggest }: { suggestions: AssistanceSuggestion[]; disabled: boolean; onSuggest: (suggestion: AssistanceSuggestion) => void }) {
   return <div className="assistance-suggestions" aria-label="下一步建议">
     <span className="eyebrow">下一步</span>
@@ -134,7 +134,7 @@ export function AssistanceTurns({ conversation, blocked, onAnswer, onRetry, onSu
           {turn.response.plan.length > 0 && <><AssistancePlanProgress plan={turn.response.plan} current={turn.response.current_step} /><ol className="assistance-plan">{turn.response.plan.map((step, i) => <li className={i === turn.response!.current_step ? 'current' : ''} key={`${i}-${step}`}>{step}</li>)}</ol></>}
         </>}
         {turn.error && <p role="alert" className="assistance-turn-error">{turn.error.message}</p>}
-        {turn.skill_uses.length > 0 && <details className="skill-uses"><summary>本轮使用的教学 Skill</summary><ul>{turn.skill_uses.map(item => <li key={`${item.name}-${item.sha256}`} title={`SHA-256: ${item.sha256}`}>{item.name} · {item.version}</li>)}</ul></details>}
+        {turn.skill_uses.length > 0 && <details className="skill-uses"><summary>本轮使用的 Skill</summary><ul>{turn.skill_uses.map(item => <li key={`${item.name}-${item.sha256}`} title={`SHA-256: ${item.sha256}`}>{item.name} · {item.version}</li>)}</ul></details>}
         {!compact && turn.artifacts.map(artifact => <AssistanceArtifactView key={artifact.artifact_id} artifact={artifact} onVote={onVote && (vote => onVote(artifact.artifact_id, vote))} />)}
         {latest && !compact && turn.status === 'ready' && onSuggest && (turn.response?.suggestions?.length ?? 0) > 0 && <Suggestions suggestions={turn.response!.suggestions!} disabled={blocked} onSuggest={onSuggest} />}
         {['failed', 'interrupted', 'cancelled'].includes(turn.status) && <button type="button" className="text-button" disabled={blocked || !latest} onClick={() => onRetry(turn.run_id)}>明确重试本轮</button>}

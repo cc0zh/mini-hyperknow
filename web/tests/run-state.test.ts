@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { blueprintDecision, hasAnswers, isTerminal, isWorking, newerRun, recoverableCourseRuns, runHeading, runLabels, supersedingCourseRunId, toggleOption } from '../src/lib/run-state.ts'
+import { blueprintDecision, hasAnswers, isTerminal, isWorking, needsClarificationAnswers, newerRun, recoverableCourseRuns, runHeading, runLabels, supersedingCourseRunId, toggleOption } from '../src/lib/run-state.ts'
 import { prepareCommand } from '../src/lib/commands.ts'
 import type { Answer, Question, Run, RunStatus } from '../src/lib/types.ts'
 
@@ -42,6 +42,13 @@ test('a stale snapshot cannot overwrite a newer run', () => {
   assert.equal(newerRun(current, state(7)), current)
   assert.equal(newerRun(current, state(8)), current)
   assert.equal(newerRun(current, state(9)).version, 9)
+})
+
+test('no-question clarification never exposes an empty answers interaction', () => {
+  assert.equal(needsClarificationAnswers({ status: 'awaiting_answers', questions: [] }), false)
+  assert.equal(needsClarificationAnswers({ status: 'awaiting_answers', questions: [single] }), true)
+  assert.equal(needsClarificationAnswers({ status: 'generating', questions: [] }), false)
+  assert.equal(needsClarificationAnswers({ status: 'generating', questions: [single] }), false)
 })
 
 test('the first recovery snapshot is accepted', () => {

@@ -62,7 +62,7 @@ class AssistanceStorage:
             if action == "message" and not text:
                 raise AppError("invalid_message", "请输入问题", 422)
             from .assistance_domain import forbidden_artifacts, requested_artifacts
-            context = {"text": text, "action": action, "skill_hint": data.get("skill_hint", "auto"),
+            context = {"text": text, "action": action,
                        "requested_artifacts": requested_artifacts(text),
                        "forbidden_artifacts": forbidden_artifacts(text),
                        "history": [], "skill_snapshots": (
@@ -109,7 +109,7 @@ class AssistanceStorage:
             run.update(kind="assistance", conversation_id=conversation_id, turn_id=turn_id,
                        input=context, steps=[])
             turn = {"turn_id": turn_id, "run_id": run["run_id"], "user_text": text, "action": action,
-                    "skill_hint": context["skill_hint"], "status": "queued", "response": None,
+                    "status": "queued", "response": None,
                     "artifacts": [], "skill_uses": [], "steps": [], "error": None}
             if not conversation["turns"] and text:
                 conversation["title"] = text[:80]
@@ -252,6 +252,11 @@ class AssistanceStorage:
             artifact.update(feedback=vote, feedback_at=now())
             artifact["version"] += 1
             conn.execute("UPDATE assistance_artifacts SET data=? WHERE id=?", (encode(artifact), artifact_id))
+            conversation = self._conversation(conn, artifact["conversation_id"])
+            for turn in conversation["turns"]:
+                turn["artifacts"] = [artifact if a["artifact_id"] == artifact_id else a
+                                     for a in turn["artifacts"]]
+            self._save_conversation(conn, conversation)
             return artifact
         return self.command(data["client_command_id"], {"command": "assistance_feedback",
                             "artifact_id": artifact_id, **data}, save, resource_type="artifact")

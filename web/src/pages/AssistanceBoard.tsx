@@ -54,7 +54,7 @@ function BoardPlayer({ resource, initial }: { resource: ReturnType<typeof useAss
     const value = resource.current.current
     if (locked || value?.kind !== 'whiteboard' || !validTurn(text)) return false
     const save = makeAssistanceCommand(value.conversation_id, `${artifactPath(value.artifact_id)}/progress`, { expected_version: value.version, cursor: value.data.cursor }, 'PUT')
-    save.question_after_save = { text: text.trim(), skill_hint: 'auto', artifact_id: value.artifact_id }
+    save.question_after_save = { text: text.trim(), artifact_id: value.artifact_id }
     const ok = await command.execute(save)
     if (ok) setQuestion('')
     return ok

@@ -112,17 +112,30 @@ test('real creation keeps choices, waits for one approval and expands automatica
     await page.getByLabel('你想探索什么？').fill(process.env.HYPERKNOW_WORKBENCH_GOAL ?? '我会 Python 基础，希望用两小时理解迭代器、生成器、惰性求值和资源清理。请安排四个紧凑单元，每个单元一个小节，使用中文，以官方 Python 文档与 PEP 为主要依据；不安排全局项目和考核。')
     await page.getByRole('button', { name: '打造课程' }).click()
     await expect(page).toHaveURL(/\/course-runs\//)
-    await expect(page.locator('.wb-questions')).toBeVisible({ timeout: 180_000 })
-    for (const field of await page.locator('.question-field').all()) {
-      const option = field.locator('.answer-option').first()
-      chosen.push((await option.locator('b').textContent())!)
-      await option.click()
+    const createdRunId = page.url().split('/').at(-1)!
+    await expect.poll(async () => (await (await page.request.get(`/api/runs/${createdRunId}`)).json()).status, { timeout: 180_000 }).not.toMatch(/^(queued|clarifying)$/)
+    const clarified = await (await page.request.get(`/api/runs/${createdRunId}`)).json()
+    if (clarified.status === 'awaiting_answers') {
+      expect(clarified.questions.length).toBeGreaterThan(0)
+      await expect(page.locator('.wb-questions')).toBeVisible()
+      for (const field of await page.locator('.question-field').all()) {
+        const option = field.locator('.answer-option').first()
+        chosen.push((await option.locator('b').textContent())!)
+        await option.click()
+      }
+      await page.screenshot({ path: testInfo.outputPath('real-clarification.png'), fullPage: true })
+      await page.getByRole('button', { name: '提交偏好并继续' }).click()
+    } else {
+      expect(['generating', 'awaiting_blueprint']).toContain(clarified.status)
+      expect(clarified.questions).toEqual([])
+      await expect(page.locator('.wb-questions')).toHaveCount(0)
+      await expect(page.getByRole('button', { name: '提交偏好并继续' })).toHaveCount(0)
+      await expect(page.getByRole('button', { name: '跳过补充' })).toHaveCount(0)
+      await page.screenshot({ path: testInfo.outputPath('real-no-clarification.png'), fullPage: true })
     }
-    await page.screenshot({ path: testInfo.outputPath('real-clarification.png'), fullPage: true })
-    await page.getByRole('button', { name: '提交偏好并继续' }).click()
   }
   const runId = page.url().split('/').at(-1)!
-  await expect(page.locator('.wb-preference-tags')).toBeVisible()
+  if (chosen.length) await expect(page.locator('.wb-preference-tags')).toBeVisible()
   for (const choice of chosen) await expect(page.locator('.wb-preference-tags')).toContainText(choice)
   const confirm = page.getByRole('button', { name: '确认并完善课程' })
   await expect(confirm.or(page.getByRole('button', { name: '继续生成剩余内容' }))).toBeVisible({ timeout: 600_000 })

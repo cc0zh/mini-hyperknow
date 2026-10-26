@@ -85,11 +85,9 @@ test('real saved assistance artifacts work, refresh resets local answers, and bo
   await expect(page.getByRole('region', { name: '闪卡', exact: true }).getByRole('button', { name: '翻转显示答案' })).toContainText(cards.data.cards[0].question)
   await expect(page.locator(`[data-artifact-id="${quiz.artifact_id}"]`).getByRole('button', { name: '提交答案' })).toBeDisabled()
   await expect(page.locator('.quiz-feedback')).toHaveCount(0)
-  await page.setViewportSize({ width: 390, height: 844 })
   await expect(page.locator('.assistance-composer')).toBeVisible()
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
-  await page.screenshot({ path: testInfo.outputPath('real-assistance-mobile.png') })
-  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.screenshot({ path: testInfo.outputPath('real-assistance-desktop.png') })
 
   await page.getByRole('link', { name: '打开独立白板', exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`/assistance/boards/${board.artifact_id}$`))

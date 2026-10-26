@@ -5,7 +5,6 @@ import type { BoardScript, BoardStep, ServiceError } from './types.ts'
 // these two turn intents exist: an ordinary teaching message and an explicit
 // advance through an already saved plan.
 export type AssistanceAction = 'message' | 'continue'
-export type SkillHint = 'auto' | 'concept-explanation' | 'problem-solving'
 export type AssistanceStatus = 'queued' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
 export interface AssistanceQuestion { question_id: string; question: string; options: string[]; multiple: boolean }
 export interface AssistanceResponse {
@@ -16,7 +15,7 @@ export interface AssistanceResponse {
   waiting_for: 'answer' | 'continue' | 'none'
   suggestions?: AssistanceSuggestion[]
 }
-export interface AssistanceSuggestion { label: string; text: string }
+export interface AssistanceSuggestion { label: string; text: string; action: AssistanceAction }
 export interface AssistanceRun {
   run_id: string
   version: number
@@ -42,7 +41,6 @@ export interface AssistanceTurn {
   run_id: string
   user_text: string
   action: AssistanceAction
-  skill_hint: SkillHint
   status: AssistanceStatus
   response: AssistanceResponse | null
   artifacts: AssistanceArtifact[]
@@ -57,19 +55,17 @@ export interface PendingAssistanceCommand {
   path: string
   body: Record<string, unknown> & { client_command_id: string }
   conversationId: string
-  question_after_save?: { text: string; skill_hint: SkillHint; artifact_id: string }
+  question_after_save?: { text: string; artifact_id: string }
 }
 
 export const assistanceLabels: Record<AssistanceAction, string> = { message: '提问', continue: '继续讲解' }
 export const artifactLabels: Record<AssistanceArtifact['kind'], string> = { flashcards: '闪卡', quiz: '测验', whiteboard: '白板', animation: '动画', diagram: '结构图' }
 export const assistanceStatusLabels: Record<AssistanceStatus, string> = { queued: '排队中', generating: '生成中', ready: '已完成', failed: '失败', cancelled: '已取消', interrupted: '已中断' }
 export function assistanceStepLabel(step: AssistanceStep): string {
-  if (step.tool === 'get_skills') return `加载技能 · ${skillDisplayName(step.name) ?? step.name ?? ''}`
+  if (step.tool === 'get_skills') return step.name ? `加载技能 · ${step.name}` : '加载技能'
   const createLabels: Record<string, string> = { create_flashcards: '生成闪卡', create_quiz: '生成测验', create_whiteboard: '生成白板', create_animation: '生成动画', create_diagram: '生成结构图' }
   return createLabels[step.tool] ?? step.tool
 }
-const skillNames: Record<string, string> = { 'concept-explanation': '概念讲解', 'problem-solving': '问题求解' }
-export const skillDisplayName = (name?: string) => (name ? skillNames[name] : undefined)
 export const planProgressPercent = (current: number, total: number) => total > 0 ? Math.round(((current + 1) / total) * 100) : 0
 export const conversationPath = (id: string) => `/assistance/conversations/${encodeURIComponent(id)}`
 export const artifactPath = (id: string) => `/assistance/artifacts/${encodeURIComponent(id)}`
@@ -86,15 +82,17 @@ export function readAssistanceCommand(scope: string): PendingAssistanceCommand |
 export function pendingCommandForScope(input: unknown, scope: string): PendingAssistanceCommand | null {
   if (!input || typeof input !== 'object') return null
   const value = input as PendingAssistanceCommand
-  if (!['POST', 'PUT'].includes(value.method) || typeof value.path !== 'string' || !value.body ||
+  if (!['POST', 'PUT'].includes(value.method) || typeof value.path !== 'string' || !value.body || typeof value.body !== 'object' || Array.isArray(value.body) ||
     typeof value.body.client_command_id !== 'string' || typeof value.conversationId !== 'string') return null
   if (scope === 'create') return value.method === 'POST' && value.path === '/assistance/conversations' && value.conversationId === '' ? value : null
   if (scope !== commandScope(value.conversationId) || !Number.isInteger(value.body.expected_version) || Number(value.body.expected_version) < 1) return null
-  const validPath = value.method === 'PUT' ? /^\/assistance\/artifacts\/[^/]+\/progress$/.test(value.path)
-    : value.path === `${conversationPath(value.conversationId)}/turns` || /^\/runs\/[^/]+\/(cancel|retry)$/.test(value.path)
+  const validPath = value.method === 'PUT' ? /^\/assistance\/artifacts\/[^/?#]+\/(progress|feedback)$/.test(value.path)
+    : value.path === `${conversationPath(value.conversationId)}/turns` || /^\/runs\/[^/?#]+\/(cancel|retry)$/.test(value.path)
   if (!validPath) return null
-  if (value.question_after_save && (value.method !== 'PUT' || typeof value.question_after_save.text !== 'string' || typeof value.question_after_save.artifact_id !== 'string' ||
-    !['auto', 'concept-explanation', 'problem-solving'].includes(value.question_after_save.skill_hint))) return null
+  if (value.question_after_save !== undefined && (!value.question_after_save || typeof value.question_after_save !== 'object' ||
+    typeof value.question_after_save.text !== 'string' || !validTurn(value.question_after_save.text) ||
+    typeof value.question_after_save.artifact_id !== 'string' || !value.question_after_save.artifact_id ||
+    value.method !== 'PUT' || value.path !== `${artifactPath(value.question_after_save.artifact_id)}/progress`)) return null
   return value
 }
 export function saveAssistanceCommand(scope: string, command: PendingAssistanceCommand | null) {
@@ -125,9 +123,9 @@ export function mergeConversation(current: AssistanceConversation | null, incomi
 export function makeAssistanceCommand(conversationId: string, path: string, body: Record<string, unknown>, method: 'POST' | 'PUT' = 'POST'): PendingAssistanceCommand {
   return { conversationId, path, method, body: { ...body, client_command_id: crypto.randomUUID() } }
 }
-export function makeTurnCommand(conversation: AssistanceConversation, text: string, action: AssistanceAction, skill_hint: SkillHint, artifact_id?: string) {
+export function makeTurnCommand(conversation: AssistanceConversation, text: string, action: AssistanceAction, artifact_id?: string) {
   return makeAssistanceCommand(conversation.conversation_id, `${conversationPath(conversation.conversation_id)}/turns`, {
-    expected_version: conversation.version, text, action, skill_hint, ...(artifact_id ? { artifact_id } : {}),
+    expected_version: conversation.version, text, action, ...(artifact_id ? { artifact_id } : {}),
   })
 }
 // Every turn needs the learner's own words, including an explicit advance.

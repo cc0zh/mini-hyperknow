@@ -1,5 +1,6 @@
 """Independent teaching content and artifact validation, without course identities."""
 
+from collections.abc import Iterator
 import re
 from typing import Annotated, Literal
 
@@ -27,15 +28,11 @@ class TeachingQuestion(Schema):
 
 
 class TeachingSuggestion(Schema):
-    """A concrete next message the learner can send with one click.
-
-    The label is what the learner reads and the text is the message itself.
-    Artifact kind is not a user-facing choice: the model decides which tool to
-    call, so a suggestion never names a turn action.
-    """
+    """A learner message with explicit intent, independent of its wording."""
 
     label: str = Field(min_length=1, max_length=40)
     text: str = Field(min_length=1, max_length=600)
+    action: Literal["message", "continue"]
 
 
 class TeachingResponse(Schema):
@@ -59,6 +56,8 @@ class TeachingResponse(Schema):
         # While clarifying, there is no answer yet to branch from.
         if self.questions and self.suggestions:
             raise ValueError("suggestions and clarification questions are mutually exclusive")
+        if any(s.action == "continue" for s in self.suggestions) and self.waiting_for != "continue":
+            raise ValueError("continue suggestions require a pending next plan step")
         return self
 
 
@@ -163,7 +162,7 @@ ARTIFACT_INTENTS = {
     "quiz": ("测验", "自测", "测试题", "选择题", "出题", "做题", "quiz"),
     "whiteboard": ("白板", "板书", "whiteboard"),
     "animation": ("动画", "animation"),
-    "diagram": ("流程图", "结构图", "示意图", "关系图", "思维导图", "mermaid"),
+    "diagram": ("图解", "流程图", "结构图", "示意图", "关系图", "思维导图", "mermaid"),
 }
 NEGATIONS = ("不", "别", "无需", "不要", "不需要", "跳过", "取消")
 # A phrase like "解释当前白板第一步" talks about the artifact that already
@@ -172,6 +171,28 @@ NEGATIONS = ("不", "别", "无需", "不要", "不需要", "跳过", "取消")
 # decides freely when no kind was requested.
 REFERENCES = ("当前", "现在", "这一", "这块", "这个", "刚才", "上面", "上述", "以上",
               "已确认", "已有的", "现有", "本轮")
+
+_ARTIFACT_KEYWORDS = {keyword: kind for kind, words in ARTIFACT_INTENTS.items() for keyword in words}
+_ARTIFACT_MENTION = re.compile("|".join(re.escape(word) for word in sorted(_ARTIFACT_KEYWORDS, key=len, reverse=True)))
+
+
+def _artifact_mentions(text: str) -> Iterator[tuple[str, str, bool]]:
+    """Carry a refusal only across a closed list of named artifact types.
+
+    This remains a lexical heuristic: arbitrary prose is not a list, and a
+    clause boundary resets the scope so a later positive request still works.
+    """
+    for clause in re.split(r"[，。；！？,.;!?\n]", text or ""):
+        lowered = clause.lower()
+        previous_end = None
+        refused = False
+        for match in _ARTIFACT_MENTION.finditer(lowered):
+            prefix = lowered[max(0, match.start() - 6):match.start()]
+            separator = lowered[previous_end:match.start()] if previous_end is not None else ""
+            if previous_end is None or not re.fullmatch(r"(?:\s|、|/|以及|及|或|和)+", separator):
+                refused = any(negation in prefix for negation in NEGATIONS)
+            yield _ARTIFACT_KEYWORDS[match.group()], prefix, refused
+            previous_end = match.end()
 
 
 def requested_artifacts(text: str) -> list[str]:
@@ -182,18 +203,10 @@ def requested_artifacts(text: str) -> list[str]:
     artifact must exist; it never grants a tool or widens model permissions.
     """
     requested = []
-    for clause in re.split(r"[，。；！？,.;!?\n]", text or ""):
-        lowered = clause.lower()
-        for kind, keywords in ARTIFACT_INTENTS.items():
-            position = min((lowered.find(keyword) for keyword in keywords if keyword in lowered), default=-1)
-            if position < 0 or kind in requested:
-                continue
-            prefix = lowered[max(0, position - 6):position]
-            if any(negation in prefix for negation in NEGATIONS):
-                continue
-            if any(marker in prefix for marker in REFERENCES):
-                continue
-            requested.append(kind)
+    for kind, prefix, refused in _artifact_mentions(text):
+        if kind in requested or refused or any(marker in prefix for marker in REFERENCES):
+            continue
+        requested.append(kind)
     return requested[:1]
 
 
@@ -206,14 +219,9 @@ def forbidden_artifacts(text: str) -> list[str]:
     empty request list.
     """
     refused = []
-    for clause in re.split(r"[，。；！？,.;!?\n]", text or ""):
-        lowered = clause.lower()
-        for kind, keywords in ARTIFACT_INTENTS.items():
-            position = min((lowered.find(keyword) for keyword in keywords if keyword in lowered), default=-1)
-            if position < 0 or kind in refused:
-                continue
-            if any(negation in lowered[max(0, position - 6):position] for negation in NEGATIONS):
-                refused.append(kind)
+    for kind, _, negated in _artifact_mentions(text):
+        if negated and kind not in refused:
+            refused.append(kind)
     return refused
 
 

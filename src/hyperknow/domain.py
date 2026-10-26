@@ -1,5 +1,6 @@
 """Validated course definitions and deterministic application rules."""
 
+import json
 from typing import Literal
 from uuid import uuid4
 
@@ -45,7 +46,7 @@ class Question(Schema):
 
 
 class Clarification(Schema):
-    questions: list[Question] = Field(min_length=1, max_length=5)
+    questions: list[Question] = Field(max_length=5)
 
     @model_validator(mode="after")
     def unique_questions(self):
@@ -160,6 +161,12 @@ def resolve_answers(questions: list[dict], answers: list[dict], skip: bool) -> l
     if not resolved:
         raise AppError("invalid_answers", "请至少回答一个问题，或明确选择跳过")
     return resolved
+
+
+def course_research_input(run: dict) -> dict:
+    return {"goal": run["goal"], "context": json.dumps({
+        "questions": run["questions"], "answers": run["answers"],
+        "clarification_skipped": run["skipped"]}, ensure_ascii=False)}
 
 
 def materialize_course(draft: CourseDraft, run: dict, created_at: str) -> dict:

@@ -15,7 +15,7 @@ from .domain import AppError, Schema
 from .lesson_domain import LessonSnapshot
 from .quiz_domain import AttemptSnapshot, MAX_ELAPSED_MS, QuizSnapshot
 from .runtime import CourseService, EventHub
-from .storage import Database
+from .storage import Database, storage_identity
 
 
 class Command(Schema):
@@ -107,7 +107,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health():
         app.state.db.list_records("courses")
         cfg = app.state.config
-        return {"status": "ok", "database": "ok", "model": {
+        return {"status": "ok", "database": "ok", "storage_id": storage_identity(app.state.db.path), "model": {
             "configured": bool(cfg.api_key), "name": cfg.model, "verified": False}}
 
     @app.post("/api/course-runs", status_code=202)

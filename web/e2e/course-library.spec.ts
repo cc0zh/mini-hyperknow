@@ -18,7 +18,7 @@ test('library rows align and deletion requires an explicit cancellable confirmat
   await expect(page.locator('.course-card a button')).toHaveCount(0)
   await expect(page.locator('.course-delete')).toHaveCount(courses.length)
 
-  for (const width of [1440, 1024, 768, 390, 320]) {
+  for (const width of [1440, 1024]) {
     await page.setViewportSize({ width, height: 1000 })
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     const geometry = await page.locator('.course-card').evaluateAll(cards => cards.map(card => {
@@ -38,7 +38,7 @@ test('library rows align and deletion requires an explicit cancellable confirmat
         expect(Math.max(...positions) - Math.min(...positions), `${width}px row ${row}: ${field}`).toBeLessThanOrEqual(1)
       }
     }
-    if (width === 1440 || width === 390) await page.screenshot({ path: info.outputPath(`library-${width}.png`), fullPage: true })
+    await page.screenshot({ path: info.outputPath(`library-${width}.png`), fullPage: true })
   }
 
   const trigger = page.locator('.course-delete').first()
@@ -48,7 +48,7 @@ test('library rows align and deletion requires an explicit cancellable confirmat
   await expect(dialog.locator('.delete-course-name')).toHaveText(courses[0].title)
   await expect(dialog).toContainText('无法撤销')
   await expect(dialog.getByRole('button', { name: '保留课程' })).toBeFocused()
-  await page.screenshot({ path: info.outputPath('delete-confirm-mobile.png'), fullPage: false })
+  await page.screenshot({ path: info.outputPath('delete-confirm-desktop.png'), fullPage: false })
   await page.keyboard.press('Escape')
   await expect(dialog).toHaveCount(0)
   await expect(trigger).toBeFocused()

@@ -8,7 +8,7 @@ from pathlib import Path
 import sqlite3
 from typing import Callable
 
-from .domain import AppError, CourseDraft, materialize_course, uid
+from .domain import AppError, Clarification, CourseDraft, course_research_input, materialize_course, uid
 from .blueprint_storage import BlueprintStorage
 from .lesson_storage import LessonStorage
 from .quiz_storage import QuizStorage
@@ -22,6 +22,11 @@ def now() -> str:
 
 def encode(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
+
+
+def storage_identity(path: Path) -> str:
+    """Non-secret local identity for avoiding accidental cross-database execution."""
+    return hashlib.sha256(str(path.resolve()).encode("utf-8")).hexdigest()
 
 
 class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage, AssistanceStorage):
@@ -306,6 +311,21 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage, As
             run.update(patch)
             run["version"] += 1
             run["updated_at"] = now()
+            self._save_run(conn, run)
+            return run
+
+    def finish_clarification(self, run_id: str, result: Clarification) -> dict | None:
+        with self.transaction() as conn:
+            run = self._get(conn, "runs", run_id)
+            if (run.get("kind", "course") != "course" or run["status"] != "clarifying"
+                    or run.get("stage") != "clarifying"):
+                return None
+            run.update(questions=result.model_dump()["questions"], answers=[], skipped=False,
+                       answers_submitted=False, status="awaiting_answers", error=None)
+            if not run["questions"]:
+                run.update(status="generating", stage="research", answers_submitted=True)
+                run["input"] = course_research_input(run)
+            run.update(version=run["version"] + 1, updated_at=now())
             self._save_run(conn, run)
             return run
 

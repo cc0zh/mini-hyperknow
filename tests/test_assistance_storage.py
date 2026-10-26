@@ -47,7 +47,7 @@ class AssistanceStorageTests(unittest.TestCase):
 
     def turn(self, conversation, **changes):
         body = {"client_command_id": self.command(), "expected_version": conversation["version"],
-                "text": "解释这个概念", "action": "message", "skill_hint": "auto", **changes}
+                "text": "解释这个概念", "action": "message", **changes}
         return self.db.assistance_turn(conversation["conversation_id"], body, "original-model", True,
                                        {"catalog": [{"name": "original-skill", "body": "original-body"}]})
 
@@ -76,6 +76,19 @@ class AssistanceStorageTests(unittest.TestCase):
         self.assertEqual(reopened.create_assistance_conversation("assistance-command-1"), conversation)
         self.assertEqual(len(reopened.list_assistance_conversations()), 1)
 
+    def test_hint_with_an_explicit_refusal_list_can_finish_without_artifacts(self):
+        text = "只给提示，请只提示第一步；不要闪卡、测验、白板、动画或图解。"
+        conversation = self.turn(self.conversation(), text=text)
+        run = conversation["active_run"]
+        self.assertEqual(run["input"]["requested_artifacts"], [])
+        self.assertEqual(run["input"]["forbidden_artifacts"],
+                         ["flashcards", "quiz", "whiteboard", "animation", "diagram"])
+        self.db.transition(run["run_id"], {"queued"}, status="generating")
+        self.db.finish_assistance(run["run_id"], response_result())
+        reopened = Database(self.path).get_assistance_conversation(conversation["conversation_id"])
+        self.assertEqual(reopened["turns"][0]["status"], "ready")
+        self.assertEqual(reopened["turns"][0]["artifacts"], [])
+
     def test_existing_v3_database_gains_tables_without_replacing_old_data(self):
         run = self.db.create_run(self.command(), "学习迭代器", "original-model")
         with self.db.transaction() as conn:
@@ -94,7 +107,7 @@ class AssistanceStorageTests(unittest.TestCase):
             try:
                 return self.db.assistance_turn(conversation["conversation_id"], {
                     "client_command_id": command_id, "expected_version": conversation["version"],
-                    "text": "并发请求", "action": "message", "skill_hint": "auto"}, "model", True, {})
+                    "text": "并发请求", "action": "message"}, "model", True, {})
             except AppError as exc:
                 return exc.code
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -106,7 +119,7 @@ class AssistanceStorageTests(unittest.TestCase):
     def test_missing_model_does_not_prevent_creation_or_leave_partial_turn(self):
         conversation = self.conversation()
         body = {"client_command_id": self.command(), "expected_version": 1, "text": "解释极限",
-                "action": "message", "skill_hint": "auto"}
+                "action": "message"}
         with self.assertRaises(AppError) as failure:
             self.db.assistance_turn(conversation["conversation_id"], body, "model", False, {})
         self.assertEqual(failure.exception.code, "model_not_configured")
@@ -116,7 +129,7 @@ class AssistanceStorageTests(unittest.TestCase):
     def test_turn_idempotency_version_and_one_inflight(self):
         conversation = self.conversation()
         body = {"client_command_id": self.command(), "expected_version": 1, "text": "解释极限",
-                "action": "message", "skill_hint": "auto"}
+                "action": "message"}
         created = self.db.assistance_turn(conversation["conversation_id"], body, "model", True, {})
         replay = self.db.assistance_turn(conversation["conversation_id"], body, "different-model", False, {})
         self.assertEqual(replay, created)
@@ -192,10 +205,37 @@ class AssistanceStorageTests(unittest.TestCase):
         self.db.finish_assistance(run_id, result)
         conversation = self.db.get_assistance_conversation(conversation["conversation_id"])
         body = {"client_command_id": self.command(), "expected_version": conversation["version"],
-                "text": "", "action": "continue", "skill_hint": "auto"}
+                "text": "", "action": "continue"}
         created = self.db.assistance_turn(conversation["conversation_id"], body, "model", True, {})
         self.assertEqual(created["turns"][-1]["action"], "continue")
         self.assertEqual(self.db.assistance_turn(conversation["conversation_id"], body, "model", True, {}), created)
+
+    def test_explicit_suggestion_action_uses_authoritative_next_step_without_a_skill(self):
+        from hyperknow.assistance_generation import validate_teaching
+        import json
+        conversation = self.turn(self.conversation())
+        run_id = conversation["active_run"]["run_id"]
+        self.db.transition(run_id, {"queued"}, status="generating")
+        result = response_result()
+        result["response"].update(plan=["定义", "例子"], waiting_for="continue", suggestions=[
+            {"label": "看个例子", "text": "用数值说明", "action": "continue"}])
+        self.db.finish_assistance(run_id, result)
+        conversation = self.db.get_assistance_conversation(conversation["conversation_id"])
+        suggestion = conversation["turns"][-1]["response"]["suggestions"][0]
+        continued = self.turn(conversation, text=suggestion["text"], action=suggestion["action"])
+        run = continued["active_run"]
+        expected = run["input"]["continuation_state"]
+        self.assertEqual(expected, {"plan": ["定义", "例子"], "current_step": 1, "is_last_step": True})
+        with self.assertRaises(ValueError):
+            validate_teaching(json.dumps(result["response"]), expected)
+        final = response_result()
+        final["response"].update(plan=expected["plan"], current_step=1, suggestions=[])
+        validated = validate_teaching(json.dumps(final["response"]), expected)
+        self.db.transition(run["run_id"], {"queued"}, status="generating")
+        self.db.finish_assistance(run["run_id"], {**final, "response": validated.model_dump()})
+        saved = self.db.get_assistance_conversation(conversation["conversation_id"])
+        self.assertEqual(saved["turns"][-1]["status"], "ready")
+        self.assertEqual(saved["turns"][-1]["skill_uses"], [])
 
     def test_large_saved_turn_cannot_remove_authoritative_continuation_state(self):
         conversation = self.turn(self.conversation(), text="问" * 12000)
@@ -355,6 +395,22 @@ class AssistanceStorageTests(unittest.TestCase):
         self.assertEqual(retried["input"], question["active_run"]["input"])
         self.assertEqual(retried["input"]["whiteboard"]["cursor"], 0)
         self.assertEqual(len(retried["input"]["whiteboard"]["steps"]), 1)
+
+    def test_feedback_reopen_and_replay_keep_embedded_artifact_current(self):
+        conversation, artifact = self.ready_board()
+        for vote in ("up", "down"):
+            body = {"client_command_id": self.command(), "expected_version": artifact["version"], "vote": vote}
+            saved = self.db.assistance_feedback(artifact["artifact_id"], body)
+            reopened = Database(self.path)
+            snapshot = reopened.get_assistance_conversation(conversation["conversation_id"])
+            self.assertEqual(snapshot["turns"][0]["artifacts"], [saved])
+            self.assertEqual(snapshot["version"], conversation["version"])
+            self.assertEqual(reopened.assistance_feedback(saved["artifact_id"], body), saved)
+            self.assertEqual(reopened.get_assistance_artifact(saved["artifact_id"]), saved)
+            same = reopened.assistance_feedback(saved["artifact_id"], {
+                "client_command_id": self.command(), "expected_version": saved["version"], "vote": vote})
+            self.assertEqual(same, saved)
+            artifact = saved
 
     def test_foreign_whiteboard_is_rejected_and_steps_only_record_while_current(self):
         _, artifact = self.ready_board()

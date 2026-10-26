@@ -342,6 +342,9 @@ test('real CLI, generated template and extracted release work outside the source
   checkRepo(extracted);
   checkActions(extracted);
   assert.ok(fs.existsSync(path.join(extracted, 'tests/tooling.test.cjs')));
+  assert.ok(fs.existsSync(path.join(extracted, 'evals/README.md')));
+  assert.ok(fs.existsSync(path.join(extracted, 'evals/concept-explanation/case.json')));
+  assert.equal(fs.existsSync(path.join(extracted, 'data/evals')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'public')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'docs/nono-profiles')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'scripts/ci.sh')), false);

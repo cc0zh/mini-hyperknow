@@ -26,6 +26,6 @@ ci.yml 在 Windows、Ubuntu、macOS 使用 Python 3.13、固定 uv 0.8.13 和 fr
 
 ## 保留的模板工具
 
-create-project.cjs 与 release-package.cjs 仍保留，不是产品部署流程。分发清单已包含业务代码、前端、uv.lock 与 .python-version；排除本地数据、环境凭据、缓存和依赖目录。被保留文档链接的历史／计划一并保留，避免精简后出现断链；未引用的维护记录仍排除。
+create-project.cjs 与 release-package.cjs 仍保留，不是产品部署流程。分发清单已包含业务代码、前端、uv.lock、.python-version及evals中的脱敏Case／Rubric／说明；排除data中的原始运行／评分／样本库、环境凭据、缓存和依赖目录。实际解包检查覆盖evals保留且data不被带出。被保留文档链接的历史／计划一并保留，避免精简后出现断链；未引用的维护记录仍排除。
 
 npm run release-package 生成 repo-metadata.tgz 和 release-manifest.json，而不是前端生产托管／可安装产品。原 release.yml、供应链与 provenance 流程暂存，本轮未运行发布、外部写入或部署。今后发布需先确定实际产品包装，不把 metadata 打包成功当成交付。

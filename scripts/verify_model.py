@@ -73,17 +73,34 @@ def main():
         if not health.json()["model"]["configured"]:
             print("BLOCKED: configure OPENAI_API_KEY in the local .env and restart the backend. No model call made.")
             return 2
-        created = client.post("/api/course-runs", json={"goal": args.goal, "client_command_id": str(uuid4())})
+        path = Path(args.output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        command = {"goal": args.goal, "client_command_id": str(uuid4())}
+        pending = {"scope": "real course acceptance; no automatic replay", "create_command": command,
+                   "status": "unconfirmed", "run_id": None}
+        path.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding="utf-8")
+        created = client.post("/api/course-runs", json=command)
         if created.status_code == 503 and created.json().get("error", {}).get("code") == "search_not_configured":
             print("BLOCKED: configure TAVILY_API_KEY locally and restart the backend. No run was created.")
             return 2
         created.raise_for_status()
-        run = wait_for(client, created.json()["run_id"], {"awaiting_answers"}, time.monotonic() + 260)
-        answers = [] if args.skip else [{"question_id": q["id"], "option_ids": [q["options"][0]["id"]],
-                                        "custom_text": ""} for q in run["questions"]]
-        submitted = client.post(f"/api/runs/{run['run_id']}/answers", json={
-            "client_command_id": str(uuid4()), "expected_version": run["version"], "skip": args.skip, "answers": answers})
-        submitted.raise_for_status()
+        pending.update(run_id=created.json()["run_id"], status="accepted")
+        path.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding="utf-8")
+        run = wait_for(client, created.json()["run_id"],
+                       {"awaiting_answers", "generating", "awaiting_blueprint"}, time.monotonic() + 260)
+        answers = []
+        clarification_mode = "not_required"
+        if run["status"] == "awaiting_answers":
+            assert run["questions"], "An empty clarification must advance automatically"
+            clarification_mode = "skipped" if args.skip else "answered"
+            answers = [] if args.skip else [{"question_id": q["id"], "option_ids": [q["options"][0]["id"]],
+                                            "custom_text": ""} for q in run["questions"]]
+            submitted = client.post(f"/api/runs/{run['run_id']}/answers", json={
+                "client_command_id": str(uuid4()), "expected_version": run["version"], "skip": args.skip, "answers": answers})
+            submitted.raise_for_status()
+        else:
+            assert run["questions"] == [] and run["answers_submitted"] and not run["skipped"]
+            assert run["stage"] in {"research", "blueprint"}
         blueprint_run = wait_for(client, run["run_id"], {"awaiting_blueprint"}, time.monotonic() + 600)
         verify_research(blueprint_run)
         blueprint = client.get(f"/api/courses/{blueprint_run['course_id']}").json()
@@ -92,9 +109,8 @@ def main():
         # A second GET cannot approve the blueprint or start unit generation.
         assert client.get(f"/api/runs/{run['run_id']}").json()["status"] == "awaiting_blueprint"
         if not args.approve_blueprint:
-            path = Path(args.output)
-            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps({"scope": "blueprint saved; awaiting explicit approval, not complete course acceptance",
+                                        "create_command": command, "clarification_mode": clarification_mode,
                                         "run": blueprint_run, "blueprint": blueprint}, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"WAITING: blueprint saved for {run['run_id']}; approve in the UI. Use --approve-blueprint only for explicit automated acceptance.")
             return 2
@@ -112,11 +128,10 @@ def main():
         assert client.get(f"/api/courses/{course['course_id']}").json() == course
         evidence = {"scope": "real model and HTTP course-generation slice; not browser or restart acceptance",
                     "health": health.json(), "run": result, "course": course, "answers_sent": answers,
-                    "blueprint_before_confirmation": blueprint, "confirmation": confirmed.json()}
+                    "blueprint_before_confirmation": blueprint, "confirmation": confirmed.json(),
+                    "create_command": command, "clarification_mode": clarification_mode}
         if args.data_dir:
             evidence["audited_model_calls"] = verify_planning_calls(args.data_dir, result, course)
-        path = Path(args.output)
-        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"REAL MODEL/API SLICE PASSED: {course['course_id']} ({course['session_count']} sessions). Evidence: {path}")
         return 0

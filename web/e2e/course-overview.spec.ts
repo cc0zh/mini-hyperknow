@@ -53,7 +53,7 @@ test('unit selection survives refresh and history, and invalid URLs recover with
   expect(after.version).toBe(saved.version)
 })
 
-test('real lesson actions and progressive details remain usable across desktop and narrow layouts', async ({ page }, info) => {
+test('real lesson actions and progressive details remain usable across desktop window sizes', async ({ page }, info) => {
   const { courses }: { courses: Course[] } = await (await page.request.get('/api/courses')).json()
   const course = courses.find(item => item.units.some(unit => unit.lectures.some(lecture => lecture.sessions.length)))
   test.skip(!course, 'Requires real saved lessons; none are manufactured.')
@@ -75,15 +75,15 @@ test('real lesson actions and progressive details remain usable across desktop a
   await page.getByRole('button', { name: /^展开简介/ }).click()
   await expect(page.getByRole('button', { name: /^收起简介/ })).toHaveAttribute('aria-expanded', 'true')
   await page.getByRole('button', { name: /^收起简介/ }).click()
-  for (const [width, height] of [[1440, 900], [1024, 768], [768, 1024], [390, 844], [320, 740]]) {
+  for (const [width, height] of [[1440, 900], [1024, 768]]) {
     await page.setViewportSize({ width, height })
     await expect(page.locator('#current-unit-title')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
-    if (width === 1440 || width === 390) await page.screenshot({ path: info.outputPath(`course-overview-${width}.png`), fullPage: true })
+    await page.screenshot({ path: info.outputPath(`course-overview-${width}.png`), fullPage: true })
   }
   if (saved.units.length > 1) {
     const other = saved.units.find(item => item.unit_id !== unit.unit_id)!
-    await page.getByLabel('当前单元', { exact: true }).selectOption(other.unit_id)
+    await page.getByRole('navigation', { name: '课程单元', exact: true }).getByRole('link').filter({ hasText: other.title }).click()
     await expect(page.locator('#current-unit-title')).toHaveText(other.title)
     expect(new URL(page.url()).searchParams.get('unit')).toBe(other.unit_id)
   }
@@ -109,11 +109,11 @@ test('real unconfirmed blueprint shows eight-unit navigation when present and ne
   await page.getByRole('navigation', { name: '课程单元', exact: true }).getByRole('link').last().click()
   await expect(page.locator('#current-unit-title')).toHaveText(saved.units.at(-1)!.title)
   await page.screenshot({ path: info.outputPath('course-blueprint-desktop.png'), fullPage: true })
-  await page.setViewportSize({ width: 390, height: 844 })
-  await page.getByLabel('当前单元', { exact: true }).selectOption(saved.units[0].unit_id)
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await page.getByRole('navigation', { name: '课程单元', exact: true }).getByRole('link').first().click()
   await expect(page.locator('#current-unit-title')).toHaveText(saved.units[0].title)
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
-  await page.screenshot({ path: info.outputPath('course-blueprint-mobile.png'), fullPage: true })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1024)
+  await page.screenshot({ path: info.outputPath('course-blueprint-desktop-1024.png'), fullPage: true })
   const after: Course = await (await page.request.get(`/api/courses/${saved.course_id}`)).json()
   expect(after.version).toBe(saved.version)
   expect(after.structure_status).toBe('blueprint')

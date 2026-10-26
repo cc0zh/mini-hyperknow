@@ -58,19 +58,19 @@ def main():
             save()
             return conversation["conversation_id"]
 
-        def turn(conversation_id, text, expect_kind=None, skill="concept-explanation", **extra):
+        def turn(conversation_id, text, expect_kind=None, **extra):
             nonlocal turn_index
             index = turn_index
             turn_index += 1
             path = f"/api/assistance/conversations/{conversation_id}/turns"
-            print(f"Starting real turn: {expect_kind or 'teaching'} / {skill}", flush=True)
+            print(f"Starting real turn: {expect_kind or 'teaching'}", flush=True)
             if index < len(evidence["turns"]):
                 entry = evidence["turns"][index]
                 assert entry["conversation_id"] == conversation_id
             else:
                 snapshot = get(f"/api/assistance/conversations/{conversation_id}")
                 command = {"client_command_id": f"verify-{uuid4()}", "expected_version": snapshot["version"],
-                           "text": text, "action": extra.pop("action", "message"), "skill_hint": skill, **extra}
+                           "text": text, "action": extra.pop("action", "message"), **extra}
                 entry = {"run_id": None, "conversation_id": conversation_id, "text": text,
                          "expect_kind": expect_kind,
                          "status": "unconfirmed", "command": command}
@@ -101,7 +101,13 @@ def main():
                     snapshot = get(f"/api/assistance/conversations/{conversation_id}")
                     current = next(t for t in snapshot["turns"] if t["run_id"] == run_id)
                     assert current["run_id"] == run_id and current["status"] == "ready"
-                    assert any(s["name"] == skill for s in current["skill_uses"])
+                    loaded = [{key: step[key] for key in ("name", "version", "sha256")}
+                              for step in run["steps"]
+                              if step.get("tool") == "get_skills" and step.get("status") == "ready"]
+                    assert current["skill_uses"] == loaded
+                    assert all(use == {key: run["input"]["skill_snapshots"][use["name"]][key]
+                                       for key in ("name", "version", "sha256")}
+                               for use in loaded)
                     entry.update(response=current["response"], skill_uses=current["skill_uses"],
                                  history_selection=run["input"].get("history_selection"))
                     for artifact in current["artifacts"]:
@@ -129,14 +135,26 @@ def main():
                 "我想理解链式法则。不要一次全讲。先用一个有两个选项的问题确认我的导数基础，"
                 "等我回答后按两步计划讲：复合函数的直觉、链式法则的计算。第一轮请只澄清。")
             assert first["response"]["waiting_for"] == "answer" and first["response"]["questions"]
-            teaching, _ = turn(conversation_id, "我熟悉导数定义和基本求导。请开始第一步复合函数直觉，讲完等待我继续，不要讲第二步。")
+            teaching, _ = turn(conversation_id, "我熟悉导数定义和基本求导。请开始第一步复合函数直觉，讲完等待我继续，不要讲第二步。请提供一个进入第二步的下一步建议。")
             assert teaching["response"]["waiting_for"] == "continue"
-            # A plain teaching turn must not manufacture an artifact on its own.
-            assert teaching["artifacts"] == [], teaching["artifacts"]
-            continuation, _ = turn(conversation_id, "继续下一步", action="continue")
+            suggestion = next(item for item in teaching["response"]["suggestions"] if item["action"] == "continue")
+            evidence["continuation_suggestion"] = suggestion
+            save()
+            continuation, _ = turn(conversation_id, suggestion["text"], action=suggestion["action"])
             assert continuation["response"]["plan"] == teaching["response"]["plan"]
             assert continuation["response"]["current_step"] == teaching["response"]["current_step"] + 1
-            turn(conversation_id, "生成三张链式法则的问答闪卡。", expect_kind="flashcards")
+            cards, _ = turn(conversation_id, "生成三张链式法则的问答闪卡。", expect_kind="flashcards")
+            card = cards["artifacts"][0]
+            feedback_body = {"client_command_id": f"verify-{uuid4()}", "expected_version": card["version"], "vote": "up"}
+            feedback_path = f"/api/assistance/artifacts/{card['artifact_id']}/feedback"
+            feedback = client.put(feedback_path, json=feedback_body)
+            feedback.raise_for_status()
+            assert client.put(feedback_path, json=feedback_body).json() == feedback.json()
+            refreshed = get(f"/api/assistance/conversations/{conversation_id}")
+            saved_card = next(a for t in refreshed["turns"] for a in t["artifacts"] if a["artifact_id"] == card["artifact_id"])
+            assert saved_card == feedback.json()
+            evidence["feedback"] = {"command": feedback_body, "artifact": feedback.json(), "replay_and_refresh_match": True}
+            save()
             turn(conversation_id, "出一道关于链式法则的选择题，含明确答案和解释。", expect_kind="quiz")
             turn(conversation_id, "用流程图说明链式法则的计算步骤。", expect_kind="diagram")
             board_turn, _ = turn(conversation_id, "用3步独立白板讲清sin(x²)求导，每步简洁。", expect_kind="whiteboard")
@@ -154,8 +172,7 @@ def main():
                  "用简单自包含HTML动画演示内层x²与外层sin的复合，含原生滑块或按钮和文字标注，"
                  "不用外部资源，不联网，不访问父页面，不使用eval。不要过度复杂。", expect_kind="animation")
             other_id = create()
-            _, other_run = turn(other_id, "如何计算cos(3x)的导数？只给一个提示，不要给最终答案，不要澄清或生成产物。",
-                                skill="problem-solving")
+            _, other_run = turn(other_id, "如何计算cos(3x)的导数？只给一个提示，不要给最终答案，不要澄清或生成产物。")
             assert other_run["input"]["history"] == [] and "whiteboard" not in other_run["input"]
             assert get("/api/courses")["courses"] == [], "This verifier must run on an isolated empty-course database"
             evidence["passed"] = True

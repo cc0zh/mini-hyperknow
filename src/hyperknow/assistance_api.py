@@ -16,7 +16,6 @@ class SubmitTurn(AssistanceCommand):
     expected_version: int = Field(strict=True, ge=1)
     text: str = Field(default="", max_length=12000)
     action: Literal["message", "continue"] = "message"
-    skill_hint: Literal["auto", "concept-explanation", "problem-solving"] = "auto"
     artifact_id: str | None = Field(default=None, min_length=1, max_length=120)
 
     @model_validator(mode="after")

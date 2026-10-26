@@ -5,7 +5,7 @@ const { fs, path, excluded, stat } = require('./common.cjs');
 const projectRoots = new Set([
   'AGENTS.md', 'CLAUDE.md', 'README.md', 'CONTRIBUTING.md', 'LICENSE', 'SECURITY.md',
   'CODEOWNERS', '.gitignore', '.gitattributes', '.editorconfig', '.markdownlint.json',
-  'package.json', 'pyproject.toml', 'uv.lock', '.python-version', '.env.example', 'src', 'web', 'docs', 'scripts', 'tests', '.github',
+  'package.json', 'pyproject.toml', 'uv.lock', '.python-version', '.env.example', 'src', 'web', 'docs', 'evals', 'scripts', 'tests', '.github',
 ]);
 
 // Repository maintenance material is not part of a new project's starting state.

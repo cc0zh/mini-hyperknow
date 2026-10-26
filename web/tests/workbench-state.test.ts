@@ -35,3 +35,10 @@ test('current unit caption uses a real run identity and does not guess from save
   assert.equal(workbenchStatus(run, null).title, '正在完善课程内容')
   assert.equal(workbenchStatus({ ...run, status: 'ready' }, course).title, '课程准备好了')
 })
+
+test('a course with no clarification questions displays its saved research stage', () => {
+  const run = { status: 'generating', stage: 'research', questions: [], answers: [] } as unknown as Run
+  assert.deepEqual(workbenchSteps(run).map(step => step.state), ['done', 'active', 'pending', 'pending'])
+  assert.equal(workbenchStatus(run, null).title, '正在查阅参考资料')
+  assert.deepEqual(savedPreferences(run), [])
+})

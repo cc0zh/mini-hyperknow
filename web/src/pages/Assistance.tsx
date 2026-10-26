@@ -58,14 +58,14 @@ function ConversationPage({ conversationId }: { conversationId: string }) {
   const inFlight = !!conversation?.active_run
   const blocked = command.busy || !!command.pending || inFlight
   const savedText = command.pending?.body.action ? String(command.pending.body.text ?? '') : null
-  // The learner writes what they want; the model decides which teaching skill
-  // and whether an artifact is the right move. `continue` is the only second
+  // The learner writes what they want; the model decides how to teach and
+  // whether an artifact is the right move. `continue` is the only second
   // intent and it stays bound to a saved plan waiting for that advance.
   async function send(overrideText = text, overrideAction: AssistanceAction = 'message'): Promise<boolean> {
     const current = resource.current.current
     if (!current || blocked || !validTurn(overrideText)) return false
     if (overrideAction === 'continue' && current.turns.at(-1)?.response?.waiting_for !== 'continue') return false
-    const ok = await command.execute(makeTurnCommand(current, overrideText.trim(), overrideAction, 'auto', artifactId))
+    const ok = await command.execute(makeTurnCommand(current, overrideText.trim(), overrideAction, artifactId))
     if (ok) { setText(''); setArtifactId(undefined) }
     return ok
   }
@@ -89,7 +89,7 @@ function ConversationPage({ conversationId }: { conversationId: string }) {
     {command.pending && <div className="pending-command" role="status"><div><b>{command.busy ? '正在提交同一命令…' : '请求结果待确认'}</b><p>保留原路径、正文、版本与命令编号，不会自动发起新一轮。</p></div><button className="button secondary small" type="button" disabled={command.busy} onClick={() => { void command.execute() }}>重试同一命令</button></div>}
     {command.rejected && <button className="text-button" type="button" onClick={() => { if (savedText !== null) setText(savedText); command.releaseRejected(); void resource.reload() }}>确认已拒绝，重新同步后修改</button>}
     {!conversation.turns.length && <p className="assistance-start-note">写下问题，或选择生成一种学习产物。进入与刷新仅展示已保存内容。</p>}
-    <AssistanceTurns conversation={conversation} blocked={blocked} onAnswer={answer => send(answer)} onRetry={runId => { void command.runAction(runId, 'retry') }} onSuggest={suggestion => { void send(suggestion.text) }} onVote={vote} />
+    <AssistanceTurns conversation={conversation} blocked={blocked} onAnswer={answer => send(answer)} onRetry={runId => { void command.runAction(runId, 'retry') }} onSuggest={suggestion => { void send(suggestion.text, suggestion.action) }} onVote={vote} />
     {inFlight && <div className="assistance-inflight" role="status"><div className="pending-command"><div><b>本轮{assistanceStatusLabels[conversation.active_run!.status]}</b><p>通过真实服务端快照同步，完成后展示保存的回复。</p></div><button className="button secondary small" type="button" disabled={command.busy || !!command.pending} onClick={() => { void command.runAction(conversation.active_run!.run_id, 'cancel') }}>取消当前回答</button></div>{conversation.active_run!.status === 'generating' && <AssistanceTimeline run={conversation.active_run!} />}</div>}
     {waiting === 'continue' && <button className="button primary continue-assistance" type="button" disabled={blocked} onClick={() => { void send('继续下一步', 'continue') }}>继续讲解<IconArrowRight size={15} /></button>}
     {artifactId && <div className="assistance-board-context"><span>问题关联已确认的白板步骤</span><Link to={boardArtifactPath(artifactId)}>回到白板</Link><button className="text-button" type="button" disabled={blocked} onClick={() => setArtifactId(undefined)}>取消关联</button></div>}

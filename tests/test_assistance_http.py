@@ -76,7 +76,7 @@ class AssistanceHTTPTests(unittest.TestCase):
 
     def queued(self, conversation, **changes):
         body = {"client_command_id": self.command(), "expected_version": conversation["version"],
-                "text": "用白板分步讲清二分", "action": "message", "skill_hint": "auto", "artifact_id": None,
+                "text": "用白板分步讲清二分", "action": "message", "artifact_id": None,
                 **changes}
         snapshot = self.db.assistance_turn(conversation["conversation_id"], body, "saved-model", True, {})
         return snapshot, body
@@ -112,7 +112,7 @@ class AssistanceHTTPTests(unittest.TestCase):
         conversation, _ = self.create()
         path = f"/api/assistance/conversations/{conversation['conversation_id']}/turns"
         body = {"client_command_id": self.command(), "expected_version": 1, "text": "解释极限",
-                "action": "message", "skill_hint": "auto"}
+                "action": "message"}
         response = self.client.post(path, json=body)
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["error"]["code"], "model_not_configured")
@@ -128,7 +128,7 @@ class AssistanceHTTPTests(unittest.TestCase):
         from hyperknow.assistance_generation import build_skill_snapshots
         conversation, _ = self.create()
         body = {"client_command_id": self.command(), "expected_version": conversation["version"],
-                "text": "解释迭代器", "action": "message", "skill_hint": "auto", "artifact_id": None}
+                "text": "解释迭代器", "action": "message", "artifact_id": None}
         # Seed an actual queued run, then replay its command through the real
         # service. The child process has an explicitly empty API key: provider
         # initialization fails locally and cannot make a paid model request.
@@ -224,3 +224,15 @@ class AssistanceHTTPTests(unittest.TestCase):
                 self.assertEqual(json.loads(ws.recv(timeout=3))["type"], "error")
             ws.send(json.dumps({"type": "ping"}))
             self.assertEqual(json.loads(ws.recv(timeout=3))["type"], "pong")
+
+    def test_feedback_round_trip_replays_same_identity_and_refresh_reads_saved_verdict(self):
+        conversation, artifact, _ = self.board()
+        path = f"/api/assistance/artifacts/{artifact['artifact_id']}/feedback"
+        body = {"client_command_id": self.command(), "expected_version": artifact["version"], "vote": "up"}
+        saved = self.client.put(path, json=body)
+        self.assertEqual(saved.status_code, 200)
+        self.assertEqual(saved.json()["feedback"], "up")
+        self.assertEqual(self.client.put(path, json=body).json(), saved.json())
+        refreshed = self.client.get(f"/api/assistance/conversations/{conversation['conversation_id']}").json()
+        self.assertEqual(refreshed["turns"][0]["artifacts"], [saved.json()])
+        self.assertEqual(self.db.calls(conversation["turns"][0]["run_id"]), [])

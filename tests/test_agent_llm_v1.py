@@ -3,7 +3,7 @@
 import unittest
 
 from agent_core.llm import LLMConfig, LLMServiceRegistry
-from agent_core.llm.openai import from_openai_response, to_openai_messages
+from agent_core.llm.openai import completion_parameters, from_openai_response, to_openai_messages
 from agent_core.llm.sanitize import sanitize_messages
 from agent_core.types import AgentContext, AssistantMessage, ToolCall, ToolResultMessage, UserMessage
 
@@ -30,6 +30,16 @@ class RegistryTests(unittest.TestCase):
 
 
 class MessageBoundaryTests(unittest.TestCase):
+    def test_provider_token_limit_uses_documented_key_without_sdk_or_network(self):
+        for endpoint in ("https://api.deepseek.com", "https://api.deepseek.com/v1/"):
+            self.assertEqual(completion_parameters(2048, endpoint), {"max_tokens": 2048})
+        for endpoint in (None, "https://api.openai.com/v1", "https://api.deepseek.com.example/v1"):
+            self.assertEqual(completion_parameters(2048, endpoint), {"max_completion_tokens": 2048})
+        self.assertEqual(completion_parameters(None, "https://api.deepseek.com"), {})
+        for value in (True, 0, -1, 1.5):
+            with self.assertRaises(ValueError):
+                completion_parameters(value, "https://api.deepseek.com")
+
     def test_interrupted_group_is_closed_before_next_user(self):
         assistant = AssistantMessage(tool_calls=[ToolCall("a", "read"), ToolCall("b", "read")])
         source = [UserMessage("first"), assistant, ToolResultMessage("a", "saved"), UserMessage("next")]

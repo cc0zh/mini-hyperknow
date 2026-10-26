@@ -2,14 +2,13 @@
 
 import asyncio
 from contextlib import suppress
-import json
 import logging
 import sqlite3
 
 from fastapi import WebSocket
 
 from .config import Settings
-from .domain import AppError, resolve_answers
+from .domain import AppError, course_research_input, resolve_answers
 from .generation import Generator
 from .research import Researcher
 from .storage import Database
@@ -198,9 +197,7 @@ class CourseService:
             self.db._model_configured(bool(self.settings.api_key))
             run["answers"] = resolve_answers(run["questions"], data["answers"], data["skip"])
             run.update(skipped=data["skip"], answers_submitted=True, status="generating", stage="research", error=None)
-            run["input"] = {"goal": run["goal"], "context": json.dumps({
-                "questions": run["questions"], "answers": run["answers"],
-                "clarification_skipped": run["skipped"]}, ensure_ascii=False)}
+            run["input"] = course_research_input(run)
             return run
         run = self.db.mutate_command(data["client_command_id"], run_id, data["expected_version"],
                                      {"action": "answers", "answers": data["answers"], "skip": data["skip"]}, submit)
@@ -279,8 +276,7 @@ class CourseService:
                 if not self.accepting:
                     continue
                 if phase == "clarifying":
-                    updated = self.db.transition(run_id, {"clarifying"}, status="awaiting_answers",
-                                                 questions=result.model_dump()["questions"])
+                    updated = self.db.finish_clarification(run_id, result)
                 elif run.get("kind") == "research" or phase == "research":
                     updated = self.db.finish_research(run_id, result)
                 elif phase == "blueprint":

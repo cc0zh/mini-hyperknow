@@ -137,7 +137,7 @@ export function useAssistanceCommand(conversationId: string, acceptConversation:
           if (!alive()) return false
           handlers.current.acceptConversation(conversation)
           const question = command.question_after_save
-          command = makeTurnCommand(conversation, question.text, 'message', question.skill_hint, question.artifact_id)
+          command = makeTurnCommand(conversation, question.text, 'message', question.artifact_id)
           persist(command)
         } else {
           if (command.conversationId) {

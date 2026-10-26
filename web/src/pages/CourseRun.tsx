@@ -5,7 +5,7 @@ import { BackLink, ErrorNotice, Loading, Mark, dateLabel } from '../components/u
 import { IconArrowRight, IconBoard, IconCheck, IconChevronLeft } from '../components/icons'
 import { BlueprintExplorer } from '../components/BlueprintExplorer'
 import { RunResearch } from '../components/RunResearch'
-import { blueprintDecision, hasAnswers, isTerminal, isWorking, supersedingCourseRunId, toggleOption } from '../lib/run-state'
+import { blueprintDecision, hasAnswers, isTerminal, isWorking, needsClarificationAnswers, supersedingCourseRunId, toggleOption } from '../lib/run-state'
 import { canReviewBlueprint } from '../lib/course-state'
 import { savedPreferences, savedStructureCounts, workbenchStatus, workbenchSteps } from '../lib/workbench-state'
 import { useRun } from '../lib/use-run'
@@ -71,10 +71,11 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
   const reviewable = canReviewBlueprint(run, course) && !courseError && !error
   const status = workbenchStatus(run, course)
   const counts = savedStructureCounts(course)
+  const awaitingAnswers = needsClarificationAnswers(run)
   const answers = run.questions.map(question => draft[question.id] ?? run.answers.find(answer => answer.question_id === question.id) ?? { question_id: question.id, option_ids: [], custom_text: '' })
   const submitAnswers = (event: FormEvent) => {
     event.preventDefault()
-    if (locked || !hasAnswers(run.questions, answers)) return
+    if (locked || !awaitingAnswers || !hasAnswers(run.questions, answers)) return
     void command.execute(`/runs/${encodeURIComponent(run.run_id)}/answers`, { expected_version: run.version, skip: false, answers: answers.map(answer => ({ ...answer, custom_text: answer.custom_text.trim() })) })
   }
   const decide = (approve: boolean) => {
@@ -90,7 +91,7 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
   const ownerChanged = !!latestRunId
   const actionNote = ownerChanged ? '这份课程已有后续生成任务，请前往最新状态。' : command.pending ? '请先确认上次操作的结果，避免重复提交。' :
     run.status === 'awaiting_blueprint' ? reviewable ? '确认后将自动完善全部单元，无需逐单元确认。' : '正在同步本次课程方向，请稍候。' :
-    run.status === 'awaiting_answers' ? '选择偏好或填写答案，也可以跳过。' : run.status === 'ready' ? '从第一课开始，或先查看完整课程。' : run.error?.retryable === false ? '请先处理显示的问题；直接重试相同输入不保证解决。已保存内容仍保留。' :
+    awaitingAnswers ? '选择偏好或填写答案，也可以跳过。' : run.status === 'ready' ? '从第一课开始，或先查看完整课程。' : run.error?.retryable === false ? '请先处理显示的问题；直接重试相同输入不保证解决。已保存内容仍保留。' :
       isTerminal(run.status) ? '已保存的内容不会丢失，可继续未完成部分。' : '内容会持续保存，你可以稍后回来查看。'
 
   return <div className="creation-workbench">
@@ -105,7 +106,7 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
         {error && <ErrorNotice title="状态暂时无法同步" message={error} retry={reload} />}
         {run.error && <ErrorNotice title="生成需要处理" message={run.error.message} />}
         {command.error && <ErrorNotice title="上次操作尚未确认" message={command.error} />}
-        {run.status === 'awaiting_answers' && <form id="course-preferences" className="wb-questions" onSubmit={submitAnswers}><h2>补充你的偏好</h2>{run.questions.map((question, index) => <QuestionField key={question.id} question={question} index={index} answer={answers[index]} disabled={locked} change={answer => setDraft({ ...draft, [question.id]: answer })} />)}</form>}
+        {awaitingAnswers && <form id="course-preferences" className="wb-questions" onSubmit={submitAnswers}><h2>补充你的偏好</h2>{run.questions.map((question, index) => <QuestionField key={question.id} question={question} index={index} answer={answers[index]} disabled={locked} change={answer => setDraft({ ...draft, [question.id]: answer })} />)}</form>}
         {narrowRail && <div className="wb-research-inline"><RunResearch research={run.research} /></div>}
       </aside>
       <section className="wb-result" aria-label="课程蓝图工作区"><div className="wb-result-heading"><h2>课程蓝图</h2><span>{course ? `${course.units.length} 单元 · ${counts.sessions} 已生成小节` : '单元顺序与学习路径'}</span></div>
@@ -121,7 +122,7 @@ function Workspace({ run, command, error, reload, connection, draft, setDraft, f
     </div>
     <footer className="wb-actionbar" role="region" aria-label="当前阶段操作"><div className="wb-action-caption"><strong>{status.title}</strong><p>{actionNote}</p></div><div className="wb-action-buttons">
       {command.pending ? command.conflict ? <button className="button primary" disabled={command.busy} onClick={() => { command.releaseConflict(); reload(); reloadCourse() }}>同步最新状态</button> : command.rejected ? <button className="button primary" disabled={command.busy} onClick={command.releaseRejected}>修改后重新提交</button> : <button className="button primary" disabled={command.busy} onClick={() => { void command.execute() }}>{command.busy ? '正在确认…' : '确认上次操作'}</button> : latestRunId ? <Link className="button primary" to={`/course-runs/${encodeURIComponent(latestRunId)}`}>查看最新生成状态</Link> : <>
-      {run.status === 'awaiting_answers' && <><button className="button secondary" disabled={locked} onClick={() => { void command.execute(`/runs/${encodeURIComponent(run.run_id)}/answers`, { expected_version: run.version, skip: true, answers: [] }) }}>跳过补充</button><button className="button primary" type="submit" form="course-preferences" disabled={locked || !hasAnswers(run.questions, answers)}>提交偏好并继续</button></>}
+      {awaitingAnswers && <><button className="button secondary" disabled={locked} onClick={() => { void command.execute(`/runs/${encodeURIComponent(run.run_id)}/answers`, { expected_version: run.version, skip: true, answers: [] }) }}>跳过补充</button><button className="button primary" type="submit" form="course-preferences" disabled={locked || !hasAnswers(run.questions, answers)}>提交偏好并继续</button></>}
       {run.status === 'awaiting_blueprint' && <><button ref={adjustButton} className="button secondary" disabled={locked || !reviewable} onClick={() => setAdjusting(true)}>调整方向</button><button className="button primary" disabled={locked || !reviewable} onClick={() => decide(true)}>确认并完善课程</button></>}
       {run.status === 'ready' && course && <><Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>查看课程总览</Link>{nextPath && <Link className="button primary" to={nextPath}>开始学习 <IconArrowRight size={13} /></Link>}</>}
       {['failed', 'cancelled', 'interrupted'].includes(run.status) && <>{course && <Link className="button secondary" to={`/courses/${encodeURIComponent(course.course_id)}`}>查看已保存内容</Link>}<button className="button primary" disabled={locked} onClick={() => mutate('retry')}>继续生成剩余内容</button></>}

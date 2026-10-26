@@ -14,8 +14,8 @@ class SkillRegistry:
     """
 
     def __init__(self, snapshots: dict[str, dict]):
-        if not snapshots or len(snapshots) > 12:
-            raise ValueError("expected 1-12 trusted skill snapshots")
+        if not isinstance(snapshots, dict) or len(snapshots) > 12:
+            raise ValueError("expected 0-12 trusted skill snapshots")
         self._skills = deepcopy(snapshots)
         for name, skill in self._skills.items():
             if not re.fullmatch(r"[a-z][a-z0-9-]{0,63}", name):
@@ -33,6 +33,8 @@ class SkillRegistry:
 
     @classmethod
     def from_directory(cls, root: Path, names: tuple[str, ...]):
+        if not names:
+            return cls({})
         root = root.resolve(strict=True)
         snapshots = {}
         for name in names:
