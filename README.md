@@ -74,6 +74,8 @@ uv run --frozen python scripts/verify_model.py
 
 ## 设计与交接
 
+优化或理解某项业务时，先查[现行业务与改动影响入口](docs/ARCHITECTURE.md#10-现行业务与改动影响入口)：完整路径、主要修改点、上下游消费者、共享/独立边界及验证入口统一从这里导航；历史审计只作当时证据，不作为现行契约。
+
 独立网页调研Agent提供后端`POST /api/research-runs`，复用串行worker与SQLite，支持真实Tavily搜索、公开网页阅读、来源报告和取消／重试／恢复；造课接入与前端展示由[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)承接。显式运行`uv run --frozen python scripts/verify_research.py`仅验证独立搜索＋模型，会产生费用；缺配置退出2。独立验收边界见[调研契约](docs/design-docs/web-research-agent.md)，不能替代新造课链路验收。
 
 通用 Python 内核已升级 V1：工具调度／逐次审批、有界输出与原文存档、显式工作区工具、JSONL 会话恢复、调用者维护的长期记忆、Token 预算压缩和 high／medium／low 模型分层。课程业务仍沿用 SQLite 与既有同步生成，不向浏览器开放文件／命令工具；同步网络取消不等于远端中止。接口、配置与安全边界见[内核 V1](docs/design-docs/agent-core-v1.md)。

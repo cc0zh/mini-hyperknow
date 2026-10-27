@@ -4,6 +4,8 @@
 
 后续状态：本审计保留重构前的2026-10-26源码事实，不再作为当前契约；两个教学Skill、固定加载和已记录跨端问题的处理见[重构计划](../exec-plans/completed/20261026-teaching-boundaries-refactor.md)。现行教学/接口以对应设计文档为准。
 
+现行定位已转到[业务与改动影响入口](../ARCHITECTURE.md#10-现行业务与改动影响入口)：从那里查完整业务、主维护点、依赖、前后端影响及验证路径；本文后续正文保留历史口径，不应将其中旧Skill、旧接口或评测限制直接当作当前实现。
+
 关联：[产品范围](product-design.md)、[架构](../ARCHITECTURE.md)、[模型工作流](agent-workflows.md)、[即时协助](instant-assistance.md)、[现有eval](backend-evaluation-pipeline.md)、[审计计划](../exec-plans/completed/20261026-business-ai-eval-audit.md)。
 
 ## 1. 阅读结论与证据口径
