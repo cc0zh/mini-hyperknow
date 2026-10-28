@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "id": "course-clarification",
+  "version": "2",
+  "title": "课程需求澄清及自动后续阶段采证",
+  "tags": [
+    "B01",
+    "development",
+    "uncalibrated"
+  ],
+  "task": {
+    "profile": "course",
+    "input": {
+      "goal": "我会基本代数、sin函数和求导公式，但不理解链式法则。请用两节、每节30分钟的入门课程讲解sin(x²)为什么求导要乘2x，包含直觉和例题，不需要编程。"
+    },
+    "answer_policy": {
+      "mode": "fixed",
+      "facts": "我具备基础代数和sin函数知识，每天投入30分钟，希望用直觉和例题理解链式法则。"
+    }
+  },
+  "prerequisites": {},
+  "steps": [
+    {
+      "id": "create",
+      "action": "course.create",
+      "input": {
+        "goal": "我会基本代数、sin函数和求导公式，但不理解链式法则。请用两节、每节30分钟的入门课程讲解sin(x²)为什么求导要乘2x，包含直觉和例题，不需要编程。"
+      },
+      "when": {
+        "state": [
+          "preparing",
+          "waiting",
+          "terminal"
+        ],
+        "action": "course.create"
+      },
+      "optional": false,
+      "checkpoint": "initial"
+    },
+    {
+      "id": "answer",
+      "action": "course.answers",
+      "input": {},
+      "when": {
+        "state": [
+          "waiting",
+          "terminal"
+        ],
+        "action": "course.answers"
+      },
+      "optional": true,
+      "checkpoint": "final"
+    }
+  ],
+  "capture": [
+    "initial",
+    "final"
+  ],
+  "checks": [
+    {
+      "check_id": "clarification",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "只在确有信息缺口时澄清，并使用真实答案",
+      "pass_when": "零问题或必要问题均可；不重复索要已有资料，真实答案被保留",
+      "fail_when": "无视已给资料、问题无关或错误使用答案",
+      "evidence": [
+        "initial",
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": [
+        "runs",
+        "resources"
+      ]
+    }
+  ],
+  "reference_facts": [
+    "令u=x²，局部变化率du/dx=2x，sin(u)对u的导数为cos(u)，故sin(x²)的导数为2x·cos(x²)。",
+    "参考事实用于核对知识，不要求唯一措辞、特定比喻或固定工具调用顺序。"
+  ],
+  "limits": {
+    "max_actions": 32,
+    "max_model_calls": 32,
+    "wait_seconds": 420,
+    "poll_seconds": 0.25
+  },
+  "completion": {
+    "states": [
+      "waiting",
+      "terminal"
+    ],
+    "outcomes": [
+      "success"
+    ]
+  }
+}

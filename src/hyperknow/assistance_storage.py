@@ -61,10 +61,7 @@ class AssistanceStorage:
             action = data.get("action", "message")
             if action == "message" and not text:
                 raise AppError("invalid_message", "请输入问题", 422)
-            from .assistance_domain import forbidden_artifacts, requested_artifacts
             context = {"text": text, "action": action,
-                       "requested_artifacts": requested_artifacts(text),
-                       "forbidden_artifacts": forbidden_artifacts(text),
                        "history": [], "skill_snapshots": (
                            skill_snapshots() if callable(skill_snapshots) else skill_snapshots)}
             artifact_id = data.get("artifact_id")
@@ -178,12 +175,7 @@ class AssistanceStorage:
             drafts = [ArtifactDraft.model_validate(a).model_dump() for a in result["artifacts"]]
             if len(drafts) > 1:
                 raise AppError("artifact_limit", "一次教学轮次只保存一个产物", 422, True)
-            requested = run["input"].get("requested_artifacts") or []
-            if requested and not any(a["kind"] == requested[0] for a in drafts):
-                raise AppError("artifact_missing", "未生成你点名的教学产物", 422, True)
-            refused = run["input"].get("forbidden_artifacts") or []
-            if any(a["kind"] in refused for a in drafts):
-                raise AppError("artifact_forbidden", "你已明确不要这类产物，本轮不保存", 422, True)
+
             artifacts = []
             for draft in drafts:
                 if draft["kind"] == "whiteboard":

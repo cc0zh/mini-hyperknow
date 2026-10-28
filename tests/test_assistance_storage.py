@@ -76,18 +76,38 @@ class AssistanceStorageTests(unittest.TestCase):
         self.assertEqual(reopened.create_assistance_conversation("assistance-command-1"), conversation)
         self.assertEqual(len(reopened.list_assistance_conversations()), 1)
 
-    def test_hint_with_an_explicit_refusal_list_can_finish_without_artifacts(self):
-        text = "只给提示，请只提示第一步；不要闪卡、测验、白板、动画或图解。"
-        conversation = self.turn(self.conversation(), text=text)
+    def test_user_text_is_frozen_without_keyword_derived_artifact_constraints(self):
+        texts = ["我看不懂这个白板，请重新生成白板讲解。", "我不懂动画原理，请生成一个动画讲解。",
+                 "不要闪卡、测验、白板、动画或图解。", "用白板讲解", "不要动画，请生成动画。"]
+        for text in texts:
+            with self.subTest(text=text):
+                conversation = self.turn(self.conversation(), text=text)
+                run = conversation["active_run"]
+                self.assertEqual(run["input"]["text"], text)
+                self.assertNotIn("requested_artifacts", run["input"])
+                self.assertNotIn("forbidden_artifacts", run["input"])
+                self.assertEqual(Database(self.path).get_run(run["run_id"])["input"], run["input"])
+
+    def test_text_reply_can_commit_without_a_keyword_derived_artifact_requirement(self):
+        conversation = self.turn(self.conversation(), text="我看不懂这个白板，请重新生成白板讲解。")
         run = conversation["active_run"]
-        self.assertEqual(run["input"]["requested_artifacts"], [])
-        self.assertEqual(run["input"]["forbidden_artifacts"],
-                         ["flashcards", "quiz", "whiteboard", "animation", "diagram"])
         self.db.transition(run["run_id"], {"queued"}, status="generating")
         self.db.finish_assistance(run["run_id"], response_result())
-        reopened = Database(self.path).get_assistance_conversation(conversation["conversation_id"])
-        self.assertEqual(reopened["turns"][0]["status"], "ready")
-        self.assertEqual(reopened["turns"][0]["artifacts"], [])
+        turn = Database(self.path).get_assistance_conversation(conversation["conversation_id"])["turns"][0]
+        self.assertEqual(turn["status"], "ready")
+        self.assertEqual(turn["artifacts"], [])
+
+    def test_historical_flags_do_not_override_artifact_commit_or_change_frozen_input(self):
+        conversation = self.turn(self.conversation(), text="我看不懂这个白板，请重新生成白板讲解。")
+        run = conversation["active_run"]
+        frozen = {**run["input"], "requested_artifacts": ["quiz"], "forbidden_artifacts": ["whiteboard"]}
+        self.db.transition(run["run_id"], {"queued"}, status="generating", input=frozen)
+        self.db.finish_assistance(run["run_id"], response_result(board_draft()))
+        reopened = Database(self.path)
+        turn = reopened.get_assistance_conversation(conversation["conversation_id"])["turns"][0]
+        self.assertEqual(turn["status"], "ready")
+        self.assertEqual([a["kind"] for a in turn["artifacts"]], ["whiteboard"])
+        self.assertEqual(reopened.get_run(run["run_id"])["input"], frozen)
 
     def test_existing_v3_database_gains_tables_without_replacing_old_data(self):
         run = self.db.create_run(self.command(), "学习迭代器", "original-model")
@@ -339,13 +359,10 @@ class AssistanceStorageTests(unittest.TestCase):
         self.assertEqual(len(self.db.calls(assistance_run_id)), 1)
         self.assertEqual(self.db.get_run(assistance_run_id)["status"], "ready")
 
-    def test_invalid_completion_rolls_back_all_artifacts_and_missing_requested_artifact(self):
+    def test_invalid_completion_rolls_back_all_artifacts(self):
         conversation = self.turn(self.conversation(), text="用白板分步推导")
         run_id = conversation["active_run"]["run_id"]
         self.db.transition(run_id, {"queued"}, status="generating")
-        with self.assertRaises(AppError) as failure:
-            self.db.finish_assistance(run_id, response_result())
-        self.assertEqual(failure.exception.code, "artifact_missing")
         bad = copy.deepcopy(board_draft())
         bad["data"]["steps"][0]["operations"][0]["content"] = ""
         with self.assertRaises(ValueError):

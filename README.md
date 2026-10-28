@@ -66,7 +66,7 @@ uv run --frozen python scripts/verify_model.py
 
 即时协助有独立的付费验收入口：先将`HK_DATA_DIR`设为独立验收目录并在8037端口启动后端，再运行`uv run --frozen python scripts/verify_assistance.py --execute`。它验证独立教学、多轮继续和五种真实产物（含结构图），不要求加载Skill，产物断言使用自然语言而不是操作枚举，不接入搜索；可加`--resume`读取上次保存的run ID，重启验收脚本不重复创建已有轮次。证据默认写入忽略的`data/verification/instant-assistance/`；这不是普通CI命令。
 
-概念解释另有[轻量评测入口](evals/README.md)：数据Pipeline准备Case／Rubric，业务Pipeline执行真实HTTP、导出固定ATIF-v1.7、进行规则＋单次LLM评分，并自动关联开发库样本。`uv run --frozen python scripts/run_eval.py prepare`不调用模型；`run`／`grade`必须显式`--execute`并指定Grader模型。运行前校验独立后端存储指纹，不使用作者默认数据；`show`只读结果，恢复和重评不重跑原教学。教学与Grader费用分开，自动标签不是黄金答案，真实验收与限制见[实施计划](docs/exec-plans/active/20261026-lightweight-backend-eval.md)。
+研发评测统一使用[评测入口](evals/README.md)：日常打开data/evals/index.html，单次结果只看输出目录的report.html，原始证据归details；`scripts/run_eval.py`只提供通用命令，`validate`／`publish`准备固定Case，`execute`执行、`resume`恢复、`regrade`对冻结证据重评，`report`／`compare`离线查看与比较。执行类操作须显式`--execute`，涉及模型时指定Grader并另获费用授权；使用隔离后端，不修改作者默认数据。旧命令与重复执行器已移除，历史schema-v1结果仍可用`report --result`只读查看，不自动转换成新版实验。工程检查、真实内容质量与独立评分校准分别报告，详见[通用说明](evals/general/README.md)。
 
 当前造课分为澄清、网页调研、全局蓝图、确认后逐单元展开，需同时配置本地 `TAVILY_API_KEY`。上述脚本默认停在蓝图等待确认；明确自动验收时使用 `uv run --frozen python scripts/verify_model.py --approve-blueprint`，否则在创建页审阅后点击确认。不要求旧课兼容，不主动清空已有本地数据；契约及当前验收边界见[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)。
 

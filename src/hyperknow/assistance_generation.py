@@ -31,20 +31,17 @@ MAX_MODEL_CALLS = 9
 TRUSTED_SKILLS: tuple[str, ...] = ()
 
 
-def teaching_output_limit(inputs: dict, output_reserve: int) -> int | None:
-    # Context headroom is not a provider output cap. Omit that cap for an
-    # explicit animation turn; ordinary/model-selected teaching stays bounded.
-    if ("animation" in (inputs.get("requested_artifacts") or [])
-            and "animation" not in (inputs.get("forbidden_artifacts") or [])):
-        return None
-    return output_reserve
-
-
 def teaching_schema() -> dict:
     schema = TeachingResponse.model_json_schema()
     # Models must always provide an explicit teaching-state envelope.
     schema["required"] = list(schema["properties"])
     return schema
+
+
+def teaching_inputs(frozen: dict) -> dict:
+    """Exclude internal snapshots and obsolete guesses without rewriting the audit."""
+    return {key: value for key, value in frozen.items()
+            if key not in {"skill_snapshots", "requested_artifacts", "forbidden_artifacts"}}
 
 
 def continuation_state(inputs: dict) -> dict | None:
@@ -134,7 +131,7 @@ class RecordedTeachingModel:
         owner.db.record_call(owner.run["run_id"], {
             "kind": "assistance", "phase": owner.run.get("stage", "generating"), "attempt": self.calls,
             "requested_model": owner.run["model"], "model": response.model, "provider": response.provider,
-            "prompt_version": "assistance-v2", "schema_version": 2,
+            "prompt_version": "assistance-v3", "schema_version": 2,
             "system_prompt": context.system_prompt, "messages": [asdict(m) for m in context.messages],
             "tools": context.tools, "input_basis": owner.run["input"], "skill_uses": deepcopy(owner.used),
             "response": asdict(response), "usage": response.usage, "stop_reason": response.stop_reason,
@@ -191,12 +188,6 @@ class AssistantGenerator:
 
     def _create(self, kind: str, args: dict):
         self.require_active()
-        requested = self.run["input"].get("requested_artifacts") or []
-        if requested and kind != requested[0]:
-            return ToolResult(False, error=f"This turn must create a {requested[0]} artifact, not a {kind}.")
-        refused = self.run["input"].get("forbidden_artifacts") or []
-        if kind in refused:
-            return ToolResult(False, error=f"The learner explicitly refused a {kind} this turn; reply in text instead.")
         if self.artifacts:
             return ToolResult(False, error="One artifact per teaching turn. Teach in the response, not with a second tool call.")
         draft = ArtifactDraft(kind=kind, **args).model_dump()
@@ -235,6 +226,12 @@ class AssistantGenerator:
                 lambda args, kind=kind: self._create(kind, args)))
         return ToolManager(definitions, max_output_chars=13000)
 
+    def _provider(self) -> OpenAIService:
+        # Output headroom only reserves context; the provider decides its output limit.
+        return OpenAIService(model=self.run["model"], api_key=self.settings.api_key,
+                             base_url=self.settings.base_url, timeout=self.settings.timeout,
+                             max_retries=0, max_output_tokens=None)
+
     def generate(self, run: dict) -> dict:
         self.run = run
         self.used = []
@@ -246,14 +243,11 @@ class AssistantGenerator:
         system = teaching_prompt(self.registry.catalog(), teaching_schema())
         # Immutable snapshots live in SQLite, but only their metadata is exposed
         # initially. The selected body enters context through get_skills.
-        inputs = {k: v for k, v in run["input"].items() if k != "skill_snapshots"}
+        inputs = teaching_inputs(run["input"])
         expected_state = continuation_state(inputs)
         if expected_state:
             inputs["required_continuation_state"] = expected_state
-        with OpenAIService(model=run["model"], api_key=self.settings.api_key,
-                           base_url=self.settings.base_url, timeout=self.settings.timeout,
-                           max_retries=0,
-                           max_output_tokens=teaching_output_limit(inputs, self.output_reserve)) as provider:
+        with self._provider() as provider:
             model = RecordedTeachingModel(provider, self)
             context = TeachingContext(system, max_context_tokens=CONTEXT_BUDGET,
                                       reserve_output_tokens=self.output_reserve, compression_threshold=1)
@@ -264,9 +258,7 @@ class AssistantGenerator:
                 "若有required_continuation_state，必须保留原plan并使用指定current_step，不得新增第三步或从头讲。")
             if result.response.stop_reason != "stop":
                 raise AppError("assistance_generation_failed", "真实教学请求未完成，请检查配置、预算或显式重试", 502, True)
-            requested = inputs.get("requested_artifacts") or []
-            if requested and not any(a["kind"] == requested[0] for a in self.artifacts):
-                raise AppError("artifact_not_created", "你点名了教学产物，但模型没有创建，未保存完成结果", 502, True)
+
             response = result.response
             for attempt in range(2):
                 self.require_active()

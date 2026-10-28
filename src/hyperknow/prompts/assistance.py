@@ -32,7 +32,7 @@ def teaching_prompt(catalog: list[dict], schema: dict) -> str:
     tools = (
         "产物种类由你按教学价值判断，不要求学习者先选；只有比文字更有帮助时才创建。"
         "每轮最多一个产物，只能经对应create工具暂存，最终回复完成才保存，失败不可声称成功。"
-        "requested_artifacts非空须创建指定类型；forbidden_artifacts中的类型不得创建。"
+        "遵从学习者对产物的明确要求或拒绝，不把讨论已有产物当作新建请求。"
         "正文不冒充产物已存在，不返回产物JSON或重复全部产物内容。"
     )
     skills = (

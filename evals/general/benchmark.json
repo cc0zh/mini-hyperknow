@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "id": "hyperknow-development",
+  "version": "2",
+  "title": "B01-B08 development cases; uncalibrated and unexecuted",
+  "usage": "development",
+  "tags": [
+    "uncalibrated"
+  ],
+  "members": [
+    {
+      "id": "artifact-animation",
+      "version": "2",
+      "case_hash": "74f5f53ef6f9974da9921f37dbf12e5ca23624a70a34ebece32dbba382cede8c"
+    },
+    {
+      "id": "artifact-diagram",
+      "version": "2",
+      "case_hash": "645648b37a3743869e1c11bcc338c6c41e93494b09e91fd5a3b56c622133c70e"
+    },
+    {
+      "id": "artifact-flashcards",
+      "version": "2",
+      "case_hash": "b1224f139901dd2402b7d02210bf6d1a323960aaba1e2a177e9ce253863d4060"
+    },
+    {
+      "id": "artifact-quiz",
+      "version": "2",
+      "case_hash": "9bd642111872b26f0142c39eb44cfb1b08f722ca65d54c4ea55692c73efd5943"
+    },
+    {
+      "id": "artifact-whiteboard",
+      "version": "2",
+      "case_hash": "269f9278e0c588bb93bd26d32e5d0d211d1ffe3384289b2efd412cac948cb171"
+    },
+    {
+      "id": "assistance-two-turns",
+      "version": "2",
+      "case_hash": "d06aeeaaa3bb7ac37524abd8588dfee8bbcf31c463a097b9536a700a71331912"
+    },
+    {
+      "id": "classroom-question",
+      "version": "2",
+      "case_hash": "0ae3c9461eb38d22c9fcb7a77ec14014bb66a4cc61a2fa362503c29222638f86"
+    },
+    {
+      "id": "concept-chain-rule-001",
+      "version": "1.general-2",
+      "case_hash": "c910fd0f03666bd71390c2a6d57212d72f44f1e5e7e1b636406871593f6ad709"
+    },
+    {
+      "id": "course-blueprint",
+      "version": "2",
+      "case_hash": "1928a4caf2c05fb3ffdd882649925042e5a93fe9f2b4b20dbed6c2f1d2ea43c6"
+    },
+    {
+      "id": "course-clarification",
+      "version": "2",
+      "case_hash": "fd79cf3d4adf4b31792134dd6ce8dd5d5f3ad6bcba4e0b96c2d1f7be74806982"
+    },
+    {
+      "id": "lesson-generation",
+      "version": "2",
+      "case_hash": "8d3c0679561181ca738761c12ce4964a8496ab5493e786cb0039cc8828a5b599"
+    },
+    {
+      "id": "quiz-exam",
+      "version": "2",
+      "case_hash": "f145732a372145f250f71ae61cb941311226b1f07d14a20aebcbe8bc94f745bf"
+    },
+    {
+      "id": "quiz-practice",
+      "version": "2",
+      "case_hash": "4dba47826651610ecfe001e23617b9effb40a4cbefab9f1aabd28ef43352ddfb"
+    },
+    {
+      "id": "web-research",
+      "version": "2",
+      "case_hash": "2dcc6f395d774f0f80b12221fe7bf506682831dfda887c6346ca7580ecf38a4f"
+    }
+  ]
+}

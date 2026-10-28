@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "id": "quiz-practice",
+  "version": "2",
+  "title": "固定真实讲义生成练习",
+  "tags": [
+    "B06",
+    "development",
+    "uncalibrated"
+  ],
+  "task": {
+    "profile": "quiz",
+    "input": {
+      "target_type": "practice"
+    }
+  },
+  "prerequisites": {
+    "resources": {
+      "session": {
+        "kind": "session"
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "prepare",
+      "action": "quiz.prepare",
+      "input": {
+        "target_type": "practice",
+        "target": "session"
+      },
+      "when": {
+        "state": [
+          "preparing",
+          "waiting",
+          "terminal"
+        ],
+        "action": "quiz.prepare"
+      },
+      "optional": false,
+      "checkpoint": "final"
+    }
+  ],
+  "capture": [
+    "final"
+  ],
+  "checks": [
+    {
+      "check_id": "saved_output",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "saved_business_output",
+      "criterion": "实际业务结果完成保存，不以工具回执替代最终提交",
+      "pass_when": "当前实际保存证据满足要求",
+      "fail_when": "当前实际保存证据不满足要求",
+      "evidence": [
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": []
+    },
+    {
+      "check_id": "question_quality",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "题干、选项、答案及解析准确且忠实于实际来源",
+      "pass_when": "答案有依据、解析正确，难度及范围符合输入",
+      "fail_when": "错题、歧义、错误答案或越过实际来源",
+      "evidence": [
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": [
+        "runs",
+        "resources"
+      ]
+    }
+  ],
+  "reference_facts": [
+    "令u=x²，局部变化率du/dx=2x，sin(u)对u的导数为cos(u)，故sin(x²)的导数为2x·cos(x²)。",
+    "参考事实用于核对知识，不要求唯一措辞、特定比喻或固定工具调用顺序。"
+  ],
+  "limits": {
+    "max_actions": 32,
+    "max_model_calls": 32,
+    "wait_seconds": 420,
+    "poll_seconds": 0.25
+  },
+  "completion": {
+    "states": [
+      "waiting",
+      "terminal"
+    ],
+    "outcomes": [
+      "success"
+    ]
+  }
+}

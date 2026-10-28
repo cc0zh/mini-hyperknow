@@ -1,7 +1,5 @@
 """Independent teaching content and artifact validation, without course identities."""
 
-from collections.abc import Iterator
-import re
 from typing import Annotated, Literal
 
 from pydantic import ConfigDict, Field, model_validator
@@ -152,77 +150,6 @@ class DiagramData(Schema):
 
 ARTIFACT_SCHEMAS = {"flashcards": FlashcardsData, "quiz": QuizData, "whiteboard": WhiteboardData,
                     "animation": AnimationData, "diagram": DiagramData}
-
-# The model chooses the artifact; the learner never picks a kind. Only an
-# explicit request in the learner's own text still guarantees that a concrete
-# artifact of the named kind is produced, and that responsibility is one item
-# of this closed vocabulary.
-ARTIFACT_INTENTS = {
-    "flashcards": ("闪卡", "抽认卡", "记忆卡", "flashcard"),
-    "quiz": ("测验", "自测", "测试题", "选择题", "出题", "做题", "quiz"),
-    "whiteboard": ("白板", "板书", "whiteboard"),
-    "animation": ("动画", "animation"),
-    "diagram": ("图解", "流程图", "结构图", "示意图", "关系图", "思维导图", "mermaid"),
-}
-NEGATIONS = ("不", "别", "无需", "不要", "不需要", "跳过", "取消")
-# A phrase like "解释当前白板第一步" talks about the artifact that already
-# exists. Naming one is not a request to make another, so a reference marker
-# immediately before the keyword suppresses the request; the model still
-# decides freely when no kind was requested.
-REFERENCES = ("当前", "现在", "这一", "这块", "这个", "刚才", "上面", "上述", "以上",
-              "已确认", "已有的", "现有", "本轮")
-
-_ARTIFACT_KEYWORDS = {keyword: kind for kind, words in ARTIFACT_INTENTS.items() for keyword in words}
-_ARTIFACT_MENTION = re.compile("|".join(re.escape(word) for word in sorted(_ARTIFACT_KEYWORDS, key=len, reverse=True)))
-
-
-def _artifact_mentions(text: str) -> Iterator[tuple[str, str, bool]]:
-    """Carry a refusal only across a closed list of named artifact types.
-
-    This remains a lexical heuristic: arbitrary prose is not a list, and a
-    clause boundary resets the scope so a later positive request still works.
-    """
-    for clause in re.split(r"[，。；！？,.;!?\n]", text or ""):
-        lowered = clause.lower()
-        previous_end = None
-        refused = False
-        for match in _ARTIFACT_MENTION.finditer(lowered):
-            prefix = lowered[max(0, match.start() - 6):match.start()]
-            separator = lowered[previous_end:match.start()] if previous_end is not None else ""
-            if previous_end is None or not re.fullmatch(r"(?:\s|、|/|以及|及|或|和)+", separator):
-                refused = any(negation in prefix for negation in NEGATIONS)
-            yield _ARTIFACT_KEYWORDS[match.group()], prefix, refused
-            previous_end = match.end()
-
-
-def requested_artifacts(text: str) -> list[str]:
-    """Return the artifact kinds the learner named, never more than one.
-
-    A request is read per clause so "不要闪卡，要一道选择题" names only the
-    quiz. This decides whether a turn keeps the hard guarantee that a named
-    artifact must exist; it never grants a tool or widens model permissions.
-    """
-    requested = []
-    for kind, prefix, refused in _artifact_mentions(text):
-        if kind in requested or refused or any(marker in prefix for marker in REFERENCES):
-            continue
-        requested.append(kind)
-    return requested[:1]
-
-
-def forbidden_artifacts(text: str) -> list[str]:
-    """Return the artifact kinds the learner explicitly refused.
-
-    "不生成新白板" is a prohibition, not a missing request. A real model
-    created a second board while the learner had just asked it not to, so the
-    negative case is recorded on its own instead of being inferred from an
-    empty request list.
-    """
-    refused = []
-    for kind, _, negated in _artifact_mentions(text):
-        if negated and kind not in refused:
-            refused.append(kind)
-    return refused
 
 
 class ArtifactDraft(Schema):

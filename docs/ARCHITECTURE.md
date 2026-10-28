@@ -8,6 +8,7 @@
 ## 1. 当前事实
 
 - `src/agent_core/` 已升级为可选持久会话／Token 预算压缩、分层模型、工具调度与逐次审批的 V1；同步 provider 契约保留，接口和边界见[内核 V1](design-docs/agent-core-v1.md)。
+- `src/eval_core/`新增版本化任务、有限交互、动作恢复、冻结证据、统一评分与离线报告；Hyperknow通过显式接入负责B01–B08业务状态与只读采证。工程检查不代替全业务模型验收，见[评测实施计划](exec-plans/active/20261027-general-evaluation-framework.md)及[新命令](../evals/general/README.md)；旧单轮执行器已移除，历史结果与费用事实保留，只提供report只读兼容。
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
 - 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
@@ -54,6 +55,7 @@ flowchart LR
 
 ```text
 src/
+  eval_core/              独立评测契约、资产、有限Runner、评分与离线报告，不反向进入产品运行时
   agent_core/             已有通用模型、上下文、工具与循环
     llm/                  同步 OpenAI-compatible provider、显式 tier registry 和消息规范化
     tools/                调度、审批、输出存档、显式工作区文件／进程工具
@@ -84,10 +86,14 @@ src/
     assistance_storage.py 会话/轮次、原子产物提交、白板位置与迟到保存屏障
     assistance_generation.py 有界教学Agent、Skill激活与逐次真实调用记录
     assistance_api.py     独立教学命令与查询
-    eval_cases.py         本地Case／Rubric校验、内容寻址和自动开发样本关联
+    eval_cli.py           唯一评测命令装配，通用资产／执行／报告入口
+    eval_adapter.py       真实业务HTTP、合法动作与恢复身份
+    eval_evidence.py      真实前置材料和只读SQLite检查点采证
+    eval_support.py       隔离目录、回环URL、只读连接及Skill轨迹检查
+    eval_legacy.py        旧Case校验与历史结果只读摘要，不含执行或评分请求
+    eval_migration.py     显式旧Case转换，不改写历史实验
     eval_atif.py          固定ATIF-v1.7文字轨迹出口与严格子集校验
-    eval_grading.py       独立无工具Grader、单请求预算及分项输出校验
-    evaluation.py         真实HTTP评测、只读SQLite证据、恢复与普通规则
+    eval_trajectories.py  多类业务run的已保存轨迹出口
     skills/               可选可信产品Skill目录；当前无内置Skill，不是开发助手权限
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
@@ -210,7 +216,7 @@ B01/B03/B04/B05/B06由[Generator.generate](../src/hyperknow/generation.py)选择
 | 课程课堂与协助白板 | BoardOperation/步骤结构、Board/公式/Mermaid及播放器能力 | 讲义/课时和独立artifact各自ID、版本、确认位置与完成语义；不能共享课程成绩或会话 |
 | 课程题组与协助测验 | 共用模型/worker底座，不共用题组与作答领域对象 | QuizDraft/Attempt/Result与ChatQuizQuestion分别维护；协助作答属浏览器现场，不写课程成绩 |
 | 产品业务与Agent内核 | provider、Agent/ToolManager、可信SkillRegistry等需要时使用的能力 | 内核不依赖课程；产品未因此自动开启JSONL第二业务库、长期记忆、摘要模型或开发工具权限 |
-| 产品运行与研发评测 | 可复用已保存真实调用和明确格式的轨迹证据 | 产品不反向依赖eval；Grader判据不注入被测教学；[当前eval](../evals/README.md)仅单轮概念解释，不是八类业务通用Runner |
+| 产品运行与研发评测 | 可复用已保存真实调用和明确格式的轨迹证据 | 产品不反向依赖eval；Grader判据不注入被测教学；[当前eval](../evals/README.md)统一通用Runner与B01–B08接入，工程覆盖不等于全业务真实质量通过 |
 
 应保留的底线是显式课程流程、独立输入快照、结构/引用校验、有界修复、确定性计分、原子提交、幂等及取消保存屏障；这些承担不同职责，不因减少文件或Prompt文字重复而删除。新增业务先复用已证实相同的机制，不预建八套Agent、注册平台或分布式队列。
 
@@ -224,7 +230,7 @@ B01/B03/B04/B05/B06由[Generator.generate](../src/hyperknow/generation.py)选择
 | 计分、完成、版本、取消与恢复 | 领域函数、业务存储和runtime/客户端所有权 | 检查所有直接消费者与持久化不变量，不把确定性规则改成模型自行判断 |
 | 数学正确性、来源充分或教学适配 | 固定真实输入和已有输出，再定位策略或上游资料 | Schema通过、引用存在、ready和进度100%都不能替代内容判定；旧输出不因改Prompt变成新成功样本 |
 
-已知但本次暂缓：B07/B08仍由关键词启发式派生产物意图，[assistance_generation.py](../src/hyperknow/assistance_generation.py)仍含独立格式修复指令，不能把本节主维护点误读成这些跨层影响已经消除。旧CourseDraft/materialize_course/finish_course仍服务部分测试，当前生产worker走调研→蓝图→单元展开，不增加第九条整课生成业务。其他待修问题和证据见[技术债](exec-plans/tech-debt-tracker.md)与[质量状态](QUALITY_SCORE.md)。
+B07/B08的产物意图由模型理解，已移除关键词派生及对应类型／必产出门禁；后端保留工具权限、结构、数量、状态和事务校验。即时协助统一不传供应商输出上限，历史冻结字段仅作审计。已知但暂缓：[assistance_generation.py](../src/hyperknow/assistance_generation.py)仍含独立格式修复指令，不能把本节主维护点误读成这些跨层影响已经消除。旧CourseDraft/materialize_course/finish_course仍服务部分测试，当前生产worker走调研→蓝图→单元展开，不增加第九条整课生成业务。其他待修问题和证据见[技术债](exec-plans/tech-debt-tracker.md)与[质量状态](QUALITY_SCORE.md)。
 
 ### 10.6 到哪里验证，不把入口当通过证明
 
@@ -236,7 +242,7 @@ B01/B03/B04/B05/B06由[Generator.generate](../src/hyperknow/generation.py)选择
 | B06题组、作答与计分 | [test_quiz.py](../tests/test_quiz.py)、[test_quiz_http.py](../tests/test_quiz_http.py) | [练习/考核完成计划](exec-plans/completed/20261022-real-practice-exams.md) |
 | B07/B08及产物交互/恢复 | [test_assistance_domain.py](../tests/test_assistance_domain.py)、[test_assistance_storage.py](../tests/test_assistance_storage.py)、[test_assistance_http.py](../tests/test_assistance_http.py)、[assistance.spec.ts](../web/e2e/assistance.spec.ts)、[assistance-generation.spec.ts](../web/e2e/assistance-generation.spec.ts) | [即时协助契约](design-docs/instant-assistance.md)链接当前真实复验/动画修复及限制；[verify_assistance.py](../scripts/verify_assistance.py)为真实调用入口 |
 | 命令、快照、删除与重启等共享机制 | [test_http.py](../tests/test_http.py)、[test_course_deletion.py](../tests/test_course_deletion.py)、[run-recovery.spec.ts](../web/e2e/run-recovery.spec.ts)及上述业务测试 | [真实验证](design-docs/real-validation.md)和各业务计划；不能从一个机制的通过推断全部业务时序通过 |
-| 研发教学评测 | [evals/README.md](../evals/README.md)、[test_evaluation.py](../tests/test_evaluation.py)与test_eval_* | [后端评测设计](design-docs/backend-evaluation-pipeline.md)的当前计划；仅首个场景，未覆盖多轮/课程前置/产物/浏览器 |
+| 研发教学评测 | [evals/README.md](../evals/README.md)、[test_eval_cli.py](../tests/test_eval_cli.py)、[test_eval_support.py](../tests/test_eval_support.py)与test_eval_* | [后端评测设计](design-docs/backend-evaluation-pipeline.md)的当前计划；包含多轮／课程前置／产物工程覆盖，全业务真实模型、独立评分校准与浏览器另验 |
 
 这些是查找检查和证据的入口，不代表本次重新执行或全部通过。规则/HTTP测试、真实模型内容、浏览器交互和安全边界须分别报告；收费脚本与评测执行须有相应授权并使用隔离数据，不因查文档自动运行。已确认成功、失败、未验和取消的范围以链接中的原始记录为准，不在此复制容易过期的通过数量。
 

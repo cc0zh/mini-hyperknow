@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "id": "concept-chain-rule-001",
+  "version": "1.general-2",
+  "title": "链式求导：一次直接解释",
+  "tags": [
+    "B07",
+    "regression",
+    "migrated-v1",
+    "development",
+    "uncalibrated"
+  ],
+  "task": {
+    "profile": "assistance",
+    "input": {
+      "text": "我会基本求导，但不理解为什么sin(x²)求导还要乘以2x。请简短解释这个原因，不要只背公式。请直接一次解释清楚，不向我提问、不生成产物，也不需要完整学习计划。"
+    }
+  },
+  "prerequisites": {
+    "legacy_source": {
+      "case_hash": "e575b0e60a2fd96223780e889a11571fe5ee0bbfbacf0c1e45eeb2484483f73e",
+      "version": 1,
+      "rubric_version": 1
+    }
+  },
+  "steps": [
+    {
+      "id": "create",
+      "action": "conversation.create",
+      "input": {},
+      "when": {
+        "state": [
+          "preparing",
+          "waiting",
+          "terminal"
+        ],
+        "action": "conversation.create"
+      },
+      "optional": false,
+      "checkpoint": "create"
+    },
+    {
+      "id": "explain",
+      "action": "assistance.message",
+      "input": {
+        "text": "我会基本求导，但不理解为什么sin(x²)求导还要乘以2x。请简短解释这个原因，不要只背公式。请直接一次解释清楚，不向我提问、不生成产物，也不需要完整学习计划。"
+      },
+      "when": {
+        "state": [
+          "waiting",
+          "terminal"
+        ],
+        "action": "assistance.message"
+      },
+      "optional": false,
+      "checkpoint": "final"
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "delivery",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "saved_assistance",
+      "criterion": "回复真实保存且属于本次原始运行",
+      "pass_when": "本次turn与run均ready并保存非空回复",
+      "fail_when": "本次运行未交付回复",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "no_artifacts",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "no_artifacts",
+      "criterion": "遵守不创建产物的要求",
+      "pass_when": "最终turn无产物",
+      "fail_when": "最终turn包含产物",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "no_questions",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "no_questions",
+      "criterion": "一次直接解释，不提问或展开计划",
+      "pass_when": "无问题、无等待、无计划",
+      "fail_when": "要求回答、等待或展开计划",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "skill_trace",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "skill_trace",
+      "criterion": "可选Skill使用与快照及实际加载一致",
+      "pass_when": "未使用或使用记录可靠",
+      "fail_when": "使用记录与冻结输入或调用不一致",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "correctness",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "数学陈述正确，解释中内外层局部变化关系及2x的来源没有错误。",
+      "pass_when": "数学关系成立；若给公式则公式正确；没有把导数关系无条件推广为有限变化关系。是否解释充分由addresses_confusion另判。",
+      "fail_when": "内外层、2x的来源或给出的公式错误，或者出现错误数学泛化。",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [
+        "turns",
+        "artifacts"
+      ],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "addresses_confusion",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "回答为什么乘以内层导数，而不只是背公式。",
+      "pass_when": "给出合理因果解释、局部变化说明或等价直觉，允许不同正确讲法，不强制某个比喻或完整导数公式。",
+      "fail_when": "仅列公式或计算结果，未解释用户的具体疑惑。",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [
+        "turns",
+        "artifacts"
+      ],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    },
+    {
+      "check_id": "instruction_following",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "直接、简短且完整地回应，不向用户提问或无故扩展教学范围。",
+      "pass_when": "解释足以回应疑惑，没有额外追问、明显偏题扩课或冒称创建产物。可提供不要求用户作答的可选下一步建议，不机械限制字数。",
+      "fail_when": "要求用户回答问题、明显偏题扩课，或在正文中冒称创建了产物。",
+      "evidence": [
+        "final"
+      ],
+      "evidence_fields": [
+        "turns",
+        "artifacts"
+      ],
+      "required": true,
+      "applicable_when": {
+        "state": [
+          "preparing",
+          "running",
+          "waiting",
+          "terminal",
+          "blocked"
+        ]
+      }
+    }
+  ],
+  "reference_facts": [
+    "令u=x²，则du/dx=2x；sin(u)对u的导数为cos(u)。",
+    "在可导条件下内外层局部变化率相乘；若给出完整导数，应为2x·cos(x²)。"
+  ],
+  "capture": [
+    "final"
+  ],
+  "limits": {
+    "max_actions": 2,
+    "wait_seconds": 420.0,
+    "poll_seconds": 0.25,
+    "max_model_calls": 9
+  },
+  "completion": {
+    "states": [
+      "waiting",
+      "terminal"
+    ],
+    "outcomes": [
+      "success"
+    ]
+  }
+}

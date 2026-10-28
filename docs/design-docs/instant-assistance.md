@@ -14,7 +14,7 @@
 - Turn：turn_id、run_id、user_text、action、status、response、artifacts、skill_uses、steps、error。状态沿用queued/generating/ready/failed/cancelled/interrupted。response为空或{text,questions,plan,current_step,waiting_for,suggestions}；questions为{question_id,question,options:string[],multiple:boolean}数组，plan为字符串数组，waiting_for为answer/continue/none。
 - action：只有message/continue两个意图，产物种类不是学习者要选的选项，不再接收skill_hint。text为用户实际输入；message必须非空，continue可为空但必须有已保存待续讲计划，next-step状态独立于可选历史预算冻结，输出必须保留原plan且current_step+1，不从历史推断缺失的权威继续状态。可选artifact_id仅用于关联同会话白板提问，输入上下文仅包含已确认步骤。
 - suggestions：按需0–4项，每项必须有{label,text,action}。推进原计划下一步用continue，且回复必须waiting_for=continue；其他建议用message。前端直传显式动作，不识别文案猜测；questions等待回答时suggestions为空。计划、理解检查和建议都不要求每轮出现。
-- 产物意图由服务端从用户文本派生两个独立字段并写入run输入：requested_artifacts（点名，最多一项）与forbidden_artifacts（明确拒绝）。命中的点名仍保留「说了要某类产物就必须真有」的强校验；拒绝在工具层与提交层都生效。判定是关键词启发式，引用已有产物的措辞（当前/这块/上面的…）不计为点名。否定沿闭合词表的顿号/和/或等并列列表传递，分句重置；仍不处理任意复杂语义，修复不改写历史run已冻结输入。
+- 产物请求、拒绝和对已有产物的指代由同一次教学模型调用结合原始文本及上下文理解，不新增关键词／语义分类器或分类调用。新run输入不再派生requested_artifacts／forbidden_artifacts，工具与提交层不再根据这些猜测强制产物类型或必产出。用户要求属于教学遵从目标，不再宣称“点名必产出／拒绝必拦截”的确定性代码保证；后端只校验已授权工具、产物Schema、每轮数量、状态和原子保存。历史run中的旧字段保留审计，但不再进入模型可见输入或作为执行门禁，不改写历史快照。
 - Artifact：artifact_id、conversation_id、turn_id、kind、title、version、data，写入反馈后另有feedback与feedback_at。kind为flashcards/quiz/whiteboard/animation/diagram。
 - steps是该run已记录的受控步骤轨迹，run进入ready／failed／cancelled／interrupted任一终态时随turn保存，可回看实际加载与创建；没有步骤时界面只显示正在生成回复，不伪造技能加载。skill_uses允许为空，但保留实际使用的name/version/sha256。
 - flashcards.data={cards:[{question,answer}]}，上限6张；quiz.data={questions:[{question_id,question,options:[{id,text}],correct_ids,explanation}]}，上限6题，correct_ids长度决定单／多选；不计入课程成绩，不保存作答。
@@ -31,13 +31,13 @@
 
 ## 模型与产物
 
-使用现有Agent、同步provider与共享worker；每个run独立上下文。五种产物工具为create_flashcards、create_quiz、create_whiteboard、create_animation、create_diagram，非空可信目录另注册可选get_skills，参数由Pydantic校验。实际创建只是本轮暂存，最终回复及全部产物通过校验并在同事务提交；失败不留下伪完成。显式产物请求必须确实生成相应产物。模型不持有任意路径、网络或执行能力。工具循环、上下文及模型调用次数有上限；普通教学限制输出，明确请求动画时不传输出上限参数；输入不静默截断当前问题，历史选择范围及预算留证。
+使用现有Agent、同步provider与共享worker；每个run独立上下文。五种产物工具为create_flashcards、create_quiz、create_whiteboard、create_animation、create_diagram，非空可信目录另注册可选get_skills，参数由Pydantic校验。实际创建只是本轮暂存，最终回复及全部产物通过结构与状态校验并在同事务提交；失败不留下伪完成。模型负责遵从明确的产物要求及拒绝，程序不从自然语言预判意图。模型不持有任意路径、网络或执行能力。工具循环、上下文及模型调用次数有上限；即时协助统一不传供应商输出上限参数，避免依赖文本猜测区分动画预算。输入不静默截断当前问题，历史选择范围及预算留证。
 
 教学策略与交互说明维护在prompts/assistance.py；具体产物制作要求跟随工具描述，结构在assistance_domain.py；状态/权限/数量与提交门禁留执行及存储模块。必要条件缺失时问一个关键问题，普通风格偏好不阻塞；只要提示不泄露完整解答，检查时定位最早错误及原因。Skill是专门方法的可选补充，不是基本教学的强制路由。
 
-普通教学输出上限默认8192；明确请求动画且未禁止动画的轮次，OpenAIService的max_output_tokens为None，供应商请求不含max_tokens或max_completion_tokens。不能据此保证无限输出或供应商默认一定高于8192/16384。未点名而由模型自行选择动画的普通教学轮次仍沿用原上限。
+2026-10-27用户确认即时协助统一不传输出上限：OpenAIService的max_output_tokens始终为None，所有即时协助请求（包括普通教学、模型自行选择产物及格式修复）均不含max_tokens或max_completion_tokens。不保证无限输出或供应商默认一定高于8192/16384，单次输出成本可能高于原普通教学限额。课程生成、网页调研及Grader的输出策略不因此改变。
 
-AssistantGenerator构造参数output_reserve仍默认8192，仅作Agent上下文预留和逐次门禁；普通轮次也用它设置输出上限。审计分别记录output_reserve与max_output_tokens（动画为null），避免把预留误称为硬上限。原时限、调用次数、HTML长度校验和隔离规则不变，不新增环境变量/API。此前16384失败的[预算实验](../exec-plans/completed/20261026-animation-output-budget.md)保持原始证据；后续[取消上限真实复验](../exec-plans/completed/20261026-animation-no-cap-validation.md)已得到完整动画参数，但产物回填后上下文估算超限导致收尾失败，0已提交产物，产品浏览器未执行。
+AssistantGenerator构造参数output_reserve仍默认8192，仅作Agent上下文预留和逐次门禁，不作为供应商输出上限。审计分别记录output_reserve与max_output_tokens（即时协助统一为null），避免把预留误称为硬上限。原时限、调用次数、HTML长度校验和隔离规则不变，不新增环境变量/API。此前16384失败的[预算实验](../exec-plans/completed/20261026-animation-output-budget.md)保持原始证据；后续[取消上限真实复验](../exec-plans/completed/20261026-animation-no-cap-validation.md)已得到完整动画参数，但产物回填后上下文估算超限导致收尾失败，0已提交产物，产品浏览器未执行。
 
 TeachingContext在成功create_animation后，对下一次请求深拷贝中的HTML使用明确省略标记/UTF-8字节数/SHA-256；原始调用响应、活动历史、审计及待提交/最终产物保留全文，工具调用ID/名称/标题/成功回执不变。失败/未完成/其他工具不投影；短于标记的HTML不改。该产品专用投影发生在内核prepare和逐调用门禁之前，不修改通用Agent或删除用户输入。旧失败响应离线复放和一次新真实生成/桌面及手机展开预览已有证据；默认手机预览仍被输入框遮挡，见[收尾上下文修复](../exec-plans/completed/20261026-animation-followup-context.md)。
 

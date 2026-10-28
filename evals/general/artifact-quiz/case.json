@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "id": "artifact-quiz",
+  "version": "2",
+  "title": "教学产物：quiz",
+  "tags": [
+    "B07",
+    "B08",
+    "quiz",
+    "development",
+    "uncalibrated"
+  ],
+  "task": {
+    "profile": "artifact",
+    "input": {
+      "text": "请生成一个quiz教学产物，帮助我理解sin(x²)求导为什么乘2x，准确解释内外层局部变化关系。",
+      "artifact_type": "quiz"
+    }
+  },
+  "prerequisites": {},
+  "steps": [
+    {
+      "id": "create",
+      "action": "conversation.create",
+      "input": {},
+      "when": {
+        "state": [
+          "preparing",
+          "waiting",
+          "terminal"
+        ],
+        "action": "conversation.create"
+      },
+      "optional": false,
+      "checkpoint": "create"
+    },
+    {
+      "id": "generate",
+      "action": "assistance.message",
+      "input": {
+        "text": "请生成一个quiz教学产物，帮助我理解sin(x²)求导为什么乘2x，准确解释内外层局部变化关系。"
+      },
+      "when": {
+        "state": [
+          "waiting",
+          "terminal"
+        ],
+        "action": "assistance.message"
+      },
+      "optional": false,
+      "checkpoint": "final"
+    }
+  ],
+  "capture": [
+    "final"
+  ],
+  "checks": [
+    {
+      "check_id": "saved_output",
+      "version": "1",
+      "kind": "rule",
+      "evaluator": "saved_assistance",
+      "criterion": "回复属于本次真实运行且已提交",
+      "pass_when": "当前实际保存证据满足要求",
+      "fail_when": "当前实际保存证据不满足要求",
+      "evidence": [
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": []
+    },
+    {
+      "check_id": "artifact_content",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "核对实际提交的quiz产物及教学内容",
+      "pass_when": "实际保存了用户请求种类的产物，内容准确且服务于疑惑",
+      "fail_when": "缺少所需产物、只声称创建、种类不符或内容错误",
+      "evidence": [
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": [
+        "turns",
+        "artifacts"
+      ]
+    },
+    {
+      "check_id": "mathematics",
+      "version": "1",
+      "kind": "llm",
+      "evaluator": "rubric-v1",
+      "criterion": "链式求导相关陈述准确",
+      "pass_when": "如涉及sin(x²)求导，内外层关系及2x来源正确",
+      "fail_when": "公式、局部变化关系或解释出现数学错误",
+      "evidence": [
+        "final"
+      ],
+      "required": true,
+      "applicable_when": {},
+      "evidence_fields": [
+        "turns",
+        "artifacts"
+      ]
+    }
+  ],
+  "reference_facts": [
+    "令u=x²，局部变化率du/dx=2x，sin(u)对u的导数为cos(u)，故sin(x²)的导数为2x·cos(x²)。",
+    "参考事实用于核对知识，不要求唯一措辞、特定比喻或固定工具调用顺序。"
+  ],
+  "limits": {
+    "max_actions": 32,
+    "max_model_calls": 32,
+    "wait_seconds": 420,
+    "poll_seconds": 0.25
+  },
+  "completion": {
+    "states": [
+      "waiting",
+      "terminal"
+    ],
+    "outcomes": [
+      "success"
+    ]
+  }
+}

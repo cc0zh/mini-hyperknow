@@ -15,10 +15,10 @@ from agent_core.compression import ContextBudgetExceeded
 from agent_core.skills import SkillRegistry
 from agent_core.tools.validation import validate
 from agent_core.types import AgentContext, AssistantMessage, ToolCall, UserMessage
-from hyperknow.assistance_domain import ArtifactDraft, TeachingResponse, forbidden_artifacts, requested_artifacts
+from hyperknow.assistance_domain import ArtifactDraft, TeachingResponse
 from hyperknow.assistance_generation import (AssistantGenerator, build_skill_snapshots, inline_schema,
                                            continuation_state, validate_teaching, RecordedTeachingModel,
-                                           CONTEXT_BUDGET, OUTPUT_RESERVE, teaching_output_limit, TeachingContext)
+                                           CONTEXT_BUDGET, OUTPUT_RESERVE, TeachingContext, teaching_inputs)
 from hyperknow.config import Settings
 from hyperknow.domain import AppError
 from hyperknow.storage import Database
@@ -45,25 +45,6 @@ class SkillTests(unittest.TestCase):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 SkillRegistry(invalid)
 
-    def test_only_an_explicit_unnegated_request_keeps_the_artifact_guarantee(self):
-        self.assertEqual(requested_artifacts("给我三道关于二分的自测题"), ["quiz"])
-        self.assertEqual(requested_artifacts("做一组导数闪卡"), ["flashcards"])
-        self.assertEqual(requested_artifacts("用白板分步讲二分查找"), ["whiteboard"])
-        self.assertEqual(requested_artifacts("用流程图说明解析流程"), ["diagram"])
-        self.assertEqual(requested_artifacts("不要闪卡，只要一道选择题"), ["quiz"])
-        self.assertEqual(requested_artifacts("不要闪卡"), [])
-        self.assertEqual(requested_artifacts("用通俗的方式讲解什么是导数"), [])
-        # Talking about the artifact that already exists is not a request for
-        # a new one; the real model produced this exact failure.
-        self.assertEqual(requested_artifacts("请只解释当前白板第一步的含义，不生成新白板，不提前讲后面的步骤。"), [])
-        self.assertEqual(requested_artifacts("这块白板上的第二步为什么要把 u 留住？"), [])
-        self.assertEqual(requested_artifacts("上面的流程图里 F 节点是什么意思？"), [])
-        self.assertEqual(forbidden_artifacts("请只解释当前白板第一步的含义，不生成新白板，不提前讲后面的步骤。"), ["whiteboard"])
-        self.assertEqual(forbidden_artifacts("不要闪卡"), ["flashcards"])
-        self.assertEqual(forbidden_artifacts("用通俗的方式讲解什么是导数"), [])
-        # Kind is the model's decision; the reader never names two at once.
-        self.assertEqual(requested_artifacts("先来闪卡再做一道自测题"), ["flashcards"])
-
     def test_product_catalog_discloses_metadata_not_body(self):
         registry = SkillRegistry(test_skill_snapshots())
         self.assertEqual({s["name"] for s in registry.catalog()}, {"test-skill"})
@@ -71,20 +52,6 @@ class SkillTests(unittest.TestCase):
             self.assertNotIn("body", item)
             loaded = registry.load(item["name"])
             self.assertEqual(item["sha256"], sha256(loaded["body"].encode()).hexdigest())
-
-    def test_refusal_applies_to_the_whole_artifact_list_not_six_nearby_characters(self):
-        cases = [
-            ("只给提示，不要完整答案。我在计算sin(x²)的导数时卡住了，请只提示第一步；不要闪卡、测验、白板、动画或图解。",
-             [], ["flashcards", "quiz", "whiteboard", "animation", "diagram"]),
-            ("不要闪卡和测验，要用白板讲。", ["whiteboard"], ["flashcards", "quiz"]),
-            ("不要白板及动画，请生成图解。", ["diagram"], ["whiteboard", "animation"]),
-            ("不要闪卡、测验；用白板讲。", ["whiteboard"], ["flashcards", "quiz"]),
-            ("用图解说明嵌套关系", ["diagram"], []),
-        ]
-        for text, requested, forbidden in cases:
-            with self.subTest(text=text):
-                self.assertEqual(requested_artifacts(text), requested)
-                self.assertEqual(forbidden_artifacts(text), forbidden)
 
     def test_snapshots_are_independent_and_digest_checked(self):
         snapshots = test_skill_snapshots()
@@ -134,6 +101,8 @@ class TeachingSchemaTests(unittest.TestCase):
         self.assertIn("不是回答或创建产物的前置条件", specialized)
         self.assertIn("action=continue", plain)
         self.assertNotIn("skill_hint", plain)
+        self.assertNotIn("requested_artifacts", plain)
+        self.assertNotIn("forbidden_artifacts", plain)
         self.assertNotIn("首先调用get_skills", specialized)
         self.assertNotIn(test_skill_snapshots()["test-skill"]["body"], specialized)
 
@@ -237,28 +206,32 @@ class TeachingToolTests(unittest.TestCase):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 AssistantGenerator(self.settings, self.db, Event(), output_reserve=invalid)
 
-    def test_explicit_animation_omits_both_provider_token_limit_parameters(self):
+    def test_all_teaching_providers_omit_output_caps_independently_of_context_reserve(self):
         from agent_core.llm.openai import completion_parameters
-        inputs = {"requested_artifacts": ["animation"], "forbidden_artifacts": []}
         for reserve in (8192, 16384):
-            limit = teaching_output_limit(inputs, reserve)
-            self.assertIsNone(limit)
             for endpoint in (None, "https://api.deepseek.com"):
-                self.assertEqual(completion_parameters(limit, endpoint), {})
-        # The reserve is independent headroom, not a promise of infinite output.
-        self.assertEqual(self.generator.output_reserve, 8192)
+                settings = Settings(Path(self.directory.name), api_key="local-construction-only",
+                                    base_url=endpoint)
+                generator = AssistantGenerator(settings, self.db, Event(), output_reserve=reserve)
+                generator.run = self.generator.run
+                with generator._provider() as provider:
+                    self.assertIsNone(provider.max_output_tokens)
+                    self.assertEqual(completion_parameters(provider.max_output_tokens, endpoint), {})
+                    self.assertEqual(provider.client.max_retries, 0)
+                self.assertEqual(generator.output_reserve, reserve)
 
-    def test_other_teaching_and_refused_animation_keep_the_existing_cap(self):
-        from agent_core.llm.openai import completion_parameters
-        for inputs in ({}, {"requested_artifacts": []},
-                       {"requested_artifacts": ["quiz"]},
-                       {"requested_artifacts": ["animation"],
-                        "forbidden_artifacts": ["animation"]}):
-            with self.subTest(inputs=inputs):
-                limit = teaching_output_limit(inputs, OUTPUT_RESERVE)
-                self.assertEqual(limit, 8192)
-                self.assertEqual(completion_parameters(limit, "https://api.deepseek.com"),
-                                 {"max_tokens": 8192})
+    def test_model_input_ignores_legacy_intent_flags_without_rewriting_the_audit(self):
+        frozen = {**self.generator.run["input"], "text": "我看不懂这个白板，请重新生成白板讲解。",
+                  "requested_artifacts": ["quiz"], "forbidden_artifacts": ["whiteboard"]}
+        original = deepcopy(frozen)
+        inputs = teaching_inputs(frozen)
+        self.assertEqual(inputs["text"], frozen["text"])
+        for key in ("skill_snapshots", "requested_artifacts", "forbidden_artifacts"):
+            self.assertNotIn(key, inputs)
+        self.assertEqual(inputs["action"], frozen["action"])
+        self.assertEqual(inputs["history"], frozen["history"])
+        self.assertEqual(frozen, original)
+        self.assertEqual(json.loads(json.dumps(inputs, ensure_ascii=False)), inputs)
 
     def test_context_guard_accounts_for_the_selected_output_reserve_before_calling(self):
         from agent_core.tokens import TokenEstimator
@@ -373,23 +346,12 @@ class TeachingToolTests(unittest.TestCase):
         self.assertEqual(steps[0]["tool"], "get_skills")
         self.assertNotIn("read_file", {t["function"]["name"] for t in self.tools.definitions()})
 
-    def test_a_named_artifact_kind_is_the_only_kind_this_turn_may_create(self):
-        conversation = self.db.create_assistance_conversation("requested-kind-conversation")
-        turn = self.db.assistance_turn(conversation["conversation_id"], {
-            "client_command_id": "requested-kind-turn", "expected_version": conversation["version"],
-            "text": "给我三道关于二分的自测题", "action": "message"},
-            "rule-input-model", True, build_skill_snapshots())
-        run = self.db.transition(turn["active_run"]["run_id"], {"queued"}, status="generating")
-        generator = AssistantGenerator(self.settings, self.db, Event())
-        generator.run = run
-        generator.registry = SkillRegistry(run["input"]["skill_snapshots"])
-        from time import monotonic
-        generator.deadline = monotonic() + 30
-        tools = generator.tools()
-        wrong = tools.execute(ToolCall("wrong", "create_flashcards",
-                                       {"title": "卡片", "data": {"cards": [{"question": "问", "answer": "答"}]}}))
-        self.assertTrue(wrong.is_error)
-        self.assertEqual(generator.artifacts, [])
+    def test_legacy_intent_flags_are_not_artifact_tool_permissions(self):
+        self.generator.run["input"].update(requested_artifacts=["quiz"], forbidden_artifacts=["flashcards"])
+        result = self.tools.execute(ToolCall("card", "create_flashcards", {
+            "title": "复习", "data": {"cards": [{"question": "问", "answer": "答"}]}}))
+        self.assertFalse(result.is_error)
+        self.assertEqual([a["kind"] for a in self.generator.artifacts], ["flashcards"])
 
     def test_one_artifact_per_turn_even_without_an_explicit_request(self):
         self.assertFalse(self.tools.execute(ToolCall("card", "create_flashcards",
@@ -398,27 +360,6 @@ class TeachingToolTests(unittest.TestCase):
                                              {"title": "流程", "data": {"source": "flowchart LR\n A-->B", "caption": "两步"}}))
         self.assertTrue(second.is_error)
         self.assertEqual(len(self.generator.artifacts), 1)
-
-    def test_an_explicit_refusal_blocks_that_kind_even_when_nothing_was_requested(self):
-        conversation = self.db.create_assistance_conversation("refusal-conversation")
-        turn = self.db.assistance_turn(conversation["conversation_id"], {
-            "client_command_id": "refusal-turn", "expected_version": conversation["version"],
-            "text": "只解释当前白板，不生成新白板", "action": "message"},
-            "rule-input-model", True, build_skill_snapshots())
-        self.assertEqual(turn["active_run"]["input"]["requested_artifacts"], [])
-        self.assertEqual(turn["active_run"]["input"]["forbidden_artifacts"], ["whiteboard"])
-        run = self.db.transition(turn["active_run"]["run_id"], {"queued"}, status="generating")
-        generator = AssistantGenerator(self.settings, self.db, Event())
-        generator.run = run
-        generator.registry = SkillRegistry(run["input"]["skill_snapshots"])
-        from time import monotonic
-        generator.deadline = monotonic() + 30
-        tools = generator.tools()
-        blocked = tools.execute(ToolCall("board", "create_whiteboard", {"title": "板书", "data": {"steps": [
-            {"title": "起点", "narration": "先看已知条件", "page": 1, "column": 1,
-             "operations": [{"kind": "text", "content": "已知 x=2", "items": [], "language": ""}]}]}}))
-        self.assertTrue(blocked.is_error)
-        self.assertEqual(generator.artifacts, [])
 
     def test_only_trusted_teaching_tools_are_registered(self):
         names = {t["function"]["name"] for t in self.tools.definitions()}

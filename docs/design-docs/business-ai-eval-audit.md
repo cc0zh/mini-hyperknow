@@ -8,6 +8,8 @@
 
 关联：[产品范围](product-design.md)、[架构](../ARCHITECTURE.md)、[模型工作流](agent-workflows.md)、[即时协助](instant-assistance.md)、[现有eval](backend-evaluation-pipeline.md)、[审计计划](../exec-plans/completed/20261026-business-ai-eval-audit.md)。
 
+后续清理：旧评测执行器已移除，下文已删除模块的名称仅为历史源码定位，不再作为可点击现行入口；现行命令与历史只读边界见[评测入口](../../evals/README.md)。
+
 ## 1. 阅读结论与证据口径
 
 - “业务已实现”“该业务经过某次真实验收”“已接入持续eval”是三件不同的事；八类业务地图不是八套已落地自动eval。
@@ -94,7 +96,7 @@
 | 通用生成结构修复 | [generation.py](../../src/hyperknow/generation.py)的bounded_repair_message和Generator.generate | 最多一次；追加有界错误及原文摘录，并重新校验；初始输出和修复输出是不同调用 |
 | 调研报告修复 | [research.py](../../src/hyperknow/research.py)的Researcher.generate | 仅修复格式与引用，不再提供搜索工具，不允许新增无依据结论 |
 | 即时协助修复 | [assistance_generation.py](../../src/hyperknow/assistance_generation.py)的AssistantGenerator.generate | 仅修复六字段结构与教学状态，不再重复创建产物；使用独立修复system指令 |
-| eval裁判 | [eval_grading.py](../../src/hyperknow/eval_grading.py)的build_grading_context，concept-grader-v1 | 无工具；判据/参考事实与原始请求/最终回复隔离；不是教学Skill，不进入被测教学轨迹 |
+| eval裁判 | `eval_grading.py`的build_grading_context，concept-grader-v1 | 无工具；判据/参考事实与原始请求/最终回复隔离；不是教学Skill，不进入被测教学轨迹 |
 
 内核的摘要提示不等于产品已启用长期记忆或自动压缩：当前两个产品Agent直接传provider，未传模型registry的低层摘要模型，也未装配持久JSONL/长期记忆。依据[Agent构造](../../src/agent_core/agent.py)及两个产品generate调用；不要把内核可选能力作为本次业务已覆盖项。
 
@@ -133,7 +135,7 @@
 | 即时协助 | TeachingResponse/TeachingQuestion/TeachingSuggestion/ContinuationState及五种产物数据 | 不含course_id；即时QuizData不等于课程QuizDraft；白板复用课程BoardStepDraft结构 |
 | eval | EvalCase/RubricItem；ATIF文字子集模型；Grader结果严格JSON检查 | result.json是普通记录对象，不是全业务统一领域Schema；规则、内容判定、校准状态分别保留 |
 
-源码：[domain.py](../../src/hyperknow/domain.py)、[main.py](../../src/hyperknow/main.py)、[research_domain.py](../../src/hyperknow/research_domain.py)、[blueprint_domain.py](../../src/hyperknow/blueprint_domain.py)、[lesson_domain.py](../../src/hyperknow/lesson_domain.py)、[quiz_domain.py](../../src/hyperknow/quiz_domain.py)、[eval_cases.py](../../src/hyperknow/eval_cases.py)。
+源码：[domain.py](../../src/hyperknow/domain.py)、[main.py](../../src/hyperknow/main.py)、[research_domain.py](../../src/hyperknow/research_domain.py)、[blueprint_domain.py](../../src/hyperknow/blueprint_domain.py)、[lesson_domain.py](../../src/hyperknow/lesson_domain.py)、[quiz_domain.py](../../src/hyperknow/quiz_domain.py)、`eval_cases.py`。
 
 Schema合法只能证明约定的结构和部分不变量，不保证来源支持、数学事实、教学质量或浏览器可用性。domain.CourseDraft/materialize_course和storage.finish_course仍保留旧整课代码，但当前worker按research→blueprint→units推进，不应把旧代码当新增的第九条生成业务。
 
@@ -186,14 +188,14 @@ Schema合法只能证明约定的结构和部分不变量，不保证来源支�
 
 | 已确认限制 | 代码依据 | 对扩展的具体影响 |
 | --- | --- | --- |
-| Case只接受concept-explanation | [EvalCase](../../src/hyperknow/eval_cases.py)的skill_hint是单值Literal，extra=forbid | auto和problem-solving直接校验失败；不能仅换题目JSON就测另一Skill或选择能力 |
-| Runner只建立空的新会话并发送一轮message | [recover_conversation/recover_turn](../../src/hyperknow/evaluation.py) | 没有当前课堂、课程前置对象、后续用户反馈和continue脚本 |
-| 证据要求assistance且history为空 | [collect_evidence](../../src/hyperknow/evaluation.py) | 多轮、其他run kind不是“评分低”，而是当前测量契约不接受 |
-| 验收数据库不能含courses | [check_backend](../../src/hyperknow/evaluation.py) | 为首轮防误连的限制合理；当前不能复用于需要真实课程对象的评测 |
-| 规则ID固定为五项 | [RULE_IDS/classify_result](../../src/hyperknow/eval_cases.py)及[evaluate_rules](../../src/hyperknow/evaluation.py) | no_artifacts/no_questions适用于首题，不是所有业务共同成功条件 |
+| Case只接受concept-explanation | `EvalCase`的skill_hint是单值Literal，extra=forbid | auto和problem-solving直接校验失败；不能仅换题目JSON就测另一Skill或选择能力 |
+| Runner只建立空的新会话并发送一轮message | `recover_conversation/recover_turn` | 没有当前课堂、课程前置对象、后续用户反馈和continue脚本 |
+| 证据要求assistance且history为空 | `collect_evidence` | 多轮、其他run kind不是“评分低”，而是当前测量契约不接受 |
+| 验收数据库不能含courses | `check_backend` | 为首轮防误连的限制合理；当前不能复用于需要真实课程对象的评测 |
+| 规则ID固定为五项 | `RULE_IDS/classify_result`及`evaluate_rules` | no_artifacts/no_questions适用于首题，不是所有业务共同成功条件 |
 | 轨迹转换只接受assistance调用形状 | [eval_atif._export](../../src/hyperknow/eval_atif.py) | 课程生成的字符串响应/消息与工具Agent快照不同；不能直接复用转换器声称全业务ATIF |
-| Grader只收到原始输入和最终TeachingResponse | [build_grading_context](../../src/hyperknow/eval_grading.py) | 无完整来源正文、产物data、已展示步骤或多轮状态；不具备评价这些内容的证据 |
-| 后端代码版本未固定 | [finalize_evidence](../../src/hyperknow/evaluation.py)的backend_code_version=None | 实际Prompt/工具/Skill哈希可追踪，但不等于业务代码或前端版本；系统改动的前后对照归因不完整 |
+| Grader只收到原始输入和最终TeachingResponse | `build_grading_context` | 无完整来源正文、产物data、已展示步骤或多轮状态；不具备评价这些内容的证据 |
+| 后端代码版本未固定 | `finalize_evidence`的backend_code_version=None | 实际Prompt/工具/Skill哈希可追踪，但不等于业务代码或前端版本；系统改动的前后对照归因不完整 |
 
 这些限制大多来自“一个单轮Case起步”的显式范围，并非首轮实现失效。明显障碍在于直接把它当全业务通用Runner，而不是首切片本身。
 
