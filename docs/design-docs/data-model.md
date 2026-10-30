@@ -2,7 +2,7 @@
 
 独立即时协助的数据、事务与恢复另见[即时协助契约](instant-assistance.md)：新增assistance_conversations与assistance_artifacts两表，保持SQLite user_version=3，不将course_id改为可空或创建假课程。会话、轮次、Skill快照、生成产物及白板cursor持久化，临时作答不进入课程成绩。
 
-状态：2026-10-22 既有造课／课堂记录与验收保留；v3题组、尝试、目标版本及确定性计分已完成本阶段范围的真实验收，见[完成计划](../exec-plans/completed/20261022-real-practice-exams.md)。思考题与成果提交仍为后续目标。
+状态：2026-10-22 基线。v3 题组、尝试、目标版本及确定性计分已实现；实现与验证程度见[质量状态](../QUALITY_SCORE.md)。思考题与成果提交仍为后续目标。
 关联：[产品设计](product-design.md)、[交互状态](learning-experience.md)、[接口](api-and-events.md)。
 
 ## 1. 唯一事实来源

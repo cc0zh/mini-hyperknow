@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "id": "correlation-causation",
+  "revision": 1,
+  "title": "相关性不是因果性的反面",
+  "domain": "statistics",
+  "workflow": "assistance",
+  "learner": {
+    "background": "见过相关系数，不熟悉混杂因素。",
+    "goal": "从相关观察中合理提出因果验证问题。",
+    "misconceptions": [
+      "认为两个量一起增长就证明一个导致另一个；又容易反过来认为相关必定没有因果。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "冰淇淋销量越高，溺水人数越多，这能说明吃冰淇淋导致溺水吗？",
+    "follow_ups": [
+      "所以只要是相关，就肯定不能有因果关系，对吗？"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "causal-claims",
+      "dimension": "correctness",
+      "description": "不由相关推出确定因果，也不把相关与因果说成互斥；混杂候选保持条件性。",
+      "critical": true
+    },
+    {
+      "id": "confounder",
+      "dimension": "pedagogy",
+      "description": "用共同影响因素说明推理缺口，并给出合理的进一步证据方向。",
+      "critical": true
+    },
+    {
+      "id": "reverse-misconception",
+      "dimension": "adaptation",
+      "description": "针对追问的新误区明确纠正，而不是同意学生过度概括。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "相关本身不足以证明因果，温度或季节可能同时影响冰淇淋销量与游泳/溺水。",
+      "存在因果作用的变量可以相关，不能由相关不足以证明因果推出相关排除因果。",
+      "混杂解释是候选解释，不是未经数据验证的确定因果结论。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax Introductory Statistics",
+        "url": "https://openstax.org/books/introductory-statistics-2e/pages/12-2-the-regression-equation",
+        "locator": "Correlation does not imply causation"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

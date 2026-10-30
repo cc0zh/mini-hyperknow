@@ -38,6 +38,7 @@ __pycache__/
 .venv/
 venv/
 data/
+eval_result/
 *.egg-info/
 
 # Terraform and infra

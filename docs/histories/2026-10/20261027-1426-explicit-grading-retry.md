@@ -2,4 +2,4 @@
 
 - **User Query:** 用户要求“再试一次”；仅授权对已有单轮回答新增一次评分，不重新生成回答或启动另外两项任务。
 - **Result:** Kimi在41.256秒后成功返回，消耗2770tokens；数学与针对性通过，因回答偏长而指令遵循失败。旧两次异常、未知用量和冻结证据完整保留，本次源码前后摘要一致；汇总及质量记录已更新，不宣称全量通过或总费用可确认。
-- **Execution Plan path:** [三项真实评测及单次重试记录](../../exec-plans/active/20261027-three-case-real-evaluation.md)。
+- **Execution Plan path:** [三项真实评测及单次重试记录](../../exec-plans/completed/20261027-three-case-real-evaluation.md)。

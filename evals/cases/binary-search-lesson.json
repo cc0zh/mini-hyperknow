@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "id": "binary-search-lesson",
+  "revision": 1,
+  "title": "二分查找的边界与不变量讲义",
+  "domain": "algorithms",
+  "workflow": "lesson",
+  "learner": {
+    "background": "会数组和while，不理解循环不变量。",
+    "goal": "能手算小数组二分查找并解释边界更新。",
+    "misconceptions": [
+      "混用闭区间和半开区间写法，导致漏元素或死循环。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "准备一节适合数组和while初学者的二分查找白板讲义，强调区间边界。",
+    "course_goal": "为会Python数组和while的人设计约1小时二分查找课程；范围限有序数组、循环不变量和边界更新，不讲平衡树。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "search-invariants",
+      "dimension": "correctness",
+      "description": "所有展示的二分查找算法、手算、停止条件和边界更新自洽，没有越界、死循环或漏候选。",
+      "critical": true
+    },
+    {
+      "id": "visible-boundaries",
+      "dimension": "pedagogy",
+      "description": "讲义与板书一致呈现区间如何缩小，适合已有背景，不将正确性仅归结为背代码。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "二分查找要求搜索范围具备排序或相应单调性。",
+      "闭区间与半开区间都可正确实现，但循环条件、mid更新及边界约定必须一致。",
+      "每轮未命中时搜索区间应严格缩小；目标保留在合法候选区间。"
+    ],
+    "sources": [
+      {
+        "title": "NIST Dictionary of Algorithms: binary search",
+        "url": "https://xlinux.nist.gov/dads/HTML/binarySearch.html",
+        "locator": "binary search definition and sorted array"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

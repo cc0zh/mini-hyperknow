@@ -20,7 +20,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 hyperknow = ["skills/*/SKILL.md"]
-eval_core = ["report_template.html"]
 
 [dependency-groups]
 dev = [

@@ -9,6 +9,7 @@ const excludedNames = new Set([
   '.git', 'node_modules', 'dist', '.tmp', 'tmp', 'temp', 'coverage',
   '.venv', 'venv', '.cache', '.npm', '.env', '.env.local', '__pycache__',
   '.verification', 'test-results', 'playwright-report',
+  'data', 'eval_result',
 ]);
 
 function excluded(name) {

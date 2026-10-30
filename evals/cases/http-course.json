@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "id": "http-course",
+  "revision": 1,
+  "title": "两小时HTTP入门课程规划",
+  "domain": "networking",
+  "workflow": "course",
+  "learner": {
+    "background": "会基础Python，没学过网络协议。",
+    "goal": "两小时内读懂一次浏览器请求与响应，不做服务器部署。",
+    "misconceptions": [
+      "把HTTP与TCP、HTML当作同一层概念。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "为会基础Python但没有网络基础的人设计总计约2小时的HTTP入门课程，目标是能解释URL、请求方法、状态码、头部和一次请求响应。不要加入部署、框架项目或HTTPS密码学细节。若需澄清允许跳过，请按这些已给条件规划。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "protocol-facts",
+      "dimension": "correctness",
+      "description": "生成的蓝图与课程在协议层次、请求响应、状态码等事实上准确。",
+      "critical": true
+    },
+    {
+      "id": "scoped-sequence",
+      "dimension": "pedagogy",
+      "description": "按给定背景、目标、约2小时和排除范围安排连贯路径，避免以广度或课时数量替代可学习性。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "HTTP是应用层协议；TCP是传输层协议，HTML是一种文档格式。",
+      "课程应由请求/响应基本模型到方法、状态和头部，不能要求未给定的运维或密码学前置知识。",
+      "用户仅有约两小时，计划时长和主题数量应与范围一致。"
+    ],
+    "sources": [
+      {
+        "title": "MDN HTTP overview",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+        "locator": "Overview, messages, extensibility"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

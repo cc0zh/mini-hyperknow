@@ -2,7 +2,7 @@
 
 独立教学新增`/api/assistance/conversations`、会话`/{id}/turns`、`/api/assistance/artifacts/{id}`、`/progress`及`/feedback`；完整字段、202返回和版本约束见[即时协助契约](instant-assistance.md)。取消／重试仍复用`/api/runs/{id}`，事件增加`conversation:{id}`及`artifact:{id}`，不引入第二套WebSocket。快照读取与恢复不自动触发模型收费。
 
-状态：2026-10-22 造课与课堂保留既有真实验收；练习／考核出题、作答、显式提交与结果查询本阶段范围已完成真实验收。thought-answers 与成果提交仍为目标；证据及未覆盖时序见[完成计划](../exec-plans/completed/20261022-real-practice-exams.md)。
+状态：2026-10-22 基线。实现与验收到什么程度见[质量状态](../QUALITY_SCORE.md)，证据留计划；思考题与成果提交仍为目标。现行产品内核见[产品内核](product-kernel.md)。
 关联：[架构](../ARCHITECTURE.md)、[数据](data-model.md)、[交互](learning-experience.md)。
 
 ## 1. 基本约定

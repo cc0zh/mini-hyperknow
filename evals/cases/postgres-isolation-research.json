@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "id": "postgres-isolation-research",
+  "revision": 1,
+  "title": "PostgreSQL重复读与幻读的资料核验",
+  "domain": "databases",
+  "workflow": "research",
+  "learner": {
+    "background": "学过SQL标准隔离级别表，但没有区分具体实现。",
+    "goal": "核验PostgreSQL中Repeatable Read的实际语义。",
+    "misconceptions": [
+      "把SQL标准允许幻读直接当成PostgreSQL实际会出现幻读。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "请根据PostgreSQL官方文档调研：Repeatable Read会出现幻读吗？区分SQL标准最低要求与PostgreSQL实现，不要把其他数据库的结论套用。说明仍可能存在的序列化异常，并给出真实读过的来源。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "implementation-v-standard",
+      "dimension": "correctness",
+      "description": "准确区分标准允许与PostgreSQL实际行为，指出无幻读但仍可能序列化异常。",
+      "critical": true
+    },
+    {
+      "id": "explain-distinction",
+      "dimension": "pedagogy",
+      "description": "帮助学生理解标准最低要求和实现加强的差别，而非只有隔离级别表。",
+      "critical": true
+    },
+    {
+      "id": "supported-sources",
+      "dimension": "grounding",
+      "description": "报告的关键结论由冻结的真实已读正文支持，来源和引用一致；没有正文则不足判定，不凭模型记忆算检索成功。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "PostgreSQL Repeatable Read使用事务快照，不允许幻读，比SQL标准对Repeatable Read的最低要求更强。",
+      "PostgreSQL Repeatable Read仍允许序列化异常；Serializable与Repeatable Read不同。",
+      "声明引用必须来源于实际已读资料；不能只因URL存在就认为其支持具体结论。"
+    ],
+    "sources": [
+      {
+        "title": "PostgreSQL transaction isolation",
+        "url": "https://www.postgresql.org/docs/current/transaction-iso.html",
+        "locator": "13.2 and Table 13.1"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

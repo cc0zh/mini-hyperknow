@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "id": "recursive-return-simulated",
+  "revision": 1,
+  "title": "模拟学生：递归return只结束哪一层",
+  "domain": "programming",
+  "workflow": "assistance",
+  "learner": {
+    "background": "知道函数调用和if，会阅读阶乘代码；尚未建立调用栈概念。",
+    "goal": "解释基例返回后上一层如何继续。",
+    "misconceptions": [
+      "认为最深一层执行return会立即终止整条递归调用链，上一层不会继续。"
+    ]
+  },
+  "task": {
+    "mode": "simulated",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "递归函数到基例return后，为什么上一层还能接着算？我以为return就把整个递归结束了。请用很小的例子。"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "stack-semantics",
+      "dimension": "correctness",
+      "description": "return语义与示例执行轨迹准确，各层等待/继续顺序正确。",
+      "critical": true
+    },
+    {
+      "id": "small-trace",
+      "dimension": "pedagogy",
+      "description": "用有限且可逐层追踪的小例子解释调用/返回，不用复杂程序掩盖误区。",
+      "critical": true
+    },
+    {
+      "id": "adaptive-followup",
+      "dimension": "adaptation",
+      "description": "根据实际学生追问调整讲解，诊断残留困惑；不凭学生自称懂了宣布学习成功。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "每次函数调用有独立栈帧；return结束当前调用并把值交给其调用者。",
+      "调用者在调用表达式的位置取得返回值后继续执行；基例阻止进一步递归，但不抹掉等待中的调用者。",
+      "阶乘若用示例，0!=1且递归应在定义域内终止；不能为演示简便引入错误递归。"
+    ],
+    "sources": [
+      {
+        "title": "Python tutorial: defining functions",
+        "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+        "locator": "Function calls, local symbol tables, return"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

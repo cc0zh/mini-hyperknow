@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "id": "python-shared-rows",
+  "revision": 1,
+  "title": "Python二维列表的共享行",
+  "domain": "programming",
+  "workflow": "assistance",
+  "learner": {
+    "background": "会列表索引，认为列表乘法复制独立对象。",
+    "goal": "预测别名行为并构造独立二维列表。",
+    "misconceptions": [
+      "认为 [[0]*2]*3 创建了三个互相独立的行列表。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "Python里 a=[[0]*2]*3，然后 a[0][0]=7。为什么三行都变了？我以为乘3是复制三份。",
+    "follow_ups": [
+      "那改成 a=[[0]*2 for _ in range(3)] 有什么本质区别？不要只给正确写法。"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "aliasing",
+      "dimension": "correctness",
+      "description": "准确预测共享行变更并解释对象引用；不得把重复操作说成浅拷贝三个独立行，或把推导式称为通用深拷贝。",
+      "critical": true
+    },
+    {
+      "id": "object-model",
+      "dimension": "pedagogy",
+      "description": "通过行对象与引用关系建立因果解释，而不仅给出修复代码。",
+      "critical": true
+    },
+    {
+      "id": "compare-constructions",
+      "dimension": "adaptation",
+      "description": "追问中明确比较两种构造的求值次数与对象身份。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "列表重复复制元素引用，而不是递归深拷贝。",
+      "a=[[0]*2]*3 的三行指向同一行列表；修改行内元素后三行都表现为[7,0]。",
+      "列表推导式每次求值[0]*2，得到三个独立行列表；这不意味着任意嵌套对象都自动深拷贝。"
+    ],
+    "sources": [
+      {
+        "title": "Python documentation: multidimensional lists",
+        "url": "https://docs.python.org/3/faq/programming.html#how-do-i-create-a-multidimensional-list",
+        "locator": "How do I create a multidimensional list?"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

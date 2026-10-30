@@ -8,7 +8,7 @@
 - 不包含：新 Skill/新 Agent 平台、课程重排、共享课程与协助会话/进度、评测扩展、模型或供应商改造。
 - 工作区基线：已有大量未提交的模型/eval/文档改动；仅在本任务必须位置增量修改，不重置或覆盖；验证使用临时数据与真实纯函数/本地存储，不 Mock。
 - 风险：接口/建议格式变化需前后端同步；零澄清需修改 Prompt/Schema/阶段流转/页面；空 Skill 必须不暴露空枚举工具；现有 eval/脚本的固定 Skill 断言须更新但不扩展范围。
-- 关联：[业务审计](../../design-docs/business-ai-eval-audit.md)、[架构](../../ARCHITECTURE.md)、[即时协助](../../design-docs/instant-assistance.md)。
+- 关联：[业务审计](../../references/business-ai-eval-audit.md)、[架构](../../ARCHITECTURE.md)、[即时协助](../../design-docs/instant-assistance.md)。
 
 ## 进度与决定
 

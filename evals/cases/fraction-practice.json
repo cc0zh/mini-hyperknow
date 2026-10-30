@@ -1,0 +1,64 @@
+{
+  "schema_version": 3,
+  "id": "fraction-practice",
+  "revision": 1,
+  "title": "分数加法误区诊断练习",
+  "domain": "mathematics",
+  "workflow": "practice",
+  "learner": {
+    "background": "会整数加法与分数表示，容易把分母直接相加。",
+    "goal": "用客观题诊断并纠正异分母加法错误。",
+    "misconceptions": [
+      "认为1/2+1/3=2/5。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "生成能检测分母直接相加误区的课后客观练习，题目与实际讲义一致。",
+    "course_goal": "为掌握整数运算的初中生设计约45分钟分数加法课程，重点是通分及分母不能直接相加，少量同分母前置。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "item-answer-validity",
+      "dimension": "correctness",
+      "description": "全部可见题目的计算、正确选项、单多选标记及解析一致且正确。",
+      "critical": true
+    },
+    {
+      "id": "diagnostic-practice",
+      "dimension": "pedagogy",
+      "description": "练习围绕真实教学内容，至少能区分分母直接相加与正确通分，不靠歧义或无关难题制造难度。",
+      "critical": true
+    },
+    {
+      "id": "lesson-faithfulness",
+      "dimension": "grounding",
+      "description": "题组标注来源与实际冻结讲义相符；没有依据的知识点不能当作已经教过。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "分数加法应先通分；1/2+1/3=5/6而非2/5。",
+      "有效客观题需要题干明确、选项可区分、答案和解析一致，不能有意外多个正确项却标单选。",
+      "练习应依据本次真实讲义，不能以题组已保存证明其知识或诊断质量。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax Prealgebra 2e",
+        "url": "https://openstax.org/books/prealgebra-2e/pages/4-5-add-and-subtract-fractions-with-different-denominators",
+        "locator": "4.5 Add and Subtract Fractions with Different Denominators"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

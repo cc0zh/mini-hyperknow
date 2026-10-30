@@ -28,7 +28,7 @@ ATIF校验只说明轨迹符合当前出口约束，不能证明没有源端漏�
 
 三个自检问题：这次重出报告会不会再调用模型？这个good标签对应一道题还是一次运行？所谓预算通过来自请求配置还是实际usage？如果回答不清楚，应先补证据身份，而不是增加自动化层数。
 
-本轮实践及边界见[执行计划](../../exec-plans/active/20261026-lightweight-backend-eval.md)。
+本轮实践及边界见[执行计划](../../exec-plans/completed/20261026-lightweight-backend-eval.md)。
 
 ## 修复当前规则，不改写历史事实
 

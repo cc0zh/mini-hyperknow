@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "id": "newton-force-pairs",
+  "revision": 1,
+  "title": "作用反作用力为什么不抵消",
+  "domain": "physics",
+  "workflow": "assistance",
+  "learner": {
+    "background": "知道合力决定加速度，尚未区分受力对象。",
+    "goal": "按物体画受力图解释推动与加速。",
+    "misconceptions": [
+      "把作用力和反作用力画到同一物体上并认为总是抵消。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "推小车时我推它，它也以同样大的力推我，那不是抵消了吗？小车为什么还能加速？",
+    "follow_ups": [
+      "所以小车对我的力，和地面对我的摩擦力，也是一对作用反作用力吗？"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "force-bodies",
+      "dimension": "correctness",
+      "description": "正确区分各力的受力对象及相互作用配对，不把人的两个外力当第三定律力对。",
+      "critical": true
+    },
+    {
+      "id": "free-body-reasoning",
+      "dimension": "pedagogy",
+      "description": "使用针对单个物体的受力推理，解释加速不违背第三定律。",
+      "critical": true
+    },
+    {
+      "id": "new-pair-diagnosis",
+      "dimension": "adaptation",
+      "description": "直接诊断追问中新的错误配对，而非只重述作用反作用相等。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "作用反作用力大小相等方向相反，作用于不同物体，不能在同一个物体的合力中直接抵消。",
+      "地面对人的摩擦与人对地的摩擦成第三定律力对；小车对人的接触力和地面对人的摩擦一般不是同一相互作用的力对。",
+      "小车加速度由作用在小车上的合力及其质量决定。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax University Physics Volume 1",
+        "url": "https://openstax.org/books/university-physics-volume-1/pages/5-5-newtons-third-law",
+        "locator": "5.5 Newton’s Third Law"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

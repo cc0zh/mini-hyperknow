@@ -1,14 +1,14 @@
 # 架构总览
 
-状态：2026-10-22 造课／课程库首切片保留原真实验收证据；白板讲义、播放、课堂问答与手动完成已接入代码，本阶段课堂已完成两主题真实讲义／问答、播放／回看、手动完成及已保存状态冷重启验收。练习／考核本阶段范围已完成真实验收，见[完成计划](exec-plans/completed/20261022-real-practice-exams.md)；最终CI门禁待填写，思考题、项目提交及完整V01–V12仍未完成。
-需求边界：[产品设计](design-docs/product-design.md)；契约入口：[设计索引](design-docs/index.md)。
+状态：2026-10-22 基线；实现与验收到什么程度见[质量状态](QUALITY_SCORE.md)，本页只记结构事实。
+边界与内核：[产品设计](design-docs/product-design.md)、[产品内核](design-docs/product-kernel.md)；契约入口：[设计索引](design-docs/index.md)。
 
-现行定位入口（2026-10-27）：先查[业务与改动影响](#10-现行业务与改动影响入口)，了解一项业务从哪里进入、主要改哪里、影响谁及如何验证，再按链接深入专题。这里维护当前导航；[业务审计](design-docs/business-ai-eval-audit.md)保留重构前快照，不作为现行业务契约。
+现行定位入口（2026-10-27）：先查[业务与改动影响](#10-现行业务与改动影响入口)，了解一项业务从哪里进入、主要改哪里、影响谁及如何验证，再按链接深入专题。这里维护当前导航；重构前的[业务审计](references/business-ai-eval-audit.md)已移入参考资料，不作为现行业务契约。
 
 ## 1. 当前事实
 
 - `src/agent_core/` 已升级为可选持久会话／Token 预算压缩、分层模型、工具调度与逐次审批的 V1；同步 provider 契约保留，接口和边界见[内核 V1](design-docs/agent-core-v1.md)。
-- `src/eval_core/`新增版本化任务、有限交互、动作恢复、冻结证据、统一评分与离线报告；Hyperknow通过显式接入负责B01–B08业务状态与只读采证。工程检查不代替全业务模型验收，见[评测实施计划](exec-plans/active/20261027-general-evaluation-framework.md)及[新命令](../evals/general/README.md)；旧单轮执行器已移除，历史结果与费用事实保留，只提供report只读兼容。
+- `src/hyperknow_eval/`为产品专属的学习任务评测：严格任务／公开投影、真实隔离场景、冻结证据、无答案学生模拟、独立教学判据及离线报告；产品运行时不反向依赖。旧通用框架、Adapter／DSL／ATIF／发布平台已删除，无历史执行兼容；见[设计](design-docs/backend-evaluation-pipeline.md)、[命令](../evals/README.md)及[实际验收](exec-plans/completed/20261029-learning-evaluation-rewrite.md)。
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
 - 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
@@ -55,7 +55,13 @@ flowchart LR
 
 ```text
 src/
-  eval_core/              独立评测契约、资产、有限Runner、评分与离线报告，不反向进入产品运行时
+  hyperknow_eval/         独立教学评测，不反向进入产品运行时
+    schema.py / cases.py  严格任务、私有标准与公开投影
+    storage.py            原子证据、摘要与单写锁
+    runner.py / runtime.py 真实隔离后端、一次提交与只读采证
+    scenarios.py          八类显式Python业务场景，不重复状态DSL
+    judging.py / calibration.py 无答案学生模拟、独立判据与作者控制
+    reporting.py / cli.py 分维报告、完整矩阵比较与唯一CLI
   agent_core/             已有通用模型、上下文、工具与循环
     llm/                  同步 OpenAI-compatible provider、显式 tier registry 和消息规范化
     tools/                调度、审批、输出存档、显式工作区文件／进程工具
@@ -86,14 +92,6 @@ src/
     assistance_storage.py 会话/轮次、原子产物提交、白板位置与迟到保存屏障
     assistance_generation.py 有界教学Agent、Skill激活与逐次真实调用记录
     assistance_api.py     独立教学命令与查询
-    eval_cli.py           唯一评测命令装配，通用资产／执行／报告入口
-    eval_adapter.py       真实业务HTTP、合法动作与恢复身份
-    eval_evidence.py      真实前置材料和只读SQLite检查点采证
-    eval_support.py       隔离目录、回环URL、只读连接及Skill轨迹检查
-    eval_legacy.py        旧Case校验与历史结果只读摘要，不含执行或评分请求
-    eval_migration.py     显式旧Case转换，不改写历史实验
-    eval_atif.py          固定ATIF-v1.7文字轨迹出口与严格子集校验
-    eval_trajectories.py  多类业务run的已保存轨迹出口
     skills/               可选可信产品Skill目录；当前无内置Skill，不是开发助手权限
     main.py               REST / WS、错误映射、装配与生命周期
 web/                      已实现的 React 应用
@@ -242,7 +240,7 @@ B07/B08的产物意图由模型理解，已移除关键词派生及对应类型�
 | B06题组、作答与计分 | [test_quiz.py](../tests/test_quiz.py)、[test_quiz_http.py](../tests/test_quiz_http.py) | [练习/考核完成计划](exec-plans/completed/20261022-real-practice-exams.md) |
 | B07/B08及产物交互/恢复 | [test_assistance_domain.py](../tests/test_assistance_domain.py)、[test_assistance_storage.py](../tests/test_assistance_storage.py)、[test_assistance_http.py](../tests/test_assistance_http.py)、[assistance.spec.ts](../web/e2e/assistance.spec.ts)、[assistance-generation.spec.ts](../web/e2e/assistance-generation.spec.ts) | [即时协助契约](design-docs/instant-assistance.md)链接当前真实复验/动画修复及限制；[verify_assistance.py](../scripts/verify_assistance.py)为真实调用入口 |
 | 命令、快照、删除与重启等共享机制 | [test_http.py](../tests/test_http.py)、[test_course_deletion.py](../tests/test_course_deletion.py)、[run-recovery.spec.ts](../web/e2e/run-recovery.spec.ts)及上述业务测试 | [真实验证](design-docs/real-validation.md)和各业务计划；不能从一个机制的通过推断全部业务时序通过 |
-| 研发教学评测 | [evals/README.md](../evals/README.md)、[test_eval_cli.py](../tests/test_eval_cli.py)、[test_eval_support.py](../tests/test_eval_support.py)与test_eval_* | [后端评测设计](design-docs/backend-evaluation-pipeline.md)的当前计划；包含多轮／课程前置／产物工程覆盖，全业务真实模型、独立评分校准与浏览器另验 |
+| 研发教学评测 | [evals/README.md](../evals/README.md)、[契约/存储](../tests/test_learning_eval_cases.py)、[真实执行](../tests/test_learning_eval_runtime.py)、[受控后端](../tests/test_learning_eval_runner.py)、[评分](../tests/test_learning_eval_judging.py)、[报告](../tests/test_learning_eval_reporting.py)、[传输拒绝](../tests/test_learning_eval_transport.py) | [教学评测设计](design-docs/backend-evaluation-pipeline.md)及其验收计划；工程、自动教学判据、独立人工校准和真人收益分别报告 |
 
 这些是查找检查和证据的入口，不代表本次重新执行或全部通过。规则/HTTP测试、真实模型内容、浏览器交互和安全边界须分别报告；收费脚本与评测执行须有相应授权并使用隔离数据，不因查文档自动运行。已确认成功、失败、未验和取消的范围以链接中的原始记录为准，不在此复制容易过期的通过数量。
 

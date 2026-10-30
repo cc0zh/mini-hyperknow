@@ -1,0 +1,25 @@
+{
+  "schema_version": 3,
+  "id": "learning-development",
+  "revision": 1,
+  "purpose": "development",
+  "cases": [
+    "cases/chain-rule-transfer.json",
+    "cases/medical-base-rate.json",
+    "cases/python-shared-rows.json",
+    "cases/newton-force-pairs.json",
+    "cases/correlation-causation.json",
+    "cases/sql-count-null.json",
+    "cases/recursive-return-simulated.json",
+    "cases/http-course.json",
+    "cases/postgres-isolation-research.json",
+    "cases/binary-search-lesson.json",
+    "cases/recursive-classroom-question.json",
+    "cases/fraction-practice.json",
+    "cases/index-exam.json",
+    "cases/tense-flashcards.json",
+    "cases/balance-whiteboard.json",
+    "cases/http-sequence-diagram.json",
+    "cases/uniform-motion-animation.json"
+  ]
+}

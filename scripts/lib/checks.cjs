@@ -74,6 +74,11 @@ function checkMarkdownLinks(root) {
         const destination = relative
           ? path.resolve(path.dirname(file), decodeURIComponent(relative))
           : file;
+        const privateRoots = ['data', 'eval_result'].map((name) => path.join(root, name));
+        if (privateRoots.some((directory) => destination === directory || destination.startsWith(`${directory}${path.sep}`))) {
+          errors.push(`${path.relative(root, file)}:${index + 1}: 私有运行工件请使用代码路径，不建立Markdown链接: ${target}`);
+          continue;
+        }
         if (!stat(destination)) {
           errors.push(`${path.relative(root, file)}:${index + 1}: 本地文档链接不存在: ${target}`);
           continue;

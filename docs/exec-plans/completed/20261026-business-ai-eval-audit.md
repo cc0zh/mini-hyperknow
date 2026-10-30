@@ -16,7 +16,7 @@
 
 - [x] 确认任务范围、文档规则与原有工作区状态；采用当前本地日期2026-10-26。
 - [x] 分别核查课程后端、前端业务影响及即时协助/eval链路，汇总到源码级证据。
-- [x] 编写业务AI/eval审计、维护设计入口，按阻碍类型排序；交付[审计](../../design-docs/business-ai-eval-audit.md)。
+- [x] 编写业务AI/eval审计、维护设计入口，按阻碍类型排序；交付[审计](../../references/business-ai-eval-audit.md)。
 - [x] 运行文档与引用检查，核对最终差异并记录未验证边界；归档前已把审计内计划链接更新至completed路径。
 - 2026-10-26：两项只读子任务分别审计课程后端与前端，主任务负责即时协助、eval和综合；不因需要优化而预设所有业务必须改成Skill或Agent。
 - 2026-10-26：纯Schema检查确认零澄清问题被拒绝、EvalCase不接受auto/problem-solving、即时回复六字段及五种产物、两个Skill v2、Grader仅收到原始输入/最终回复；没有创建业务成功样本。
@@ -24,7 +24,7 @@
 
 ## 验收与交接
 
-- 交付：[业务、AI契约与评测可优化性审计](../../design-docs/business-ai-eval-audit.md)，包含业务路径、8个主提示语义入口、2个产品Skill、8个分权限工具名称、主要Schema、前端影响、硬阻碍与分级建议；设计索引追加入口。
+- 交付：[业务、AI契约与评测可优化性审计](../../references/business-ai-eval-audit.md)，包含业务路径、8个主提示语义入口、2个产品Skill、8个分权限工具名称、主要Schema、前端影响、硬阻碍与分级建议；设计索引追加入口。
 - 已执行：仓库状态、设计与局部代码读取；两个只读子任务结果与关键实现交叉核对；无业务生成或评分请求。
 - 无网络纯Schema检查通过：Clarification拒绝空questions；EvalCase拒绝auto/problem-solving；即时输出六字段、5个产物Schema和2个v2 Skill；Grader证据键及空工具列表符合审计描述。检查通过stdin执行uv run --frozen python，不写业务库/Case库。
 - Node无网络纯函数复现通过：pendingCommandForScope对progress返回命令，对feedback返回null；确认过滤行为，不外推实际用户已丢反馈。

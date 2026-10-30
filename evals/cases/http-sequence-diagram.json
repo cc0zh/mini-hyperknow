@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "id": "http-sequence-diagram",
+  "revision": 1,
+  "title": "请求响应结构图",
+  "domain": "networking",
+  "workflow": "artifact",
+  "learner": {
+    "background": "知道浏览器与服务器，容易把响应先于请求或混淆角色。",
+    "goal": "用结构图追踪一次HTTP请求响应。",
+    "misconceptions": [
+      "把HTTP服务器主动响应与客户端发起请求的角色混淆。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "请画一个简单结构图说明浏览器向服务器发HTTP请求并收到响应，标出请求方法/路径与响应状态码分别在哪里。不要展开TLS和数据库内部。",
+    "artifact_kind": "diagram"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "message-roles",
+      "dimension": "correctness",
+      "description": "角色、流向、方法/路径/状态标签正确，图与正文无冲突。",
+      "critical": true
+    },
+    {
+      "id": "diagram-purpose",
+      "dimension": "pedagogy",
+      "description": "真实diagram产物帮助区分请求响应组成，保持用户限定的简单范围；不将源码存在称作浏览器渲染通过。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "HTTP客户端发送请求，服务器返回响应；请求方法与目标路径属于请求，状态码属于响应。",
+      "图的方向、标签与文字解释应一致，不可把状态码当作请求方法。"
+    ],
+    "sources": [
+      {
+        "title": "MDN HTTP messages",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages",
+        "locator": "HTTP requests and responses"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "id": "uniform-motion-animation",
+  "revision": 1,
+  "title": "匀速运动教学动画",
+  "domain": "physics",
+  "workflow": "artifact",
+  "learner": {
+    "background": "会坐标读数，容易把速度与位置混淆。",
+    "goal": "通过时间与位置对应关系解释匀速直线运动。",
+    "misconceptions": [
+      "认为速度2m/s意味着位置永远是2米。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "请用一个简单HTML动画演示x₀=0、v=2m/s的小车在0到4秒的匀速直线运动，显示时间和位置，让我明白2m/s不是“位置2米”。无需外网资源。",
+    "artifact_kind": "animation"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "motion-model",
+      "dimension": "correctness",
+      "description": "正文及可检查的动画数据/代码符合x=2t，单位、时间范围和端点一致。",
+      "critical": true
+    },
+    {
+      "id": "time-position-link",
+      "dimension": "pedagogy",
+      "description": "真实animation产物将时间和位置变化联系起来，回应速度/位置混淆；不声称未观察的浏览器运行成功。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "匀速运动x(t)=x₀+vt；此处x=2t，t=0,1,2,3,4秒对应x=0,2,4,6,8米。",
+      "速度是位置对时间的变化率，单位m/s不同于位置单位m。",
+      "后端生成的HTML内容不等于动画在浏览器真实运行或通过无障碍验收。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax University Physics Volume 1",
+        "url": "https://openstax.org/books/university-physics-volume-1/pages/3-1-position-displacement-and-average-velocity",
+        "locator": "Position and average velocity"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

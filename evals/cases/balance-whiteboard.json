@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "id": "balance-whiteboard",
+  "revision": 1,
+  "title": "方程两边平衡白板",
+  "domain": "mathematics",
+  "workflow": "artifact",
+  "learner": {
+    "background": "会整数运算，容易只在方程一边减数。",
+    "goal": "可逐步解释2x+3=11的等价变形。",
+    "misconceptions": [
+      "认为移项只是变号口诀，不需要两边执行相同运算。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "请用白板一步一步解释2x+3=11，突出每一步两边做了相同运算。我不理解为什么移项要变号。",
+    "artifact_kind": "whiteboard"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "equivalent-steps",
+      "dimension": "correctness",
+      "description": "每步等价变形、结果和两边运算准确。",
+      "critical": true
+    },
+    {
+      "id": "balance-representation",
+      "dimension": "pedagogy",
+      "description": "真实whiteboard步骤呈现平衡原理并回应移项误区，不仅展示答案；后端证据不证明前端播放效果。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "2x+3=11，两边减3得2x=8，两边除2得x=4。",
+      "等式两边施加同一个可逆运算保持解集；不能只改一边或无条件声称任何同运算都保持等价。",
+      "板书步骤和口头讲解必须相符。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax Elementary Algebra 2e",
+        "url": "https://openstax.org/books/elementary-algebra-2e/pages/2-1-solve-equations-using-the-subtraction-and-addition-properties-of-equality",
+        "locator": "Properties of equality"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

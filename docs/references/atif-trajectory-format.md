@@ -1,6 +1,6 @@
 # ATIF轨迹格式固定版本参考
 
-核对日期：2026-10-26。项目出口锁定ATIF-v1.7，现已用Pydantic实现本地文字子集导出／校验，并校验首份真实轨迹；没有安装Harbor、运行完整上游校验器、接入AgentLoop或上传轨迹。本文记录固定来源及适用边界，项目映射见[后端评测设计](../design-docs/backend-evaluation-pipeline.md)，真实证据见[实施计划](../exec-plans/active/20261026-lightweight-backend-eval.md)。
+核对日期：2026-10-26；状态更新：2026-10-29原评测框架与ATIF出口已退役。下文是当时实现和来源核验记录，不代表现行能力；现行[学习任务评测](../design-docs/backend-evaluation-pipeline.md)不导出ATIF，也不转换历史文件。当时锁定ATIF-v1.7，实现本地文字子集导出／校验并核对首份真实轨迹；未安装Harbor、运行完整上游校验器、接入AgentLoop或上传。原证据见[首切片计划](../exec-plans/completed/20261026-lightweight-backend-eval.md)。
 
 ## 固定来源
 
@@ -26,7 +26,7 @@ Harbor提交：`872da9479f4a2078142d22c49c9ffae0f09e2e63`。通过公开Git远�
 - schema允许的可选字段不代表采集系统能提供。缺失usage／推理／反馈不能补零或编造；校验器不替业务核查数据完整性和事实正确性。
 - 校验器接受多个版本，且以结构检查为主；本地媒体检查也不等于来源可访问、内容正确或安全。首轮不启用多模态，不引入媒体下载行为。
 
-采用ATIF不要求安装整个Harbor或复制其代码。当前[本地出口](../../src/hyperknow/eval_atif.py)使用已有Pydantic，独立定义严格文字子集，转换与校验版本均为1；不复制上游实现，不新增依赖。格式版本、规范提交、转换规则版本及本地校验器版本是四个不同标识，升级时都需留痕，不能仅修改schema_version字符串。
+采用ATIF不要求安装整个Harbor或复制其代码。当时本地出口 `src/hyperknow/eval_atif.py`（现已移除，可查Git历史）使用已有Pydantic，独立定义严格文字子集，转换与校验版本均为1；不复制上游实现，不新增依赖。格式版本、规范提交、转换规则版本及本地校验器版本是四个不同标识，升级时都需留痕，不能仅修改schema_version字符串。
 
 ## AgentLoop与Claude Code接入的区别
 

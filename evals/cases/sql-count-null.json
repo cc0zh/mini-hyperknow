@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "id": "sql-count-null",
+  "revision": 1,
+  "title": "SQL COUNT 与 NULL",
+  "domain": "databases",
+  "workflow": "assistance",
+  "learner": {
+    "background": "能写基本SELECT，认为NULL是普通字符串或零。",
+    "goal": "预测COUNT聚合的差异。",
+    "misconceptions": [
+      "认为COUNT(*)和COUNT(column)在含NULL时总相等。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "表 t 的 x 列有三行：1、NULL、1。SELECT COUNT(*), COUNT(x), COUNT(DISTINCT x) FROM t 各是多少？为什么不一样？",
+    "follow_ups": [
+      "如果把NULL写成字符串'NULL'存进去，COUNT(x)还会忽略它吗？"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "counts",
+      "dimension": "correctness",
+      "description": "三个计数及NULL/字符串区别准确，不把DISTINCT NULL计为一个非空值。",
+      "critical": true
+    },
+    {
+      "id": "row-and-value",
+      "dimension": "pedagogy",
+      "description": "区分行数、非空值数与不同非空值数，解释而不是只列数字。",
+      "critical": true
+    },
+    {
+      "id": "literal-null",
+      "dimension": "adaptation",
+      "description": "追问时澄清SQL NULL与文本字面值的区别，不将空值规则机械套到字符串。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "此表COUNT(*)=3、COUNT(x)=2、COUNT(DISTINCT x)=1。",
+      "COUNT(expression)统计表达式非NULL的行；DISTINCT在其中去重。",
+      "字符串NULL是非空SQL字符串，不是SQL NULL值；类型转换和列约束仍可能影响是否允许插入。"
+    ],
+    "sources": [
+      {
+        "title": "PostgreSQL aggregate functions",
+        "url": "https://www.postgresql.org/docs/current/functions-aggregate.html",
+        "locator": "count(*) and count(any)"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

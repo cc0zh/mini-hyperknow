@@ -12,8 +12,16 @@
 
 ## 当前资料
 
+- [DeepTutor论文内核核查](deeptutor-paper-kernel-check.md)：论文 §2／§3／§5.4／附录 B 与固定 main 源码的定向核对；补上「两路上下文装配」与「画像三路（含教学反思）」两处内核遗漏，纠正消融比较对象，区分论文事实、仓库事实与不可推出。
+
+- [DeepTutor产品内核调研](deeptutor-product-kernel-research.md)：中文文档及固定main／dev源码；区分能力证据、教学反馈、自主推进与复习，复核停轮／评分／模式的实现边界；对照当前反馈消费和追答断点，建议先验证可恢复的单课时教学回合，不构成实施授权。
+
+- [DeepTutor学习任务评测参考](deeptutor-learning-evaluation.md)：论文阅读范围、固定官方源码核验、知识缺口／多轮／答案隔离的采用与产品扩权的拒绝；RAG eval不能冒称TutorBench实现。
+
 - [设计文档组织方式参考](design-document-references.md)：用户指定的 ActSpace 文档阅读范围、借鉴方法和明确不继承的架构；Hyperknow 证据入口。
 - [白板字体参考](whiteboard-font.md)：Excalifont 英文／数字与小赖 Xiaolai 中文的分工、原始资源、OFL 1.1 许可证及当前验收边界。
 - [Agent／教学eval论文调研](agent-evaluation-research.md)：九篇论文的阅读范围与局限、DeepSeek Harness／Comet固定源码参考，以及面向当前项目的评测颗粒度、证据、校准和比较建议；尚未实施。
-- [ATIF轨迹固定版本](atif-trajectory-format.md)：ATIF-v1.7的固定Harbor来源、本地文字子集出口／校验及AgentLoop适配边界；首份真实轨迹已校验，未运行上游完整校验器或接入云端。
+- [ATIF轨迹固定版本](atif-trajectory-format.md)：历史ATIF-v1.7来源与当时出口边界；2026-10-29已退役，不是现行CLI能力。
 - [通用评测重构参考](evaluation-refactor-sources.md)：阿里云手册、美团文章及Penguin可检索正文片段的阅读范围、采用原则与不采用项；不是全文／源码审计或效果验证。
+
+- [业务、AI契约与评测可优化性审计](business-ai-eval-audit.md)：2026-10-26 静态审计，2026-10-30 从设计目录移入。保留重构前源码快照与当时建议，**不是当前业务地图或契约**；现行定位查[架构](../ARCHITECTURE.md#10-现行业务与改动影响入口)。

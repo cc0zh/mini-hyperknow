@@ -59,8 +59,10 @@ class ResearchLiveServerTests(unittest.TestCase):
             cls.process = subprocess.Popen(
                 [sys.executable, "-m", "uvicorn", "hyperknow.main:app", "--host", "127.0.0.1",
                  "--port", str(cls.port), "--log-level", "warning"],
-                # Never load the repository .env or the author's database.
-                cwd=root, env=env, stdout=subprocess.DEVNULL, stderr=cls.server_log)
+                # Explicit env disables dotenv and binds the temporary database.
+                # Do not make the directory being deleted the child's Windows
+                # cwd: teardown can briefly retain that directory handle.
+                cwd=repository, env=env, stdout=subprocess.DEVNULL, stderr=cls.server_log)
             deadline = time.monotonic() + 15
             while time.monotonic() < deadline:
                 if cls.process.poll() is not None:

@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "id": "tense-flashcards",
+  "revision": 1,
+  "title": "英语时态对比闪卡",
+  "domain": "language",
+  "workflow": "artifact",
+  "learner": {
+    "background": "知道一般过去时，容易把现在完成时与明确结束的过去时间搭配。",
+    "goal": "通过双向提示练习过去事件与当前联系的区别。",
+    "misconceptions": [
+      "认为现在完成时可以无条件与yesterday等明确过去时间状语搭配。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "请做6张英语闪卡，帮我区分一般过去时和现在完成时。每张有可练习的正面和可核对的背面，重点纠正“I have seen him yesterday”这类错误，而不是只列规则。",
+    "artifact_kind": "flashcards"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "tense-accuracy",
+      "dimension": "correctness",
+      "description": "例句和答案符合所教时态规则，正确处理指定错误句与时间状语。",
+      "critical": true
+    },
+    {
+      "id": "retrieval-cards",
+      "dimension": "pedagogy",
+      "description": "真实保存flashcards产物、正背面对应且可用于提取练习，不能以正文声称已做闪卡代替产物。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "在标准教学语境中，明确已结束过去时间如yesterday通常配一般过去时：I saw him yesterday。",
+      "现在完成时连接过去与当前，不应简化为“所有过去发生的事都用现在完成时”。",
+      "闪卡的正面应构成可回答的练习，背面答案应准确匹配；同一错误例不能同时被当正确范例。"
+    ],
+    "sources": [
+      {
+        "title": "British Council: present perfect",
+        "url": "https://learnenglish.britishcouncil.org/grammar/english-grammar-reference/present-perfect",
+        "locator": "Present perfect and finished past time"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

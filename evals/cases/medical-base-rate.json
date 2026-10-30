@@ -1,0 +1,66 @@
+{
+  "schema_version": 3,
+  "id": "medical-base-rate",
+  "revision": 1,
+  "title": "阳性结果与基础患病率",
+  "domain": "probability",
+  "workflow": "assistance",
+  "learner": {
+    "background": "知道百分比，不熟悉条件概率。",
+    "goal": "区分灵敏度与阳性后的患病概率。",
+    "misconceptions": [
+      "把99%的灵敏度直接当作阳性后的患病概率。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "假设某病患病率1%，检测灵敏度99%，假阳性率5%。我检测阳性，是不是99%有病？这些是假设数字，不是现实诊断。",
+    "follow_ups": [
+      "我还是不明白，99%准确为什么会有那么多健康人阳性？可以用一万人算吗？"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "posterior",
+      "dimension": "correctness",
+      "description": "条件概率方向和计数正确；后验约16.7%，不是99%；不把题设推为现实诊断。",
+      "critical": true
+    },
+    {
+      "id": "natural-frequencies",
+      "dimension": "pedagogy",
+      "description": "用自然频数清楚区分患病/健康及真阳性/假阳性，帮助学生理解基础率作用。",
+      "critical": true
+    },
+    {
+      "id": "persistent-confusion",
+      "dimension": "adaptation",
+      "description": "追问后真正解释为什么健康人数量大导致假阳性多，不仅机械重述贝叶斯公式。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "10000人中100患病，其中99真阳性；9900未患病，其中495假阳性。",
+      "阳性总计594，其中患病99，P(患病|阳性)=99/594=1/6，约16.7%。",
+      "灵敏度为P(阳性|患病)，并非P(患病|阳性)；题设是假设数据，不能据此给现实个体下诊断。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax Introductory Statistics",
+        "url": "https://openstax.org/books/introductory-statistics-2e/pages/3-3-two-basic-rules-of-probability",
+        "locator": "Conditional probability and multiplication rule"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

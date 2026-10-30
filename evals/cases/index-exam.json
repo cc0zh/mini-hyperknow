@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "id": "index-exam",
+  "revision": 1,
+  "title": "数据库索引单元考核",
+  "domain": "databases",
+  "workflow": "exam",
+  "learner": {
+    "background": "会SELECT与WHERE，容易认为有索引总是更快。",
+    "goal": "通过单元客观题检查索引适用性理解。",
+    "misconceptions": [
+      "认为每条查询都该强制用索引；不考虑选择性和写入成本。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "为当前真实单元生成索引基础考核，检查“有索引总是更快”的误区。",
+    "course_goal": "为掌握基础SQL查询的人设计约1小时数据库索引入门课程；解释B树索引、选择性、读写代价和优化器选择，不涉及数据库运维部署。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "index-tradeoffs",
+      "dimension": "correctness",
+      "description": "题干、答案和解析准确体现索引代价和适用条件，没有总是更快等绝对化错误。",
+      "critical": true
+    },
+    {
+      "id": "assessment-alignment",
+      "dimension": "pedagogy",
+      "description": "题目检查单元目标和典型误区，不能只靠术语记忆或陌生前置知识。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "索引可能加速部分查询，但维护占空间并增加写入开销。",
+      "优化器可能根据选择性、表大小和代价选择顺序扫描，不能说有索引总是更快。",
+      "考核可以依据真实单元大纲及已缓存讲义，不能要求不存在的学生作答来证明学习收益。"
+    ],
+    "sources": [
+      {
+        "title": "PostgreSQL indexes",
+        "url": "https://www.postgresql.org/docs/current/indexes-intro.html",
+        "locator": "11.1 Introduction to indexes"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

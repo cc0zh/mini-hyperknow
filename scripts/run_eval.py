@@ -1,6 +1,6 @@
-"""Single entry point for the unified evaluation CLI."""
+"""Learning-task evaluation CLI; all billable operations require --execute."""
 
-from hyperknow.eval_cli import main
+from hyperknow_eval.cli import main
 
 
 if __name__ == "__main__":

@@ -1,0 +1,67 @@
+{
+  "schema_version": 3,
+  "id": "chain-rule-transfer",
+  "revision": 1,
+  "title": "从漏掉内层导数到新函数迁移",
+  "domain": "mathematics",
+  "workflow": "assistance",
+  "learner": {
+    "background": "会幂函数求导，但尚不理解复合函数。",
+    "goal": "理解内层变化率为何必须相乘，并尝试迁移。",
+    "misconceptions": [
+      "把复合函数直接当作单个变量求导，漏乘内层变化率。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 3,
+    "clarification": "skip",
+    "opening": "我会求 x² 的导数。对 y=(3x+1)²，我写成 y′=2(3x+1)，为什么有人说少了东西？不要只背公式。",
+    "follow_ups": [
+      "里面虽然有3，但整体不是已经平方求导了吗？能用变化快慢解释为什么还乘3吗？",
+      "那 y=(x²+1)³ 怎么处理？请说明哪个是内层、哪个是外层。"
+    ]
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "derivatives",
+      "dimension": "correctness",
+      "description": "所有出现的链式法则计算正确，尤其两个指定函数；不得漏内层导数或把幂指数重复相乘。",
+      "critical": true
+    },
+    {
+      "id": "rate-explanation",
+      "dimension": "pedagogy",
+      "description": "将乘法与复合变化率联系起来，区分内外层，而非只重复公式或无关比喻。",
+      "critical": true
+    },
+    {
+      "id": "respond-and-transfer",
+      "dimension": "adaptation",
+      "description": "后续回答针对“已平方为何还乘3”的困惑作出解释，并正确迁移到内层不为线性函数的新题。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "复合函数 f(g(x)) 的导数为 f′(g(x))g′(x)。",
+      "(3x+1)² 的导数为 6(3x+1)。",
+      "(x²+1)³ 的导数为 6x(x²+1)²。"
+    ],
+    "sources": [
+      {
+        "title": "OpenStax Calculus Volume 1",
+        "url": "https://openstax.org/books/calculus-volume-1/pages/3-6-the-chain-rule",
+        "locator": "3.6 The Chain Rule"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}

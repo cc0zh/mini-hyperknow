@@ -260,6 +260,18 @@ test('document checker catches broken local links and anchors without parsing co
   });
 });
 
+test('document checks do not traverse private runtime directories or follow their links', (t) => {
+  const dir = docsFixture(t);
+  write(dir, 'AGENTS.md', '# Entry\n\ndocs/ is the repository knowledge source.\n');
+  for (const directory of ['data', 'eval_result']) {
+    write(dir, `${directory}/private.md`, '[Invalid](do-not-follow.md)\n');
+    assert.equal(filesIn(dir).some((file) => file.includes(`${path.sep}${directory}${path.sep}`)), false);
+  }
+  assert.doesNotThrow(() => checkDocs(dir));
+  write(dir, 'AGENTS.md', '# Entry\n\ndocs/ is the repository knowledge source.\n[Private](eval_result/absent.md#private)\n');
+  assert.throws(() => checkDocs(dir), /私有运行工件请使用代码路径/);
+});
+
 test('document checker accepts external links and same-document anchors', (t) => {
   const dir = docsFixture(t);
   write(dir, 'AGENTS.md', [
@@ -343,7 +355,11 @@ test('real CLI, generated template and extracted release work outside the source
   checkActions(extracted);
   assert.ok(fs.existsSync(path.join(extracted, 'tests/tooling.test.cjs')));
   assert.ok(fs.existsSync(path.join(extracted, 'evals/README.md')));
-  assert.ok(fs.existsSync(path.join(extracted, 'evals/concept-explanation/case.json')));
+  assert.ok(fs.existsSync(path.join(extracted, 'evals/suite.json')));
+  assert.ok(fs.existsSync(path.join(extracted, 'evals/cases/chain-rule-transfer.json')));
+  assert.ok(fs.existsSync(path.join(extracted, 'src/hyperknow_eval/cli.py')));
+  assert.equal(fs.existsSync(path.join(extracted, 'src/eval_core/__init__.py')), false);
+  assert.equal(fs.existsSync(path.join(extracted, 'src/eval_core/contracts.py')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'data/evals')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'public')), false);
   assert.equal(fs.existsSync(path.join(extracted, 'docs/nono-profiles')), false);

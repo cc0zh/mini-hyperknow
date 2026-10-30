@@ -1,0 +1,57 @@
+{
+  "schema_version": 3,
+  "id": "recursive-classroom-question",
+  "revision": 1,
+  "title": "课堂问答：基例后上一层继续",
+  "domain": "programming",
+  "workflow": "question",
+  "learner": {
+    "background": "正在学习Python递归，尚不理解返回后的控制流。",
+    "goal": "结合真实已展示讲义消除return终止整条链的误区。",
+    "misconceptions": [
+      "认为一个return结束所有递归层。"
+    ]
+  },
+  "task": {
+    "mode": "scripted",
+    "max_turns": 1,
+    "clarification": "skip",
+    "opening": "一般递归中，最深一层return之后，为什么调用它的上一层还能继续运行后面的语句？不要假设讲义里有没展示过的print代码。",
+    "course_goal": "为会Python函数和if的人设计约1小时递归入门课程，重点是小规模调用栈、基例和返回值，不讲动态规划。"
+  },
+  "budget": {
+    "timeout_seconds": 1800,
+    "max_actions": 100,
+    "max_observed_calls": 80
+  },
+  "rubric": [
+    {
+      "id": "return-control",
+      "dimension": "correctness",
+      "description": "控制流解释和所有示例准确，不将基例return解释为清空整条调用链。",
+      "critical": true
+    },
+    {
+      "id": "actual-context",
+      "dimension": "pedagogy",
+      "description": "直接回应当前困惑，区分已展示讲义与新增例子，不虚构学生看过的内容。",
+      "critical": true
+    }
+  ],
+  "reference": {
+    "facts": [
+      "return结束当前调用而非全部调用者，返回值回到调用位置，调用者继续执行。",
+      "课堂回答只能把真实已展示讲义内容作为已知上下文；新例子可以引入，但不能冒称已在板上展示。"
+    ],
+    "sources": [
+      {
+        "title": "Python tutorial: functions",
+        "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+        "locator": "return and per-call local symbol tables"
+      }
+    ],
+    "review_status": "author_reviewed",
+    "reviewer": "repository-assistant; independent human review pending"
+  },
+  "provenance": "Authored for this rewrite from cited primary/educational references; development task, not a held-out or human-validated learner outcome."
+}
