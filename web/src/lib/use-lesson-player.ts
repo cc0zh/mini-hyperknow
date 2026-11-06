@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { ApiError, describeError, isInputRejection, request } from './api'
-import { acknowledgeInteraction, activeInteraction, heldInteraction, interactionIdentity, lessonCommand, lessonStorageKey, nextCursor, PlaybackClock, readingDelay, resumeIntent } from './lesson-state'
-import type { LessonCommand } from './lesson-state'
+import { acknowledgeInteraction, activeInteraction, heldInteraction, interactionIdentity, lessonCommand, lessonStorageKey, nextCursor, PlaybackClock, readingDelay, resumeIntent, summaryIsShown } from './lesson-state'
+import type { LessonCommand, QuestionAnchor } from './lesson-state'
+import { isBoardScriptV2 } from './board-protocol'
 import type { Interaction, LessonSnapshot, PlayIntent, Run } from './types'
 import type { useLesson } from './use-lesson'
 
@@ -48,7 +49,7 @@ export function useLessonPlayer(sessionId: string, lesson: ReturnType<typeof use
   }
   function progress(intent: PlayIntent, cursor?: number): StoredCommand | null {
     const current = lesson.current.current
-    if (!current?.script) return null
+    if (!isBoardScriptV2(current?.script)) return null
     return make(`/sessions/${encodeURIComponent(sessionId)}/progress`, {
       expected_version: current.progress.version, script_id: current.script.script_id,
       cursor: cursor ?? current.progress.cursor, play_intent: intent,
@@ -110,16 +111,24 @@ export function useLessonPlayer(sessionId: string, lesson: ReturnType<typeof use
   async function advance() {
     clock.cancel()
     const current = lesson.current.current
-    if (!current?.script || pendingRef.current || holdRef.current || !navigator.onLine) return
+    if (!isBoardScriptV2(current?.script) || pendingRef.current || holdRef.current || !navigator.onLine) return
     const cursor = nextCursor(current.progress.cursor, current.script.steps.length)
     if (cursor === null) { stop(); return }
-    const command = progress(clock.playing ? 'playing' : 'paused', cursor)
-    if (command) await execute(command, clock.playing)
+    const shouldPlay = clock.playing && current.script.steps[cursor].stage !== 'check'
+    if (current.script.steps[cursor].stage === 'check') stop()
+    const command = progress(shouldPlay ? 'playing' : 'paused', cursor)
+    if (command) await execute(command, shouldPlay)
   }
   async function play() {
-    if (pendingRef.current || holdRef.current) return
-    const command = progress('playing')
-    if (command) await execute(command, true)
+    if (pendingRef.current || holdRef.current || !navigator.onLine) return
+    const current = lesson.current.current
+    if (!isBoardScriptV2(current?.script)) return
+    const cursor = current.progress.cursor < 0 || current.script.steps[current.progress.cursor]?.stage === 'check'
+      ? nextCursor(current.progress.cursor, current.script.steps.length) : current.progress.cursor
+    if (cursor === null) return
+    const shouldPlay = current.script.steps[cursor].stage !== 'check'
+    const command = progress(shouldPlay ? 'playing' : 'paused', cursor)
+    if (command) await execute(command, shouldPlay)
   }
   async function pause() {
     stop()
@@ -127,13 +136,13 @@ export function useLessonPlayer(sessionId: string, lesson: ReturnType<typeof use
     const command = progress('paused')
     if (command) await execute(command)
   }
-  async function ask(question: string) {
+  async function ask(question: string, anchor: QuestionAnchor = {}) {
     if (pendingRef.current || holdRef.current || question.trim().length < 2 || question.trim().length > 2000) return false
     const wasPlaying = clock.playing
     stop()
     const command = progress('paused')
     if (!command) return false
-    command.question_after_pause = { question: question.trim(), was_playing: wasPlaying }
+    command.question_after_pause = { question: question.trim(), was_playing: wasPlaying, ...anchor }
     return execute(command)
   }
   async function continueLesson() {
@@ -176,24 +185,31 @@ export function useLessonPlayer(sessionId: string, lesson: ReturnType<typeof use
   const scriptId = snapshot?.script?.script_id
   const narration = snapshot?.script?.steps[cursor]?.narration ?? ''
   const final = !!snapshot?.script && cursor === snapshot.script.steps.length - 1
+  const check = snapshot?.script?.steps[cursor]?.stage === 'check'
   useEffect(() => {
-    if (playing && !busy && !pending && !hold && online && !final) clock.schedule(readingDelay(narration), () => { void advance() })
+    if (playing && !busy && !pending && !hold && online && !final && !check) clock.schedule(readingDelay(narration), () => { void advance() })
     return () => clock.cancel()
     // Rendering diagrams/fonts and polling an unchanged snapshot never reset or
     // advance this clock. Only confirmed teaching state controls it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clock, playing, busy, pending, hold?.interaction_id, hold?.run_id, online, final, cursor, scriptId, narration])
-  useEffect(() => { if (final || hold || lesson.error) stop() }, [final, hold?.interaction_id, hold?.run_id, lesson.error])
+  }, [clock, playing, busy, pending, hold?.interaction_id, hold?.run_id, online, final, check, cursor, scriptId, narration])
+  useEffect(() => { if (final || check || hold || lesson.error) stop() }, [final, check, hold?.interaction_id, hold?.run_id, lesson.error])
 
   return {
-    playing, busy, pending, error, rejected, hold, online, advance, play, pause, ask, continueLesson, runAction,
+    playing, busy, pending, error, rejected, hold, online, advance, play, pause, pauseLocal: stop, ask, continueLesson, runAction,
     retry: () => execute(),
     releaseRejected: () => { if (rejected && !busy) { persistPending(null); setRejected(false); setError(null) } },
     prepare: () => { if (!pendingRef.current) return execute(make(`/sessions/${encodeURIComponent(sessionId)}/prepare`, {})); return Promise.resolve(false) },
+    regenerate: () => {
+      stop()
+      const current = lesson.current.current
+      if (!current || pendingRef.current || holdRef.current) return Promise.resolve(false)
+      return execute(make(`/sessions/${encodeURIComponent(sessionId)}/regenerate`, { expected_version: current.progress.version }))
+    },
     complete: () => {
       stop()
       const current = lesson.current.current
-      if (!current?.script || pendingRef.current) return Promise.resolve(false)
+      if (!isBoardScriptV2(current?.script) || !summaryIsShown(current.script, current.progress.cursor) || pendingRef.current || holdRef.current) return Promise.resolve(false)
       return execute(make(`/sessions/${encodeURIComponent(sessionId)}/complete`, { expected_version: current.progress.version, script_id: current.script.script_id }))
     },
   }

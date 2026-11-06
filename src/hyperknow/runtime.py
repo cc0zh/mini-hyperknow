@@ -116,6 +116,13 @@ class CourseService:
         await self.notify_lesson(snapshot)
         return snapshot
 
+    async def regenerate(self, session_id: str, data: dict):
+        snapshot = self.db.regenerate_lesson(session_id, data, self.settings.model, bool(self.settings.api_key))
+        if snapshot["generation_run"]:
+            self.enqueue(snapshot["generation_run"])
+        await self.notify_lesson(snapshot)
+        return snapshot
+
     async def delete_course(self, course_id: str, data: dict):
         result = self.db.delete_course(course_id, data)
         await self.hub.resource_changed("course", course_id, data["expected_version"] + 1, "deleted")

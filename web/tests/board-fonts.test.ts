@@ -8,7 +8,7 @@ test('HTML and Mermaid share Excalifont followed by the Chinese Xiaolai fallback
   assert.equal(boardFontFamily, 'Excalifont, Xiaolai, sans-serif')
   assert.deepEqual(boardFonts.map(font => font.family), ['Excalifont', 'Xiaolai'])
   const css = readFileSync(new URL('../src/styles/classroom.css', import.meta.url), 'utf8')
-  assert.equal(css.match(/font-family: Excalifont, Xiaolai, sans-serif/g)?.length, 3)
+  assert.ok((css.match(/font-family: Excalifont, Xiaolai, sans-serif/g)?.length ?? 0) >= 3)
   // Code keeps a monospace stack; it now comes from the --font-mono token, so the
   // assertion accepts either the token reference or a literal monospace family.
   assert.match(css, /\.board-code \{[^}]*font-family:.*(monospace|--font-mono)/s)

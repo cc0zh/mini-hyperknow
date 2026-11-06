@@ -47,12 +47,13 @@
 | `GET /api/courses` | 课程列表及一致的进度摘要 |
 | `GET /api/courses/{course_id}` | 完整目录、完成情况、课时比例和 next_item |
 | `POST /api/courses/{course_id}/delete` | client_command_id、expected_version（课程 version）；200 返回 `{course_id, deleted:true}`。事务内检查版本并删除课程及其课堂、练习、作答、运行与调研证据；关联任务 queued／clarifying／generating／awaiting_answers／awaiting_blueprint 时返回 409 course_active，需先停止相关任务。未知课程 404；同命令／输入重试在删除后仍返回成功，异输入 409 |
-| `GET /api/sessions/{session_id}` | LessonSnapshot：课时元数据、完整脚本、progress、interactions、generation_run、completed 及顶层 version；不触发模型 |
+| `GET /api/sessions/{session_id}` | LessonSnapshot：课时元数据、新协议script、progress、interactions、generation_run、completed、format_error及顶层version；旧格式不解析，script=null并返回明确format_error；不触发模型 |
 | `POST /api/sessions/{session_id}/prepare` | 200；无讲义及历史生成记录时建立 lesson run，已有脚本／记录复用；失败等状态由显式 run retry 处理 |
+| `POST /api/sessions/{session_id}/regenerate` | 202；client_command_id、expected_version取progress.version；用户显式授权新生成。旧原始脚本保存在run证据，成功前不替换，不做旧格式转换或自动收费；并发／未知结果继续遵循幂等与版本契约 |
 | `GET /api/sessions/{session_id}/lesson` | 与课时 GET 相同的已保存快照，不另造暂停版本 |
 | `PUT /api/sessions/{session_id}/progress` | 200；检查 progress.version、script_id、cursor 与 play_intent，只允许保持或前进一步，不允许倒退／跳步；问答 pending 时拒绝 |
-| `POST /api/sessions/{session_id}/questions` | 202；cursor 必须等于确认位置，问题 2–2000 字；保存锚点、was_playing、pending Interaction、question run 并暂停，回答稍后提交 |
-| `POST /api/sessions/{session_id}/complete` | 200；已有关联讲义时手动完成，activity_progress、课程版本及课堂暂停同事务提交；不以播放到末步自动完成 |
+| `POST /api/sessions/{session_id}/questions` | 202；cursor必须等于教学确认位置，问题2–2000字；可选anchor_step_id／anchor_object_id仅指向已确认前缀，保存查看锚点、was_playing、pending Interaction及question run并暂停；也承载check回答的模型反馈 |
+| `POST /api/sessions/{session_id}/complete` | 200；仅最终summary已确认后允许手动完成，否则409 lesson_incomplete；完成事实、课程版本及暂停同事务提交，播完不自动完成，不代表掌握 |
 
 ### 练习与考核端点
 

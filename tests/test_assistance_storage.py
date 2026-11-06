@@ -22,9 +22,9 @@ def response_result(*artifacts):
 def board_draft():
     return {"kind": "whiteboard", "title": "分步推导", "data": {"steps": [
         {"title": "起点", "narration": "先看已知条件", "page": 1, "column": 1,
-         "operations": [{"kind": "text", "content": "已知 x=2", "items": [], "language": ""}]},
+         "operations": [{"object_id": "given", "kind": "text", "content": "已知 x=2", "items": [], "language": ""}]},
         {"title": "下一步", "narration": "再代入表达式", "page": 1, "column": 1,
-         "operations": [{"kind": "formula", "content": "x+1=3", "items": [], "language": ""}]},
+         "operations": [{"object_id": "substitution", "kind": "formula", "content": "x+1=3", "items": [], "language": ""}]},
     ]}}
 
 

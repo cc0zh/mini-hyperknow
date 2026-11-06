@@ -6,6 +6,8 @@
 
 ## 当前能力与边界
 
+2026-11-05课堂重建为完整单课教学：本课路线图、逐个要点解释与例子、理解检查和回扣总结；点阵白板为主要视觉，右侧文字补充原因／情境，支持稳定图形对象、两栏累计板书、局部强调、同步图文回看及插问回课。仅使用新课堂协议，不兼容旧讲义；旧格式明确提示，须显式重新生成，不自动转换、不清空数据库、不因刷新收费。最终总结展示后才允许手动结课，提前离开保留位置，不认定掌握；理解检查回答和模型反馈通过真实问答保存。概念、流程和代码真实生成、浏览器及内容核查边界见[课堂重构计划](docs/exec-plans/completed/20261105-complete-classroom.md)。
+
 2026-10-23新增[调研→全局蓝图确认→逐单元展开](docs/exec-plans/completed/20261023-course-blueprint-workflow.md)，已用一个真实asyncio主题验通调整、确认、局部取消／重试及等待／完成状态冷重启；不要求旧课兼容，不清空用户库。内容核查限制见完成计划，不据此宣称完整产品验收。
 
 已实现文字目标、真实模型澄清／目录生成、SQLite 课程库及运行恢复，以及按课时生成并缓存讲义、无语音手写白板、课堂插话、位置恢复和手动完成。真实练习／单元考核本阶段范围已完成：三题型出题、逐题保存与反馈、显式提交、服务端计分、结果停留／再练及恢复。页面使用真实 API，课程、讲义、问答与出题共用一个串行 worker；证据与未覆盖项见[完成计划](docs/exec-plans/completed/20261022-real-practice-exams.md)，最终CI门禁待主代理填写。
@@ -63,6 +65,18 @@ npm.cmd run build
 ```powershell
 uv run --frozen python scripts/verify_model.py
 ```
+
+完整课堂可从一门**已真实生成**的课程中选择概念／流程／公式或代码课时，在独立目录执行真实模型、HTTP、逐步确认与冷重启检查：
+
+```powershell
+uv run --frozen python scripts/verify_classroom.py --execute --course-id <实际课程ID> --session-id <实际课时ID> --data-dir data/validation/classroom-check --keep-first-unplayed
+```
+
+可重复传入 `--session-id`；`--source-db`可指定只读来源，默认使用本地配置的数据库。脚本只复制选中真实课程与创建记录，不复制旧讲义，不改源库，自启并停止自己拥有的临时后端。默认8046端口必须空闲；结果与原始调用保存在隔离目录，已有证据需显式 `--resume`，不重发未知请求。首课可保留未播放供浏览器验收。该命令不代替内容人工核查、浏览器操作或课程规划验收。
+
+课堂浏览器验收连接同一隔离库的真实前后端，设置`HYPERKNOW_CLASSROOM_EVIDENCE`为上述证据JSON，再运行`npm.cmd --prefix web run test:browser -- classroom.spec.ts`。还可设置`HYPERKNOW_WEB_PORT`及Vite代理的`HYPERKNOW_API_ORIGIN`。测试在写入前核对每课script_id；无证据就skip，不伪通过。`HYPERKNOW_CLASSROOM_ALLOW_MODEL=1`才允许创建真实插问与检查反馈（可能收费）；不设置时只执行不新增回答的场景。使用新生成的样本时要保留原证据，不将历史失败改成成功。
+
+课堂先一次生成完整单课，播放时逐步展开，并非每点“下一步”都调用模型。每步板书按编号紧凑排布、默认整步入镜；点选可放大，“本步全览”恢复所看步骤，“回到当前讲解”返回教学位置。新版教师式讲解只作用于新讲义；旧缓存保持原文，可在同步讲解底部“讲义生成说明与更新”二次确认后显式重新生成（可能收费，成功后从头播放）。
 
 即时协助有独立的付费验收入口：先将`HK_DATA_DIR`设为独立验收目录并在8037端口启动后端，再运行`uv run --frozen python scripts/verify_assistance.py --execute`。它验证独立教学、多轮继续和五种真实产物（含结构图），不要求加载Skill，产物断言使用自然语言而不是操作枚举，不接入搜索；可加`--resume`读取上次保存的run ID，重启验收脚本不重复创建已有轮次。证据默认写入忽略的`data/verification/instant-assistance/`；这不是普通CI命令。
 

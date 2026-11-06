@@ -9,11 +9,11 @@ import type { BoardScript, BoardStep, Interaction, LessonSnapshot } from '../src
 const snapshot = (version: number, progressVersion = 2): LessonSnapshot => ({
   version, course_id: 'state-only', course_title: '', unit_title: '', lecture_title: '',
   session: { session_id: 'cursor-state', title: '', description: '', outline: '', key_points: [], estimated_minutes: 0 },
-  script: null, progress: { script_id: null, cursor: -1, play_intent: 'paused', version: progressVersion, updated_at: '' },
+  script: null, format_error: null, progress: { script_id: null, cursor: -1, play_intent: 'paused', version: progressVersion, updated_at: '' },
   interactions: [], generation_run: null, completed: false,
 })
-const step = (id: string, page: number, column: 1 | 2): BoardStep => ({ step_id: id, title: '', narration: '', page, column, operations: [{ kind: 'text', content: '', items: [], language: '' }] })
-const script: BoardScript = { script_id: 'prefix-state', session_id: 'cursor-state', course_id: 'state-only', content_version: 1, schema_version: 1, title: '', created_at: '', steps: [step('a', 1, 1), step('b', 1, 2), step('c', 2, 1), step('d', 1, 1)] }
+const step = (id: string, page: number, column: 1 | 2): BoardStep => ({ step_id: id, stage: 'explain', keypoint_id: null, focus_ids: [], check: null, title: '', narration: '', page, column, operations: [{ object_id: id + '-text', target_ids: [], kind: 'text', content: '', items: [], language: '', columns: [], rows: [], nodes: [], edges: [] }] })
+const script: BoardScript = { script_id: 'prefix-state', session_id: 'cursor-state', course_id: 'state-only', content_version: 1, schema_version: 2, title: '', objectives: [], roadmap: [], created_at: '', steps: [step('a', 1, 1), step('b', 1, 2), step('c', 2, 1), step('d', 1, 1)] }
 
 test('reload starts paused even when saved backend intent was playing', () => {
   const clock = new PlaybackClock()
@@ -143,7 +143,7 @@ test('session version guards the whole snapshot even at equal progress version',
 test('newer session facts cannot be suppressed just because progress did not change', () => {
   const before = snapshot(10, 4)
   const after = snapshot(11, 4)
-  const interaction: Interaction = { interaction_id: 'answer-state', run_id: 'run-state', script_id: 'prefix-state', step_id: 'a', cursor: 0, question: '', answer: '', was_playing: false, status: 'ready', error: null, created_at: '' }
+  const interaction: Interaction = { interaction_id: 'answer-state', run_id: 'run-state', script_id: 'prefix-state', step_id: 'a', anchor_step_id: null, anchor_object_id: null, cursor: 0, question: '', answer: '', was_playing: false, status: 'ready', error: null, created_at: '' }
   after.interactions = [interaction]
   assert.deepEqual(mergeLesson(before, after).interactions, [interaction])
   assert.deepEqual(mergeLesson(after, before).interactions, [interaction])
@@ -161,7 +161,7 @@ test('unknown write results retry the same method body cursor version and ID', (
   assert.equal(lessonCommand(null, changed), changed)
 })
 
-const interaction = (id: string, runId: string, status: Interaction['status'] = 'ready'): Interaction => ({ interaction_id: id, run_id: runId, script_id: 'prefix-state', step_id: 'a', cursor: 0, question: '', answer: null, was_playing: true, status, error: null, created_at: '' })
+const interaction = (id: string, runId: string, status: Interaction['status'] = 'ready'): Interaction => ({ interaction_id: id, run_id: runId, script_id: 'prefix-state', step_id: 'a', anchor_step_id: null, anchor_object_id: null, cursor: 0, question: '', answer: null, was_playing: true, status, error: null, created_at: '' })
 
 test('retrying an earlier interaction locks playback even when it is not last', () => {
   const earlier = interaction('earlier', 'retry-run', 'pending')

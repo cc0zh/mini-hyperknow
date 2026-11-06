@@ -100,3 +100,156 @@
 @media (max-width: 1250px) { .classroom-layout { grid-template-columns: minmax(0, 1fr) 260px; gap: 17px; } .board-paper { padding: 25px 23px; } }
 @media (max-width: 1050px) { .classroom-layout { grid-template-columns: 1fr; } .classroom-aside { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; } .interaction-history { margin-top: 0; } }
 @media (max-width: 700px) { .classroom-aside { grid-template-columns: 1fr; } .classroom-ticket { display: none; } .classroom-top .connection-label { margin-left: 0; } .board-paper { min-height: 350px; padding: 20px; } .board-paper h2 { font-size: 26px; } }
+
+/* The dedicated classroom is a canvas, not the public shell or a dashboard.
+   All chrome occupies its own grid/flex track; nothing floats over the ink. */
+.classroom-screen { --classroom-paper: #fffefa; --classroom-ink: #222126; --classroom-purple: #6545a4; --classroom-line: #e0ded8; --classroom-muted: #625d68; --classroom-highlight: #fff0a3; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: var(--classroom-paper); color: var(--classroom-ink); color-scheme: light; }
+.classroom-loading { padding: 32px; min-height: 100dvh; background: var(--surface); }
+.classroom-header { min-height: 72px; flex-shrink: 0; padding: 10px 24px; border-bottom: 1px solid var(--classroom-line); display: flex; align-items: center; gap: 24px; }
+.classroom-exit { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; color: var(--classroom-muted); font-size: 14px; text-decoration: none; }
+.classroom-identity { flex: 1; min-width: 0; }
+.classroom-identity > span { font-size: 12px; color: var(--classroom-muted); }
+.classroom-identity h1 { font-size: 19px; line-height: 1.5; font-weight: 600; margin: 1px 0 0; overflow-wrap: anywhere; }
+.classroom-progress-label { font-size: 12px; color: var(--classroom-muted); }
+.classroom-toggle { border: 1px solid var(--classroom-line); border-radius: 5px; background: transparent; color: var(--classroom-ink); padding: 9px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+.classroom-screen button:focus-visible, .classroom-screen a:focus-visible, .scene-board :focus-visible { outline: 3px solid #7857b3; outline-offset: 3px; }
+.classroom-screen .button.primary { background: var(--classroom-purple); color: #fff; border-color: var(--classroom-purple); }
+.classroom-screen .button.secondary { color: var(--classroom-ink); background: var(--classroom-paper); border-color: var(--classroom-line); }
+.classroom-screen button:disabled { opacity: .45; cursor: not-allowed; }
+.classroom-roadmap { flex-shrink: 0; border-bottom: 1px solid var(--classroom-line); padding: 0 24px; max-height: 34dvh; overflow: auto; }
+.classroom-roadmap > summary { cursor: pointer; padding: 12px 0; color: var(--classroom-purple); font-size: 13px; font-weight: 600; }
+.classroom-roadmap > summary > span { font-size: 12px; font-weight: 400; color: var(--classroom-muted); margin-left: 14px; }
+.roadmap-content { display: flex; align-items: flex-start; gap: 32px; padding: 0 0 20px; }
+.classroom-objectives { flex: 0 0 28%; padding-left: 20px; margin: 4px 0; font-size: 14px; line-height: 1.8; }
+.roadmap-content nav { display: flex; flex-wrap: wrap; gap: 12px; flex: 1; }
+.roadmap-content nav button { display: grid; grid-template-columns: 28px 1fr; gap: 5px 8px; text-align: left; background: transparent; border: 0; border-left: 2px solid var(--classroom-line); padding: 8px 12px; color: var(--classroom-ink); cursor: pointer; max-width: 300px; }
+.roadmap-content nav button[aria-current] { border-color: var(--classroom-purple); }
+.roadmap-content nav button span { grid-row: span 2; color: var(--classroom-purple); font-family: var(--font-mono); font-size: 12px; }
+.roadmap-content nav button b { font-size: 14px; font-weight: 500; }
+.roadmap-content nav button small { font-size: 12px; color: var(--classroom-muted); line-height: 1.6; }
+.classroom-notices { flex-shrink: 0; max-height: 22dvh; overflow: auto; }
+.classroom-alert { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 0; border: 0; border-bottom: 1px solid #ded1a8; border-radius: 0; background: #fff9e6; color: #665028; padding: 8px 24px; font-size: 12px; line-height: 1.7; }
+.classroom-alert.error { background: #fff1ed; color: #863c2b; }
+.classroom-alert button { background: transparent; border: 0; text-decoration: underline; color: inherit; cursor: pointer; flex-shrink: 0; padding: 5px; font: inherit; }
+.classroom-workspace { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 25vw, 400px); flex: 1; min-height: 0; }
+.aside-collapsed .classroom-workspace { grid-template-columns: minmax(0, 1fr); }
+.classroom-canvas { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.classroom-sidebar { display: flex; min-height: 0; flex-direction: column; border-left: 1px solid var(--classroom-line); background: #faf9f6; }
+.classroom-sidebar-tabs { display: flex; min-height: 48px; border-bottom: 1px solid var(--classroom-line); padding: 0 16px; gap: 16px; flex-shrink: 0; }
+.classroom-sidebar-tabs button { padding: 12px 0 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-size: 13px; cursor: pointer; color: var(--classroom-muted); }
+.classroom-sidebar-tabs button[aria-pressed="true"] { color: var(--classroom-purple); border-bottom-color: var(--classroom-purple); }
+.classroom-sidebar-scroll { padding: 28px 24px; overflow: auto; flex: 1; min-height: 0; scrollbar-gutter: stable; }
+.classroom-stage { color: var(--classroom-purple); font-size: 12px; letter-spacing: .05em; }
+.classroom-sidebar h2 { font-size: 20px; line-height: 1.6; margin: 12px 0 20px; font-weight: 600; overflow-wrap: anywhere; }
+.classroom-prose { white-space: pre-wrap; font-size: 15px; line-height: 1.95; overflow-wrap: anywhere; color: #38343e; }
+.classroom-prose a { color: var(--classroom-purple); text-decoration: underline; }
+.classroom-check { margin-top: 28px; border-top: 2px solid #d9ccea; padding-top: 20px; }
+.classroom-check h3, .confirmed-history h3 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+.classroom-check p, .classroom-question p { font-size: 14px; line-height: 1.85; color: var(--classroom-muted); overflow-wrap: anywhere; white-space: pre-wrap; }
+.classroom-question h2 { margin-bottom: 12px; }
+.classroom-screen form { display: grid; gap: 10px; }
+.classroom-screen form label { font-size: 13px; font-weight: 500; }
+.classroom-screen textarea { font: inherit; font-size: 15px; line-height: 1.8; color: var(--classroom-ink); border: 1px solid #c9c4cf; background: var(--classroom-paper); border-radius: 5px; width: 100%; min-height: 140px; resize: vertical; padding: 12px; }
+.classroom-screen textarea:focus-visible { outline: 3px solid #c2aade; outline-offset: 2px; }
+.classroom-screen form small, .classroom-helper { color: var(--classroom-muted); font-size: 12px; line-height: 1.8; }
+.classroom-screen .text-button { color: var(--classroom-purple); }
+.classroom-check details { margin-top: 18px; font-size: 13px; }
+.classroom-check details summary { padding: 9px 0; cursor: pointer; color: var(--classroom-purple); }
+.classroom-check details .classroom-prose { font-size: 14px; padding-top: 12px; }
+.confirmed-history { margin-top: 40px; border-top: 1px solid var(--classroom-line); padding-top: 20px; }
+.confirmed-history > button { display: flex; align-items: baseline; gap: 10px; text-align: left; width: 100%; padding: 10px 4px; border: 0; background: transparent; color: var(--classroom-muted); font-size: 13px; line-height: 1.6; cursor: pointer; }
+.confirmed-history > button span { font-family: var(--font-mono); font-size: 11px; }
+.confirmed-history > button[aria-current] { color: var(--classroom-purple); font-weight: 600; }
+.classroom-interaction { border-bottom: 1px solid var(--classroom-line); padding: 0 0 24px; margin-bottom: 24px; }
+.classroom-interaction > div:first-child { display: flex; gap: 10px; align-items: center; justify-content: space-between; font-size: 12px; color: var(--classroom-muted); }
+.classroom-interaction > div:first-child button { background: transparent; border: 0; color: var(--classroom-purple); text-decoration: underline; font: inherit; cursor: pointer; padding: 6px 0; }
+.classroom-interaction h3 { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.8; font-weight: 600; }
+.classroom-interaction .classroom-prose { font-size: 14px; }
+.classroom-interaction > p { color: #863c2b; font-size: 13px; }
+.classroom-hold { flex-shrink: 0; padding: 16px 24px; background: #f0eaf7; border-top: 1px solid #d9ccea; }
+.classroom-hold b { font-size: 13px; color: var(--classroom-purple); }
+.classroom-hold p { margin: 6px 0 12px; font-size: 12px; line-height: 1.6; }
+.classroom-hold .button { width: 100%; }
+.classroom-player { min-height: 84px; flex-shrink: 0; display: flex; align-items: center; gap: 24px; justify-content: space-between; border-top: 1px solid var(--classroom-line); padding: 12px 24px; background: var(--classroom-paper); }
+.classroom-play-state { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.classroom-play-state b { font-size: 14px; font-weight: 600; }
+.classroom-play-state span, .classroom-play-state small { font-size: 12px; color: var(--classroom-muted); }
+.classroom-play-state small { flex-basis: 100%; }
+.classroom-play-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+.classroom-practice { color: var(--classroom-purple); font-size: 13px; padding: 10px; text-decoration: underline; text-underline-offset: 4px; }
+.classroom-unprepared { flex: 1; min-height: 0; overflow: auto; padding: 48px clamp(32px, 6vw, 90px); background-image: radial-gradient(#c9c4ce88 .7px, transparent .7px); background-size: 22px 22px; }
+.unprepared-heading > span { font-size: 12px; color: var(--classroom-muted); letter-spacing: .1em; }
+.unprepared-heading h2 { font-family: Excalifont, Xiaolai, sans-serif; color: var(--classroom-purple); font-size: 32px; font-weight: 500; margin: 20px 0; }
+.unprepared-heading p { font-size: 16px; color: var(--classroom-muted); line-height: 1.8; }
+.classroom-unprepared .empty-state { margin-top: 48px; border: 0; background: transparent; padding: 24px 0; text-align: left; }
+.classroom-unprepared .empty-state h2 { color: var(--classroom-ink); font-size: 21px; }
+.classroom-unprepared .empty-state p { color: var(--classroom-muted); max-width: 560px; font-size: 15px; line-height: 1.9; }
+
+/* Shared v2 board: safe HTML only for KaTeX/sanitized Mermaid. Diagrams and
+   annotations are native SVG; all teaching text remains React-escaped. */
+.scene-board { --slate-ink: #222126; --slate-900: #222126; --slate-700: #6545a4; --slate-500: #57515e; --slate-100: #fbf9ff; --slate-paper: #fffefa; --slate-wash: #faf8f3; --slate-rule: #e0ded8; --slate-chrome-faint: #625d68; --slate-mark-ink: #222126; --slate-mark-bg: #fff0a3; display: flex; flex: 1; flex-direction: column; border: 0; border-radius: 0; min-width: 0; min-height: 420px; box-shadow: none; }
+.classroom-canvas .scene-board { min-height: 0; }
+.scene-board .board-toolbar { padding: 10px 24px; min-height: 42px; font: 12px var(--font-ui); letter-spacing: 0; gap: 20px; flex-shrink: 0; }
+.board-viewport { flex: 1; min-height: 300px; position: relative; overflow: clip; touch-action: none; cursor: grab; background: var(--slate-paper); background-image: radial-gradient(#c9c4ce88 .7px, transparent .7px); background-size: 22px 22px; }
+.classroom-canvas .board-viewport { min-height: 0; }
+.board-viewport:active { cursor: grabbing; }
+.board-viewport:focus-visible { outline-offset: -4px; }
+.scene-board .board-scene { position: absolute; top: 0; left: 0; transform-origin: 0 0; padding: 0; min-height: 0; background: none; font-size: 22px; line-height: 30px; transition: none; }
+.board-viewport.is-following .board-scene { transition: transform 380ms var(--ease); }
+.scene-board .scene-title { position: absolute; top: 10px; left: 64px; font-size: 32px; font-weight: 500; line-height: 1.5; border: 0; padding: 0; margin: 0; color: #6545a4; }
+.scene-board .board-empty { position: absolute; top: 110px; left: 64px; width: 620px; color: #625d68; }
+.scene-step-frame { position: absolute; box-sizing: border-box; border: 1px solid #ded7e8; border-radius: 16px; pointer-events: none; }
+.classroom-teacher-talk > p { margin: 0 0 18px; }
+.classroom-teacher-talk > p:last-child { margin-bottom: 0; }
+.classroom-script-settings { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--classroom-line); color: #625d68; font: 12px/1.8 var(--font-ui); }
+.classroom-script-settings summary { cursor: pointer; }
+.classroom-script-settings p { margin: 12px 0; }
+.classroom-script-settings [role="group"] { padding: 12px; border: 1px solid #d9ccea; background: #f9f6fd; border-radius: 6px; }
+.scene-step-frame.current { border-color: #b9a7cf; }
+.scene-board .scene-step-title { margin: 18px 24px 0; font-size: 28px; line-height: 38px; color: #6545a4; font-weight: 500; }
+.scene-step-title > span { display: inline-block; margin-right: 14px; font: 16px var(--font-ui); color: #8b7d9c; }
+.scene-object { position: absolute; padding: 0; box-sizing: border-box; border: 1px solid transparent; border-radius: 4px; overflow: auto; cursor: pointer; scrollbar-width: thin; }
+.scene-object-ink { box-sizing: border-box; width: 100%; height: 100%; padding: 28px 10px 8px; }
+.scene-object-order { position: absolute; top: 3px; left: 10px; color: #8b7d9c; font: 12px var(--font-ui); letter-spacing: .06em; pointer-events: none; }
+.scene-object.focus-target { border-color: #e4d8ad; }
+.scene-object:focus-visible, .scene-object.selected { border-color: #9979c8; outline: 2px dashed #9979c8; outline-offset: 5px; }
+.scene-object.just-revealed { animation: board-ink-in 500ms var(--ease) both; animation-delay: var(--reveal-delay, 0ms); }
+.scene-board .board-text, .scene-board .board-highlight, .scene-board .board-list p { margin: 0 0 12px; line-height: 30px; overflow-wrap: anywhere; }
+.scene-board .board-list ul { margin: 0; padding-left: 32px; }
+.scene-board .board-list li { margin: 0 0 8px; line-height: 30px; overflow-wrap: anywhere; }
+.scene-board .board-box { margin: 0; padding: 10px 12px; background: transparent; line-height: 30px; overflow-wrap: anywhere; }
+.scene-board .board-arrow { margin: 0; }
+.board-circle-text { border: 2px solid #6545a4; border-radius: 50%; padding: 16px; margin: 0; text-align: center; white-space: pre-wrap; }
+.scene-board .board-code { margin: 0; padding: 10px 12px; font-size: 16px; color: #222126; }
+.scene-board .board-code > span { font-size: 12px; line-height: 18px; margin-bottom: 6px; color: #625d68; opacity: 1; }
+.scene-board .board-code pre { line-height: 24px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.scene-board .board-formula { font-size: 22px; margin: 0; }
+.scene-board .board-mermaid { margin: 0; height: 100%; overflow: clip; display: flex; align-items: center; justify-content: center; }
+.scene-board .board-mermaid svg { max-height: 100%; max-width: 100%; }
+.board-table { table-layout: fixed; width: 100%; border-collapse: collapse; font-size: 19px; line-height: 26px; }
+.board-table th, .board-table td { border: 1.5px solid #625d68; padding: 10px; font-size: 19px; line-height: 26px; text-align: left; vertical-align: top; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 400; }
+.board-table th { color: #6545a4; background: #f7f3fc; }
+.board-table-wrap > p { margin: 0 0 16px; }
+.board-diagram { display: block; overflow: visible; color: #222126; font-family: inherit; }
+.diagram-caption { fill: #222126; font-size: 20px; }
+.diagram-node { cursor: pointer; animation: board-ink-in 420ms var(--ease) both; animation-delay: var(--reveal-delay, 0ms); }
+.diagram-node rect { fill: #fffefa; stroke: #57515e; stroke-width: 2; }
+.diagram-node text { fill: #222126; font-size: 20px; }
+.diagram-node.focus-target rect { stroke: #9277b1; fill: #fff8db; }
+.diagram-node.selected rect, .diagram-node:focus-visible rect { fill: #fff0a3; stroke: #6545a4; stroke-width: 3; }
+.diagram-edge { animation: board-ink-in 480ms var(--ease) both; animation-delay: var(--reveal-delay, 0ms); }
+.diagram-edge > path { fill: none; stroke: #57515e; stroke-width: 2; }
+.diagram-edge > text { font-size: 16px; fill: #57515e; paint-order: stroke; stroke: #fffefa; stroke-width: 6px; }
+.scene-annotation { position: absolute; overflow: visible; pointer-events: none; color: #6545a4; animation: board-ink-in 600ms var(--ease) both; }
+.scene-annotation > rect { fill: #fff0a3; opacity: .4; }
+.scene-annotation > ellipse, .scene-annotation > path { fill: none; stroke: #6545a4; stroke-width: 3; stroke-linecap: round; }
+.board-camera-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; justify-content: flex-end; min-height: 52px; border-top: 1px solid #e0ded8; padding: 4px 16px; background: #fffefa; font: 12px var(--font-ui); color: #625d68; flex-shrink: 0; }
+.board-camera-controls > div { display: flex; align-items: center; gap: 4px; }
+.board-camera-controls button { cursor: pointer; min-height: 36px; min-width: 36px; padding: 6px 10px; background: transparent; border: 1px solid transparent; border-radius: 4px; color: #38343e; font: inherit; font-size: 16px; }
+.board-camera-controls button:hover { border-color: #d9ccea; background: #f7f3fc; }
+.board-camera-controls output { min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
+.board-camera-controls .return-to-current { font-size: 12px; color: #6545a4; }
+.assistance-board-page .scene-board { height: 68dvh; }
+@keyframes board-ink-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 1100px) { .classroom-header { gap: 16px; padding-inline: 16px; } .classroom-progress-label { display: none; } .classroom-player { padding-inline: 16px; gap: 12px; } .classroom-play-state small { display: none; } .classroom-play-actions { gap: 6px; } .classroom-play-actions .button { padding-inline: 12px; } .classroom-sidebar-scroll { padding: 24px 20px; } }
+@media (prefers-reduced-motion: reduce) { .scene-object.just-revealed, .diagram-node, .diagram-edge, .scene-annotation { animation: none; } .board-viewport.is-following .board-scene { transition: none; } .player-dot.playing { animation: none; } }

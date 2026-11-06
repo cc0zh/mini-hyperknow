@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Board } from '../components/Board'
+import { AssistanceBoardCanvas } from '../components/Board'
 import { AssistanceText, AssistanceTurns } from '../components/AssistanceTurns'
 import { BackLink, ErrorNotice, Loading } from '../components/ui'
-import { artifactPath, conversationPath, conversationRoute, isAdvanceAllowed, makeAssistanceCommand, makeBoardScript, validBoardCursor, validTurn } from '../lib/assistance'
+import { artifactPath, conversationPath, conversationRoute, isAdvanceAllowed, makeAssistanceCommand, validBoardCursor, validTurn } from '../lib/assistance'
 import type { AssistanceArtifact, AssistanceConversation, WhiteboardArtifact } from '../lib/assistance'
 import { PlaybackClock, readingDelay } from '../lib/lesson-state'
 import { useAssistanceCommand, useAssistanceResource } from '../lib/use-assistance'
@@ -69,7 +69,7 @@ function BoardPlayer({ resource, initial }: { resource: ReturnType<typeof useAss
     {command.error && <ErrorNotice title="操作尚未完成" message={command.error} />}
     {command.rejected && <button className="text-button" type="button" onClick={() => { command.releaseRejected(); void resource.reload(); void conversation.reload() }}>确认已拒绝，重新同步后修改</button>}
     {!online && <p role="alert" className="inline-note">网络已断开，已暂停；联网后需明确播放。</p>}
-    <Board script={makeBoardScript(artifact)} cursor={cursor} fontReady={font.state === 'ready'} />
+    <AssistanceBoardCanvas title={artifact.title} frames={artifact.data.steps} cursor={cursor} fontReady={font.state === 'ready'} />
     <div className="player-controls assistance-player" aria-label="独立白板播放器"><div><b>{inFlight ? '会话正在回答 · 已暂停' : finished ? '板书已全部展示' : playing ? '正在播放' : '已暂停'}</b><small>已确认 {cursor + 1} / {artifact.data.steps.length} 步</small></div><div>
       {playing ? <button className="button secondary" type="button" onClick={stop}>暂停</button> : <button className="button primary" type="button" disabled={locked || finished} onClick={() => { clock.play(); setPlaying(true) }}>{cursor < 0 ? '开始播放' : '播放'}</button>}
       <button className="button secondary" type="button" disabled={locked || finished} onClick={() => { stop(); void advance() }}>下一步</button>

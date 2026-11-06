@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课堂播放器为什么需要两个位置？</title>
+  <style>
+    :root { color-scheme: light; --ink: #292438; --muted: #625d70; --purple: #61439c; --line: #dfd9e9; --paper: #fbfaf7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.8 system-ui, sans-serif; }
+    main { max-width: 1024px; margin: auto; padding: 56px 28px 80px; }
+    h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.25; max-width: 800px; }
+    h2 { margin-top: 44px; font-size: 25px; }
+    h3 { font-size: 18px; }
+    .eyebrow { color: var(--purple); font-weight: 700; letter-spacing: .12em; }
+    p, li { max-width: 78ch; }
+    code { background: #eeebf3; border-radius: 4px; padding: 2px 5px; }
+    pre { overflow: auto; background: #272331; color: #f1edf8; border-radius: 10px; padding: 22px; line-height: 1.6; }
+    pre code { background: transparent; padding: 0; }
+    .callout { border-left: 4px solid var(--purple); background: #f0ebf8; padding: 16px 22px; }
+    .demo { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 24px 0; }
+    .demo-head { padding: 16px 22px; background: white; display: flex; gap: 20px; flex-wrap: wrap; }
+    .stage { display: grid; grid-template-columns: 1.5fr 1fr; }
+    .board { min-height: 250px; padding: 28px; background-image: radial-gradient(#cec8d6 1px, transparent 1px); background-size: 18px 18px; }
+    .board h3 { color: var(--purple); font-size: 24px; }
+    .narration { background: white; border-left: 1px solid var(--line); padding: 24px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px; background: white; border-top: 1px solid var(--line); }
+    button { font: inherit; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); cursor: pointer; }
+    button:hover { background: #f1edf8; }
+    button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    button.primary { background: var(--purple); color: white; }
+    .hint { color: var(--muted); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    @media (max-width: 640px) { .stage { grid-template-columns: 1fr; } .narration { border-left: 0; border-top: 1px solid var(--line); } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">STATE DESIGN · 2026-11-05</div>
+  <h1>课堂播放器为什么需要<br>“教学位置”和“查看位置”？</h1>
+  <p>课堂讲到了第七步，学生拖回第三步查看一张图。如果我们只存一个 cursor，就必须在“让学生回看”和“保护已经确认的学习位置”之间二选一。解决办法是把<strong>事实、视图和提问锚点</strong>分开。</p>
+  <div class="callout">教学位置回答“服务端已经确认讲到了哪里”；查看位置回答“学生现在看哪里”；问题锚点回答“这次问题指向哪里”。它们有关联，但不是同一个事实。</div>
+
+  <h2>先试一次回看</h2>
+  <p>这是离线状态设计演示，不连接应用或模型。点击回看后，板书和右侧讲解会一起切换，而教学进度不会倒退。</p>
+  <section class="demo" aria-label="两种位置的离线演示">
+    <div class="demo-head" aria-live="polite"><b id="confirmed"></b><span id="viewed"></span></div>
+    <div class="stage"><div class="board"><h3 id="board-title"></h3><p id="board-text"></p></div><aside class="narration"><h3>当前所看步骤的解释</h3><p id="narration"></p></aside></div>
+    <div class="controls"><button id="back">回看前一步</button><button id="return">回到当前教学</button><button id="advance" class="primary">确认并讲下一步</button></div>
+  </section>
+  <p class="hint">真实产品中，“确认下一步”必须先经过服务端事务与版本校验，不能先更新画面，再假定写入会成功。</p>
+
+  <h2>三个位置，各自负责什么</h2>
+  <table><thead><tr><th>位置</th><th>持有者</th><th>规则</th></tr></thead><tbody>
+    <tr><td><code>progress.cursor</code></td><td>服务端 SQLite</td><td>只能保持或前进一步。它限制已讲前缀，也决定什么时候可以结课。</td></tr>
+    <tr><td><code>viewCursor</code></td><td>前端查看状态</td><td>不能超过确认位置；回看时同时驱动白板和讲解，不改教学事实。</td></tr>
+    <tr><td><code>anchor_step_id / anchor_object_id</code></td><td>随问题保存</td><td>只能引用已讲内容。回答“这条箭头为什么回到这里”时，需要知道具体是哪条箭头。</td></tr>
+  </tbody></table>
+
+  <h2>最容易出现的两个错误</h2>
+  <h3>错误一：只让白板回看，右侧仍显示最新讲解</h3>
+  <p>这会让两块各自“正常”的组件组合成一个错误解释：旧图旁边出现新结论。修复点是共享的查看位置，而非给两个组件各加一个回看开关。</p>
+  <pre><code>// 相同查看位置，控制同一个教学步骤的两种表达
+const viewedStep = script.steps[viewCursor]
+renderBoard(script.steps.slice(0, viewCursor + 1))
+renderNarration(viewedStep.narration)
+
+// 保留独立的权威事实，不在回看时发进度回退命令
+const confirmedStep = snapshot.progress.cursor</code></pre>
+  <h3>错误二：把提问锚点当成教学位置</h3>
+  <p>学生可以在第七步时问第三步的图。正确做法是保存两个事实：教学暂停在第七步，这次问题指向第三步。明确继续时回到第七步，既不重复讲第三到第六步，也不丢掉问题引用。</p>
+
+  <h2>与播放和相机的关系</h2>
+  <ul>
+    <li>播放时钟只根据确认位置推进；进入回看应先停止自动推进，避免阅读时画面被抢走。</li>
+    <li>手动平移只改变相机，不改变上述位置；“回到当前讲解”同时恢复教学位置与相机跟随。</li>
+    <li>页面刷新读取权威位置，但本地播放始终暂停。数据库里的 playing 是历史意图，不是恢复时的自动播放指令。</li>
+    <li>对象 ID 表达图中的身份，坐标只是排版结果。相机移动、字体重排或窗口变化不应使引用失效。</li>
+  </ul>
+
+  <h2>自检</h2>
+  <ol><li>学生回看时，自动播放继续推进了两步，界面应该保持哪个位置？为什么？</li><li>问题回答在刷新后才完成，需要哪些持久化事实才能回到原教学位置？</li><li>同一张图被重新排版，问题应该绑定坐标还是对象 ID？</li></ol>
+  <p class="hint">这类分离同样适用于日志回放、调试器、视频审阅和实时仪表盘：实时事实、历史查看和用户标注常常有不同生命周期。</p>
+</main>
+<script>
+  const steps = [
+    ['路线图', '问题 → 对照 → 反馈循环', '先建立今天要回答的三个问题，让后续内容有明确的位置。'],
+    ['谁决定下一步？', '固定工作流：代码决定路径', '即使每个节点都使用模型，只要后续路径预先写死，编排控制权仍在程序。'],
+    ['观察和行动', 'Observe → Decide → Act', '模型根据当前观察选择行动；行动产生结果，下一轮需要读取这个结果。'],
+    ['闭合反馈循环', 'Act → 工具失败 → Observe', '第一次执行失败时，返回的信息提供新的证据，帮助调整下一次行动。'],
+    ['退出与总结', '完成 / 最大轮次 / 错误 / 人工中止', '循环必须有明确边界，完成一遍教学也不意味着已经掌握。']
+  ]
+  let confirmed = 3
+  let viewed = 3
+  const byId = id => document.getElementById(id)
+  function draw() {
+    const step = steps[viewed]
+    byId('confirmed').textContent = `教学已确认：第 ${confirmed + 1} 步`
+    byId('viewed').textContent = `当前查看：第 ${viewed + 1} 步${viewed < confirmed ? '（回看中）' : ''}`
+    byId('board-title').textContent = step[0]
+    byId('board-text').textContent = step[1]
+    byId('narration').textContent = step[2]
+    byId('back').disabled = viewed === 0
+    byId('advance').disabled = confirmed === steps.length - 1
+  }
+  byId('back').onclick = () => { viewed = Math.max(0, viewed - 1); draw() }
+  byId('return').onclick = () => { viewed = confirmed; draw() }
+  byId('advance').onclick = () => { confirmed = Math.min(steps.length - 1, confirmed + 1); viewed = confirmed; draw() }
+  draw()
+</script>
+</body>
+</html>

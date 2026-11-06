@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>白板布局：量盒子，还是量实际墨迹？</title>
+<style>
+  :root{font:16px/1.85 system-ui,sans-serif;color:#242334;background:#f7f5fa}body{max-width:900px;margin:36px auto;padding:0 24px}h1,h2{line-height:1.4;color:#6545a4}h1{font-size:29px}h2{font-size:21px;margin-top:32px}p{margin:12px 0}code,pre{font-family:Consolas,monospace}pre{padding:18px;overflow:auto;background:#efebf5;border-radius:8px;font-size:13px;line-height:1.7}.controls{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.viewport{height:200px;overflow:hidden;border:1px dashed #b9a7cf;margin:18px 0;background:#fffefa;display:flex;align-items:center;padding-left:24px}.canvas{transform-origin:0 50%}.box{width:360px;border:2px solid #6545a4;padding:8px;overflow:hidden;box-sizing:border-box}.ink{display:block;white-space:nowrap;font-size:22px;line-height:1.6}output{display:block;background:#fff8db;padding:12px;font-size:14px;border-radius:6px}button{font:inherit;padding:6px 14px;border:1px solid #b9a7cf;border-radius:6px;cursor:pointer;background:white;color:#6545a4}.note{font-size:14px;color:#676173}li{margin:7px 0}
+</style>
+<h1>量到容器宽，不代表内容已经入镜</h1>
+<p>白板已经缩到一屏，为什么公式末尾仍然消失？相机解决的是「纸面能否入镜」，但纸面里面的公式还可能溢出。两者是不同层级的几何问题。</p>
+<h2>先看失效方式</h2>
+<p>一个伸展的块级容器总是占满可用宽度。其内部内容即使很长，容器的 <code>offsetWidth</code> 也不会跟着变长。拿这个数做适配，会得出一个错误结论：「已经放得下了」。</p>
+<div class="controls">
+  <label>白板缩放 <input id="zoom" type="range" min="40" max="120" value="85"> <span id="zoom-value">85%</span></label>
+  <button type="button" id="mode" aria-pressed="false">切换：量实际内容</button>
+</div>
+<div class="viewport"><div class="canvas" id="canvas"><div class="box" id="box"><span class="ink" id="ink">停止条件 = 轮次到达上限，或者截止时间已过；程序负责真正终止。</span></div></div></div>
+<output id="metrics" aria-live="polite"></output>
+<p class="note">这是离线DOM几何演示，不加载KaTeX、不调用模型，不是产品的真实生成验收。先切换测量方式，再拖动缩放，观察同一段内容是否始终完整。</p>
+<h2>把白板缩放从测量中消掉</h2>
+<pre><code>range.selectNodeContents(ink)
+canvasScale = box.getBoundingClientRect().width / box.offsetWidth
+naturalWidth = range.getBoundingClientRect().width / canvasScale
+fit = Math.min(1, availableWidth / naturalWidth)</code></pre>
+<p><code>getBoundingClientRect()</code> 是变换后的屏幕像素；<code>clientWidth</code>／<code>offsetWidth</code> 是布局像素。直接比较它们，会把相机缩小误认为内容本身变短。先统一坐标系，再计算适配比。</p>
+<h2>为什么纯估算仍会少一行</h2>
+<p>125像素的表格单元格、19像素的中文字，看似能装下6.58字，但一行实际上只能容纳六个完整字符。13字需要三行，不是把247像素总宽除以125得到的两行。计算还要留意标题、内边距、合并边框、语言标签和全局段落行距。</p>
+<ul><li>容器、内容和相机必须分别测量，再统一单位。</li><li>量真实内容不能依赖容器自动伸展的尺寸；Range适合已有DOM内容。</li><li>字体加载和宽度变化后重新测量；观察宽度而不是每次高度变化，避免反馈循环。</li><li>先以结构测试检查几何，再用真实浏览器检查裁字和内部滚动条，不能互相代替。</li></ul>
+<details><summary>自检：整张纸入镜，能证明所有公式已完整显示吗？</summary><p>不能。纸面内部可能有独立溢出的元素、滚动容器或SVG裁切，需要继续检查实际墨迹。</p></details>
+<details><summary>自检：用Range量到的宽为什么要除以相机缩放？</summary><p>Range提供屏幕坐标；用于适配的可用宽度来自布局坐标。除去相机变换后才能比较同一单位。</p></details>
+<script>
+  const zoom=document.getElementById('zoom'), canvas=document.getElementById('canvas'), box=document.getElementById('box'), ink=document.getElementById('ink'), mode=document.getElementById('mode'), metrics=document.getElementById('metrics');
+  let actual=false;
+  function render(){
+    const scale=Number(zoom.value)/100;
+    canvas.style.transform=`scale(${scale})`;
+    ink.style.fontSize='22px';
+    const range=document.createRange();range.selectNodeContents(ink);
+    const natural=range.getBoundingClientRect().width/scale;
+    const available=box.clientWidth-16;
+    const measured=actual?natural:ink.offsetWidth;
+    const fit=Math.min(1,(available-4)/measured);
+    ink.style.fontSize=`${22*fit}px`;
+    document.getElementById('zoom-value').textContent=`${zoom.value}%`;
+    mode.textContent=actual?'当前：量实际内容（点此换成盒子）':'当前：量盒子（点此换成实际内容）';
+    mode.setAttribute('aria-pressed',String(actual));
+    metrics.textContent=`布局可用宽 ${available}px ｜ 实际内容自然宽约 ${Math.round(natural)}px ｜ 本次采用 ${Math.round(measured)}px ｜ 内容适配 ${Math.round(fit*100)}%`;
+  }
+  zoom.addEventListener('input',render);mode.addEventListener('click',()=>{actual=!actual;render()});render();
+</script>
+</html>

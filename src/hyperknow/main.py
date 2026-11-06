@@ -63,6 +63,8 @@ class AskQuestion(LessonCommand):
     cursor: int = Field(ge=-1)
     question: str = Field(min_length=2, max_length=2000)
     was_playing: bool
+    anchor_step_id: str | None = Field(default=None, min_length=1, max_length=80)
+    anchor_object_id: str | None = Field(default=None, min_length=1, max_length=80)
 
 
 class AnswerQuiz(ChangeRun):
@@ -163,6 +165,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/sessions/{session_id}/prepare", response_model=LessonSnapshot)
     async def prepare(session_id: str, data: Command):
         return await app.state.service.prepare(session_id, data.model_dump())
+
+    @app.post("/api/sessions/{session_id}/regenerate", status_code=202, response_model=LessonSnapshot)
+    async def regenerate(session_id: str, data: ChangeRun):
+        return await app.state.service.regenerate(session_id, data.model_dump())
 
     @app.put("/api/sessions/{session_id}/progress", response_model=LessonSnapshot)
     async def progress(session_id: str, data: SaveProgress):

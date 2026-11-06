@@ -29,13 +29,22 @@ from test_course import course_data
 
 def script_input():
     # Deliberate function input, never a provider response or acceptance fixture.
-    return {"title": "暂停与恢复", "steps": [
+    return {"schema_version": 2, "title": "暂停与恢复", "objectives": ["解释await让出控制权与恢复的条件"],
+        "roadmap": [{"keypoint_id": "await", "source_keypoint_index": 0, "title": "协作式切换", "question": "等待时谁持有控制权？"}], "steps": [
         {"title": "调用", "narration": "普通调用在返回前保持控制权。", "page": 1, "column": 1,
-         "operations": [{"kind": "text", "content": "普通调用"}]},
+         "stage": "opening", "operations": [{"object_id": "call", "kind": "text", "content": "普通调用"}]},
         {"title": "暂停", "narration": "await允许调度器安排其他任务。", "page": 1, "column": 2,
-         "operations": [{"kind": "code", "content": "await work()", "language": "python"}]},
+         "stage": "explain", "keypoint_id": "await",
+         "operations": [{"object_id": "pause", "kind": "code", "content": "await work()", "language": "python"}]},
         {"title": "恢复", "narration": "条件满足后继续执行。", "page": 2, "column": 1,
-         "operations": [{"kind": "arrow", "content": "暂停 → 恢复"}]},
+         "stage": "example", "keypoint_id": "await",
+         "operations": [{"object_id": "resume", "kind": "arrow", "content": "暂停 → 恢复"}]},
+        {"title": "检查", "narration": "请预测等待网络返回时其他任务能否前进，并用课堂提问说明理由。", "page": 2, "column": 2,
+         "stage": "check", "keypoint_id": "await", "check": {"question": "await等待期间其他任务能否前进？", "expected_answer": "能，控制权交回调度器。"},
+         "operations": [{"object_id": "question", "kind": "text", "content": "等待时其他任务会怎样？"}]},
+        {"title": "总结", "narration": "await是协作式让出控制权，不是任务结束。", "page": 3, "column": 1,
+         "stage": "summary", "focus_ids": ["pause", "resume"],
+         "operations": [{"object_id": "summary", "kind": "box", "content": "让出 → 等待 → 恢复"}]},
     ]}
 
 
@@ -51,9 +60,9 @@ def persist_domain_input(db):
 class LessonSchemaTests(unittest.TestCase):
     def test_all_supported_operations_are_preserved(self):
         for kind in ("text", "code", "formula", "box", "arrow", "highlight", "mermaid"):
-            op = BoardOperation(kind=kind, content="具体内容")
+            op = BoardOperation(object_id="object", kind=kind, content="具体内容")
             self.assertEqual(op.content, "具体内容")
-        self.assertEqual(BoardOperation(kind="list", items=["知识点"]).items, ["知识点"])
+        self.assertEqual(BoardOperation(object_id="object", kind="list", items=["知识点"]).items, ["知识点"])
 
     def test_invalid_operations_are_not_silently_dropped(self):
         for payload in ({"kind": "html", "content": "x"}, {"kind": "box"},
@@ -61,11 +70,11 @@ class LessonSchemaTests(unittest.TestCase):
                         {"kind": "text", "content": "x", "language": "html"},
                         {"kind": "list", "items": [" "]}):
             with self.subTest(payload=payload), self.assertRaises(ValidationError):
-                BoardOperation.model_validate(payload)
+                BoardOperation.model_validate({"object_id": "object", **payload})
 
     def test_script_limits_and_order(self):
         for mutate in (
-            lambda d: d.update(steps=d["steps"] * 7),
+            lambda d: d.update(steps=d["steps"] * 8),
             lambda d: d["steps"][0].update(operations=[]),
             lambda d: d["steps"][0].update(operations=[{"kind": "text", "content": "x"}] * 7),
             lambda d: d["steps"][0].update(column=3),
@@ -76,13 +85,13 @@ class LessonSchemaTests(unittest.TestCase):
             mutate(data)
             with self.assertRaises(ValidationError):
                 BoardScriptDraft.model_validate(data)
-        self.assertEqual(len(BoardScriptDraft.model_validate(script_input()).steps), 3)
+        self.assertEqual(len(BoardScriptDraft.model_validate(script_input()).steps), 5)
 
     def test_code_and_mermaid_whitespace_is_not_normalized(self):
         source = "  print('保留缩进')\n"
-        self.assertEqual(BoardOperation(kind="code", content=source, language="python").content, source)
+        self.assertEqual(BoardOperation(object_id="code", kind="code", content=source, language="python").content, source)
         with self.assertRaises(ValidationError):
-            BoardOperation(kind="text", content="  ")
+            BoardOperation(object_id="text", kind="text", content="  ")
 
     def test_question_is_trimmed_before_length_validation(self):
         base = {"client_command_id": "question-input", "expected_version": 1,
@@ -146,7 +155,7 @@ class LessonStorageTests(unittest.TestCase):
         snapshot = self.ready()
         script = snapshot["script"]
         self.assertEqual(snapshot["progress"]["cursor"], -1)
-        self.assertEqual(len({s["step_id"] for s in script["steps"]}), 3)
+        self.assertEqual(len({s["step_id"] for s in script["steps"]}), 5)
         saved = self.progress(snapshot, 0, play_intent="playing")
         reopened = Database(self.path)
         restored = reopened.get_lesson(self.sid)
@@ -268,10 +277,12 @@ class LessonStorageTests(unittest.TestCase):
 
     def test_complete_without_mastery_gate_and_idempotent_parent_version(self):
         snapshot = self.ready()
+        for cursor in range(len(snapshot["script"]["steps"])):
+            snapshot = self.progress(snapshot, cursor, f"complete-progress-{cursor}")
         payload = self.command(snapshot, "complete-lesson")
         completed = self.db.complete_lesson(self.sid, payload)
         self.assertTrue(completed["completed"])
-        self.assertEqual(completed["progress"]["cursor"], -1)
+        self.assertEqual(completed["progress"]["cursor"], 4)
         course = self.db.get_course(self.course["course_id"])
         self.assertEqual((course["version"], course["progress"]), (2, 100))
         self.assertTrue(course["units"][0]["lectures"][0]["sessions"][0]["completed"])
@@ -332,6 +343,8 @@ class LessonStorageTests(unittest.TestCase):
 
     def test_complete_storage_failure_rolls_back_fact_parent_and_receipt(self):
         snapshot = self.ready()
+        for cursor in range(len(snapshot["script"]["steps"])):
+            snapshot = self.progress(snapshot, cursor, f"rollback-progress-{cursor}")
         payload = self.command(snapshot, "completion-storage-failure")
         with self.db.transaction() as conn:
             conn.execute("CREATE TRIGGER reject_course BEFORE INSERT ON courses "

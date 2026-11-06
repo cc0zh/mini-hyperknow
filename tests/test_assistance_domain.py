@@ -146,7 +146,7 @@ class TeachingSchemaTests(unittest.TestCase):
 
     def test_board_is_ordered_and_does_not_accept_course_or_execution(self):
         step = {"title": "定义", "narration": "先理解定义", "page": 1, "column": 1,
-                "operations": [{"kind": "text", "content": "复合函数"}]}
+                "operations": [{"object_id": "definition", "kind": "text", "content": "复合函数"}]}
         draft = {"kind": "whiteboard", "title": "复合函数", "data": {"steps": [step]}}
         self.assertEqual(ArtifactDraft.model_validate(draft).data["steps"][0]["page"], 1)
         for patch in ({"page": 2}, {"operations": [{"kind": "bash", "content": "noop"}]}):

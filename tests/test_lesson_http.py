@@ -34,7 +34,7 @@ class LessonLiveServerTests(unittest.TestCase):
         cls.db = Database(Path(cls.directory.name) / "hyperknow.sqlite3")
         draft = course_data()
         session = draft["units"][0]["lectures"][0]["sessions"][0]
-        draft["units"][0]["lectures"][0]["sessions"] = [deepcopy(session) for _ in range(4)]
+        draft["units"][0]["lectures"][0]["sessions"] = [deepcopy(session) for _ in range(5)]
         run = cls.db.create_run("live-domain-course", "理解协程", "stored-model")
         cls.db.transition(run["run_id"], {"queued"}, status="generating")
         ready = cls.db.finish_course(run["run_id"], CourseDraft.model_validate(draft))
@@ -50,6 +50,9 @@ class LessonLiveServerTests(unittest.TestCase):
         cls.db.ask_question(sid, {"client_command_id": "live-interrupted-question",
             "expected_version": saved["progress"]["version"], "script_id": saved["script"]["script_id"],
             "cursor": -1, "question": "为什么会暂停？", "was_playing": False}, "stored-model", True)
+        cls.legacy_source = '{ "schema_version": 1, "script_id": "old-http-script", "steps": [] }'
+        with cls.db.transaction() as conn:
+            conn.execute("INSERT INTO lesson_scripts VALUES (?,?,?)", ("old-http-script", cls.sids[4], cls.legacy_source))
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             cls.port = sock.getsockname()[1]
@@ -179,6 +182,14 @@ class LessonLiveServerTests(unittest.TestCase):
             self.assertEqual(json.loads(ws.recv())["type"], "subscribed")
             before = self.client.get(f"/api/courses/{self.cid}").json()
             saved = self.snapshot(sid)
+            early = self.client.post(f"/api/sessions/{sid}/complete", json=self.payload(saved, "http-early-complete"))
+            self.assertEqual((early.status_code, early.json()["error"]["code"]), (409, "lesson_incomplete"))
+            self.assertFalse(self.snapshot(sid)["completed"])
+            for cursor in range(len(saved["script"]["steps"])):
+                response = self.client.put(f"/api/sessions/{sid}/progress", json=self.payload(
+                    saved, f"http-complete-progress-{cursor}", cursor=cursor, play_intent="paused"))
+                self.assertEqual(response.status_code, 200)
+                saved = response.json()
             payload = self.payload(saved, "http-complete")
             response = self.client.post(f"/api/sessions/{sid}/complete", json=payload)
             self.assertEqual(response.status_code, 200)
@@ -187,8 +198,55 @@ class LessonLiveServerTests(unittest.TestCase):
             self.assertEqual(event["resource_type"], "course")
             after = self.client.get(f"/api/courses/{self.cid}").json()
             self.assertEqual(after["version"], before["version"] + 1)
-            self.assertEqual(after["progress"], 25)
+            self.assertEqual(after["progress"], 20)
             self.assertEqual(after["version"], event["version"])
             self.assertEqual(self.client.post(f"/api/sessions/{sid}/complete", json=payload).json(), response.json())
             self.assertEqual(self.client.get(f"/api/courses/{self.cid}").json(), after)
             self.assertEqual(self.client.get("/api/courses").json()["courses"], [after])
+
+    def test_unsupported_lesson_is_readable_and_only_explicit_regeneration_creates_a_run(self):
+        sid = self.sids[4]
+        saved = self.snapshot(sid)
+        self.assertIsNone(saved["script"])
+        self.assertEqual(saved["format_error"]["code"], "lesson_format_unsupported")
+        self.assertIsNone(saved["generation_run"])
+        self.assertEqual(saved["progress"]["version"], 1)
+        self.assertEqual(self.client.get(f"/api/sessions/{sid}").json(), saved)
+        prepare = self.client.post(f"/api/sessions/{sid}/prepare", json={"client_command_id": "old-http-prepare"})
+        self.assertEqual((prepare.status_code, prepare.json()["error"]["code"]), (409, "lesson_format_unsupported"))
+        path = f"/api/sessions/{sid}/regenerate"
+        body = {"client_command_id": "old-http-regenerate", "expected_version": saved["progress"]["version"]}
+        response = self.client.post(path, json=body)
+        self.assertEqual((response.status_code, response.json()["error"]["code"]), (503, "model_not_configured"))
+        self.assertEqual(self.snapshot(sid), saved)
+        for patch in ({"expected_version": 0}, {"unknown": True}):
+            self.assertEqual(self.client.post(path, json={**body, **patch}).status_code, 422)
+        # Direct command input queues real storage work but does not enqueue a model worker.
+        queued = self.db.regenerate_lesson(sid, body, "stored-model", True)
+        run = queued["generation_run"]
+        self.assertEqual(self.snapshot(sid), queued)
+        self.assertEqual(run["status"], "queued")
+        self.assertEqual(run["previous_script_data"], self.legacy_source)
+        self.db.transition(run["run_id"], {"queued"}, status="failed", error={"code": "direct-input-failure"})
+        failed = self.snapshot(sid)
+        self.assertEqual(failed["generation_run"]["status"], "failed")
+        self.assertEqual(failed["format_error"], saved["format_error"])
+        self.assertEqual(self.db.calls(run["run_id"]), [])
+        with self.db.transaction() as conn:
+            self.assertEqual(conn.execute("SELECT data FROM lesson_scripts WHERE session_id=?", (sid,)).fetchone()["data"], self.legacy_source)
+
+    def test_z_question_anchor_fields_are_validated_before_model_configuration(self):
+        sid = self.sids[1]
+        saved = self.snapshot(sid)
+        steps = saved["script"]["steps"]
+        path = f"/api/sessions/{sid}/questions"
+        base = self.payload(saved, "http-anchor-question", cursor=saved["progress"]["cursor"],
+                            question="这个对象为什么？", was_playing=False)
+        for patch in ({"anchor_step_id": steps[-1]["step_id"]}, {"anchor_object_id": "summary"},
+                      {"anchor_object_id": "foreign-object"}, {"anchor_step_id": ""}):
+            response = self.client.post(path, json={**base, **patch})
+            self.assertEqual(response.status_code, 422)
+        accepted = self.client.post(path, json={**base, "anchor_step_id": steps[0]["step_id"], "anchor_object_id": "call"})
+        self.assertEqual(accepted.status_code, 503)
+        self.assertEqual(accepted.json()["error"]["code"], "model_not_configured")
+        self.assertEqual(self.snapshot(sid), saved)

@@ -69,13 +69,26 @@ export function nextCursor(cursor: number, length: number): number | null {
   return cursor + 1 < length ? cursor + 1 : null
 }
 
+export function summaryIsShown(script: BoardScript | null, cursor: number): boolean {
+  return !!script && script.steps.length > 0 && cursor === script.steps.length - 1 && script.steps[cursor].stage === 'summary'
+}
+
+export interface QuestionAnchor { anchor_step_id?: string; anchor_object_id?: string }
+export function questionAnchor(script: BoardScript, teachingCursor: number, viewCursor: number, objectId?: string | null): QuestionAnchor | null {
+  if (viewCursor < 0 || viewCursor > teachingCursor || !script.steps[viewCursor]) return null
+  const step = script.steps[viewCursor]
+  if (!objectId) return { anchor_step_id: step.step_id }
+  const owner = script.steps.slice(0, viewCursor + 1).find(item => item.operations.some(operation => operation.object_id === objectId || operation.nodes.some(node => node.id === objectId)))
+  return owner ? { anchor_step_id: owner.step_id, anchor_object_id: objectId } : null
+}
+
 export interface LessonCommand {
   method: 'POST' | 'PUT'
   path: string
   body: Record<string, unknown> & { client_command_id: string }
   // UI acknowledgement is persisted only after its progress command succeeds.
   continue_interaction?: string
-  question_after_pause?: { question: string; was_playing: boolean }
+  question_after_pause?: { question: string; was_playing: boolean } & QuestionAnchor
 }
 
 export function lessonCommand(pending: LessonCommand | null, next: LessonCommand): LessonCommand {

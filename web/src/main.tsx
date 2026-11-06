@@ -18,6 +18,7 @@ import './styles/assistance.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><BrowserRouter><Routes>
+    <Route path="/courses/:courseId/sessions/:sessionId" element={<Classroom />} />
     <Route element={<Shell />}>
       <Route path="/" element={<Home />} />
       <Route path="/assistance" element={<Assistance />} />
@@ -26,7 +27,6 @@ createRoot(document.getElementById('root')!).render(
       <Route path="/course-runs/:runId" element={<CourseRun />} />
       <Route path="/courses" element={<Courses />} />
       <Route path="/courses/:courseId" element={<CourseOverview />} />
-      <Route path="/courses/:courseId/sessions/:sessionId" element={<Classroom />} />
       <Route path="/courses/:courseId/sessions/:sessionId/practice" element={<QuizPage />} />
       <Route path="/courses/:courseId/exams/:examId" element={<QuizPage />} />
       <Route path="*" element={<div className="page"><EmptyState title="没有这个页面" action={<Link className="button primary" to="/">回到首页</Link>}>当前版本提供课程创建、课程目录和白板课堂。</EmptyState></div>} />

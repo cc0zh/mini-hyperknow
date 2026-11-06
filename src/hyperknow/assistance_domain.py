@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from pydantic import ConfigDict, Field, model_validator
 
 from .domain import Schema
-from .lesson_domain import BoardScriptDraft, BoardStepDraft
+from .lesson_domain import BoardFrame, validate_board_references
 
 Text = Annotated[str, Field(min_length=1, max_length=3000)]
 
@@ -125,12 +125,19 @@ class AnimationData(Schema):
         return self
 
 
+class AssistanceBoardStep(BoardFrame):
+    """An independent artifact frame, not a course lesson step."""
+
+
 class WhiteboardData(Schema):
-    steps: list[BoardStepDraft] = Field(min_length=1, max_length=18)
+    steps: list[AssistanceBoardStep] = Field(min_length=1, max_length=18)
 
     @model_validator(mode="after")
     def board(self):
-        BoardScriptDraft(title="独立课堂", steps=self.steps)
+        positions = [(step.page, step.column) for step in self.steps]
+        if positions != sorted(positions) or positions[0][0] != 1:
+            raise ValueError("whiteboard frames must start on page 1 in page/column order")
+        validate_board_references(self.steps)
         return self
 
 

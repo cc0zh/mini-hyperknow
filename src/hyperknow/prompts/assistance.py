@@ -34,6 +34,9 @@ def teaching_prompt(catalog: list[dict], schema: dict) -> str:
         "每轮最多一个产物，只能经对应create工具暂存，最终回复完成才保存，失败不可声称成功。"
         "遵从学习者对产物的明确要求或拒绝，不把讨论已有产物当作新建请求。"
         "正文不冒充产物已存在，不返回产物JSON或重复全部产物内容。"
+        "独立whiteboard是视觉产物，不要求课程路线图或stage；每个operation必须有唯一object_id，图节点id也全板唯一。"
+        "table用columns与等宽rows，diagram用nodes:{id,label}和edges:{from_id,to_id,label}且边端点必须属于该图。"
+        "highlight/circle使用target_ids指向此前已出现对象或节点，不允许超前引用；白板给结构和具体例子，narration互补解释。"
     )
     skills = (
         "Skill是可选的专门方法，不是回答或创建产物的前置条件。"

@@ -1,5 +1,5 @@
 import { request } from './api.ts'
-import type { BoardScript, BoardStep, ServiceError } from './types.ts'
+import type { BoardFrame, ServiceError } from './types.ts'
 
 // Artifact kind is the model's decision, not a learner-facing choice. Only
 // these two turn intents exist: an ordinary teaching message and an explicit
@@ -31,7 +31,7 @@ interface ArtifactBase { artifact_id: string; conversation_id: string; turn_id: 
 export type AssistanceArtifact = ArtifactBase & (
   { kind: 'flashcards'; data: { cards: { question: string; answer: string }[] } } |
   { kind: 'quiz'; data: { questions: { question_id: string; question: string; options: { id: string; text: string }[]; correct_ids: string[]; explanation: string }[] } } |
-  { kind: 'whiteboard'; data: { steps: BoardStep[]; cursor: number } } |
+  { kind: 'whiteboard'; data: { steps: BoardFrame[]; cursor: number } } |
   { kind: 'animation'; data: { html: string } } |
   { kind: 'diagram'; data: { source: string; caption: string } }
 ) & { version: number; feedback?: 'up' | 'down'; feedback_at?: string }
@@ -132,10 +132,6 @@ export function makeTurnCommand(conversation: AssistanceConversation, text: stri
 export const validTurn = (text: string) => text.trim().length > 0 && text.trim().length <= 12000
 export const validBoardCursor = (previous: number, next: number, count: number) => Number.isInteger(next) && next >= -1 && next < count && (next === previous || next === previous + 1)
 export const isAdvanceAllowed = (cursor: number, count: number, pendingQuestion: boolean) => !pendingQuestion && cursor + 1 < count
-export const makeBoardScript = (artifact: WhiteboardArtifact): BoardScript => ({
-  script_id: artifact.artifact_id, session_id: '', course_id: '', content_version: artifact.version, schema_version: 1,
-  title: artifact.title, steps: artifact.data.steps, created_at: '',
-})
 export function selectQuizOption(selected: string[], id: string, correctIds: string[]) {
   return correctIds.length > 1 ? selected.includes(id) ? selected.filter(value => value !== id) : [...selected, id] : [id]
 }

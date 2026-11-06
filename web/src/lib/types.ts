@@ -116,12 +116,18 @@ export interface Course {
 
 export type PlayIntent = 'paused' | 'playing'
 export interface BoardOperation {
-  kind: 'text' | 'list' | 'code' | 'formula' | 'box' | 'arrow' | 'highlight' | 'mermaid'
+  kind: 'text' | 'list' | 'code' | 'formula' | 'box' | 'arrow' | 'highlight' | 'mermaid' | 'table' | 'diagram' | 'circle'
+  object_id: string
+  target_ids: string[]
   content: string
   items: string[]
   language: string
+  columns: string[]
+  rows: string[][]
+  nodes: { id: string; label: string }[]
+  edges: { from_id: string; to_id: string; label: string }[]
 }
-export interface BoardStep {
+export interface BoardFrame {
   step_id: string
   title: string
   narration: string
@@ -129,13 +135,21 @@ export interface BoardStep {
   column: 1 | 2
   operations: BoardOperation[]
 }
+export interface BoardStep extends BoardFrame {
+  stage: 'opening' | 'explain' | 'example' | 'check' | 'summary'
+  keypoint_id: string | null
+  focus_ids: string[]
+  check: { question: string; expected_answer: string } | null
+}
 export interface BoardScript {
   script_id: string
   session_id: string
   course_id: string
   content_version: number
-  schema_version: number
+  schema_version: 2
   title: string
+  objectives: string[]
+  roadmap: { keypoint_id: string; title: string; question: string; source_keypoint_index: number }[]
   steps: BoardStep[]
   created_at: string
 }
@@ -151,6 +165,8 @@ export interface Interaction {
   run_id: string
   script_id: string
   step_id: string | null
+  anchor_step_id: string | null
+  anchor_object_id: string | null
   cursor: number
   question: string
   answer: string | null
@@ -167,6 +183,7 @@ export interface LessonSnapshot {
   lecture_title: string
   session: Session
   script: BoardScript | null
+  format_error: ServiceError | null
   progress: LessonProgress
   interactions: Interaction[]
   generation_run: Run | null

@@ -158,6 +158,13 @@ class QuizStorageTests(unittest.TestCase):
             self.lesson()
         return persisted_quiz(self.db, kind, self.sid if kind == "practice" else self.eid)
 
+    def show_summary(self, lesson):
+        for cursor in range(len(lesson["script"]["steps"])):
+            lesson = self.db.save_progress(self.sid, {
+                "client_command_id": f"manual-summary-{cursor}", "expected_version": lesson["progress"]["version"],
+                "script_id": lesson["script"]["script_id"], "cursor": cursor, "play_intent": "paused"})
+        return lesson
+
     def attempt(self, target=None):
         target = target or self.ready()
         return self.db.create_attempt(target["quiz"]["quiz_id"], "domain-create-attempt")
@@ -400,7 +407,7 @@ class QuizStorageTests(unittest.TestCase):
 
     def test_practice_submit_after_manual_completion_does_not_increment_course_twice(self):
         target = self.ready()
-        lesson = self.db.get_lesson(self.sid)
+        lesson = self.show_summary(self.db.get_lesson(self.sid))
         self.db.complete_lesson(self.sid, {
             "client_command_id": "manual-first", "expected_version": lesson["progress"]["version"],
             "script_id": lesson["script"]["script_id"]})
@@ -414,7 +421,7 @@ class QuizStorageTests(unittest.TestCase):
             self.assertNotIn("attempt_id", fact)  # Preserve the original completion fact.
 
     def test_manual_lesson_completion_bumps_practice_target_without_a_quiz(self):
-        lesson = self.lesson()
+        lesson = self.show_summary(self.lesson())
         before = self.db.get_quiz_target("practice", self.sid)
         payload = {"client_command_id": "manual-complete", "expected_version": lesson["progress"]["version"],
                    "script_id": lesson["script"]["script_id"]}

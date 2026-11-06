@@ -27,10 +27,10 @@
 | Session | 稳定 ID、标题、说明、大纲、要点、顺序；时长若有仅是估计，不伪称实测 |
 | Exam | 稳定 ID、所属单元、目标与范围；不内置无证据的通过线 |
 | Project / ProjectStage | 课程目标／最终成果，及各阶段要求、所属单元、顺序和交付增量 |
-| BoardScript / BoardStep | 当前为不可变 script_id／content_version、稳定 step_id、讲解、page／column 和八种 operation；无思考题字段，思考题为未来扩展 |
+| BoardScript / BoardStep | 单一schema_version=2：objectives、roadmap及来源索引；稳定step_id、stage、keypoint_id、focus_ids、check、讲解、page／column与有object_id的视觉操作；不兼容旧脚本 |
 | LessonProgress | script_id、最近确认可展示的 cursor、play_intent、独立 version 及 updated_at；讲到不等于课时完成 |
-| LessonSnapshot | 课堂聚合顶层 version、课时及课程上下文、script、progress、interactions、generation_run、completed；不是另一份目录 |
-| LessonInteraction | 当前为课堂问题及回答、interaction_id／run_id／script_id、cursor／step_id、was_playing、状态、错误和时间；思考题作答与反馈仍为目标 |
+| LessonSnapshot | 课堂聚合顶层version、课时及课程上下文、script、progress、interactions、generation_run、completed、format_error；不支持的旧脚本不混入新类型 |
+| LessonInteraction | 问题或check回答及模型反馈、interaction_id／run_id／script_id、教学cursor／step_id、查看anchor_step_id／anchor_object_id、was_playing、状态、错误和时间；无掌握评分 |
 | Quiz | 稳定题组版本、目标类型及 ID、有序问题、选项、答案集合、解释和来源内容引用 |
 | QuizAttempt | 题组版本、有序作答／跳过、用时、当前位置、提交状态、个人汇总结果及计分版本 |
 | ProjectSubmission | 项目阶段、文字／链接、保存时间、提交身份；不含虚构评审结果 |
@@ -86,7 +86,7 @@ Attempt绑定固定quiz_id与scoring_version，保存cursor、question_started_a
 ## 4. 状态与版本
 
 - Course 的 schema_version 表示 JSON 结构，version 表示记录修改；当前无课程结构编辑，课时手动完成及首次练习／考核完成只提升记录版本，不无声替换目录。
-- Script 内容不可变；当前生成后重入读取同一个 content_version=1，不因刷新重新调用模型。Quiz当前同样不可变且再练复用同一版本；未来脚本主动重生成保留旧版本仍是长期目标。
+- Script生成后重入读取同一版本，不因刷新调用模型。显式regenerate建立新run，旧脚本原字节保存在run.previous_script_data，成功前当前脚本不动，成功后切换新script_id并恢复cursor=-1；不迁移旧协议、不清库。Quiz仍不可变且再练复用同一版本。
 - Attempt 保存 `in_progress` 或 `submitted`。全题已答／跳过后，用户点击“看结果”显式提交；汇总结果和相关完成标记同事务写入，最后一次保存答案本身不自动提交。
 - LessonProgress 初始 script_id=null、cursor=-1、play_intent=paused、version=1；生成讲义后关联脚本，cursor 仍为 -1。cursor 只允许保持或 +1，后端确认后前端才展示步骤；页栏回看不会倒退确认位置。
 - 课堂快照顶层 version 是 session 资源的聚合版本，run 变化、问答 ready 等也会提升；progress.version 由脚本／位置／播放意图写事务更新（提问或完成写入暂停也会更新），不是每次回答状态改变都更新。课堂命令的 expected_version 取 progress.version，WS 与完整快照排序取顶层 version，不能混用。

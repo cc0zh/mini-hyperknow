@@ -10,7 +10,8 @@
 - `src/agent_core/` 已升级为可选持久会话／Token 预算压缩、分层模型、工具调度与逐次审批的 V1；同步 provider 契约保留，接口和边界见[内核 V1](design-docs/agent-core-v1.md)。
 - `src/hyperknow_eval/`为产品专属的学习任务评测：严格任务／公开投影、真实隔离场景、冻结证据、无答案学生模拟、独立教学判据及离线报告；产品运行时不反向依赖。旧通用框架、Adapter／DSL／ATIF／发布平台已删除，无历史执行兼容；见[设计](design-docs/backend-evaluation-pipeline.md)、[命令](../evals/README.md)及[实际验收](exec-plans/completed/20261029-learning-evaluation-rewrite.md)。
 - provider 当前只有同步 `complete(context)`，没有原生 Token 流；`Agent.abort()` 只能在后续循环边界生效，不能证明已取消在途网络请求。
-- 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；产品课程、澄清、运行、命令回执、模型调用，以及讲义、课堂位置、问答和课时完成事实已保存到 SQLite。本阶段新增题组／作答／结果与考核完成事实；思考题及成果提交尚未实现。
+- 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；课程、澄清、运行、命令回执、模型调用、讲义、课堂位置、问答和完成事实，以及题组／作答／结果均保存到 SQLite。课堂开放式理解检查复用问答持久化，不提供掌握评分；项目成果提交仍未实现。
+- 2026-11-05课堂以完整单课教学为当前产品优先级：路线图→逐要点解释与例子→检查→总结。新脚本只接受schema_version=2，不兼容旧课堂、不迁移或清库，旧格式通过format_error与显式重新生成处理。前端为白板主导的独立课堂空间，模型负责内容与关系，前端负责对象布局及统一图文时间线。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
 - `src/hyperknow/`已有FastAPI与串行生成执行器，支持course／lesson／question／quiz／research／assistance；课程新增研究→蓝图→等待一次确认→自动逐单元展开，独立调研端点仍保留。契约与当前验收见[蓝图工作流](design-docs/course-blueprint-workflow.md)。`web/`已有首页、双栏创建／蓝图、课程库、总览、课堂、练习／考核及独立即时协助/协助白板页面；启动命令见[README](../README.md)。
 
@@ -76,7 +77,7 @@ src/
     domain.py             课程/澄清 schema、答案规则、实体化
     blueprint_domain.py   全局规划与单元展开结构、预算、来源上下文及持久ID
     blueprint_storage.py  一次确认/调整、逐单元局部提交、取消/重试保存屏障
-    lesson_domain.py      八种板书操作、讲义/问答 schema、上下文与统一进度派生
+    lesson_domain.py      完整教学协议、稳定白板对象/引用、问答锚点、上下文与统一进度派生
     lesson_storage.py     讲义、确认位置、问答及手动完成事务
     generation.py         课程/讲义/问答/出题真实模型、输入依据、结构校验和一次修复
     prompts/              课程/课堂/题组/调研/协助提示；不负责工具执行、上下文裁剪或持久化
@@ -136,7 +137,7 @@ SQLite 当前保存课程、目标与澄清、运行、命令回执、模型调�
 
 即时协助另以幂等DDL新增assistance_conversations(id,data)和assistance_artifacts(id,conversation_id,data)，保持user_version=3；原表及升级备份不变。产物生成暂存于单run内，回复／全部产物／ready通过事务同时提交；白板cursor独立使用artifact.version。闪卡位置、即时测验选择和HTML内部状态仅为浏览器现场，不与课程成绩混用。
 
-播放器只有一个前端 PlaybackClock；后端不开自动讲课定时器。前端串行写入下一步，经后端确认后才展示该步骤。页栏回看只改变本地显示选择，不改变确认 cursor。GET 保留数据库中权威 play_intent，同一版本不因读取而改成 paused；恢复时前端仍创建暂停的本地时钟，不根据 GET 自动播放。进入、刷新和重连不会发起讲义生成，必须明确点击准备或重试。
+播放器只有一个前端 PlaybackClock；后端不开自动讲课定时器。前端串行写入下一步，经后端确认后才展示；check自动暂停。本地viewCursor统一回看的板书与讲解，不改变教学确认cursor；查看锚点可随问题保存，必须属于确认前缀。GET保留权威play_intent，恢复本地时钟始终暂停。进入、刷新和重连不生成讲义；prepare、retry或regenerate均需显式操作。完成要求已确认最终summary，提前离开只保留位置，播完不自动完成。
 
 具体数据不变量和保存屏障见[数据模型](design-docs/data-model.md)，协议见[接口与事件](design-docs/api-and-events.md)。
 
@@ -173,7 +174,7 @@ SQLite 当前保存课程、目标与澄清、运行、命令回执、模型调�
 研发评测：Case/Rubric → 隔离真实业务HTTP → 证据/轨迹 → 规则与Grader
 ```
 
-课时讲义与题组按需生成，课程结构ready不代表它们已经生成。课堂完成和题组提交是行为事实，不代表掌握度。思考题反馈、项目成果提交/恢复及自适应重排未实现；课程中已有项目阶段描述不等于成果提交业务已实现。
+课时讲义与题组按需生成，课程结构ready不代表它们已经生成。课堂完成和题组提交是行为事实，不代表掌握度。课堂check使用真实问答保存开放式回答与反馈，不是独立考试评分；项目成果提交／恢复及自适应重排未实现。
 
 ### 10.2 模型参与的业务：主维护点与影响面
 
@@ -211,7 +212,7 @@ B01/B03/B04/B05/B06由[Generator.generate](../src/hyperknow/generation.py)选择
 | --- | --- | --- |
 | 所有生成业务 | FastAPI装配、单worker、provider、run/调用记录、SQLite与通知机制 | 每个run的输入、模型、状态、预算与提交目标；共用worker不等于共享可变对话 |
 | 造课调研与独立调研 | Researcher、搜索/阅读工具、引用规则 | 独立调研不自动创建课程；协助Agent没有搜索/文件/命令权限 |
-| 课程课堂与协助白板 | BoardOperation/步骤结构、Board/公式/Mermaid及播放器能力 | 讲义/课时和独立artifact各自ID、版本、确认位置与完成语义；不能共享课程成绩或会话 |
+| 课程课堂与协助白板 | 新BoardOperation、稳定对象引用、安全公式／Mermaid等渲染能力 | 课堂完整教学脚本与协助的独立步骤类型明确分离，不作旧协议兼容；各自ID／版本／位置及完成语义，不共享课程成绩或会话 |
 | 课程题组与协助测验 | 共用模型/worker底座，不共用题组与作答领域对象 | QuizDraft/Attempt/Result与ChatQuizQuestion分别维护；协助作答属浏览器现场，不写课程成绩 |
 | 产品业务与Agent内核 | provider、Agent/ToolManager、可信SkillRegistry等需要时使用的能力 | 内核不依赖课程；产品未因此自动开启JSONL第二业务库、长期记忆、摘要模型或开发工具权限 |
 | 产品运行与研发评测 | 可复用已保存真实调用和明确格式的轨迹证据 | 产品不反向依赖eval；Grader判据不注入被测教学；[当前eval](../evals/README.md)统一通用Runner与B01–B08接入，工程覆盖不等于全业务真实质量通过 |

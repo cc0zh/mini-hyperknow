@@ -283,6 +283,12 @@ class QuizLiveServerTests(unittest.TestCase):
         self.lesson()
         target = self.get(f"/api/sessions/{self.sid}/practice")
         lesson = self.get(f"/api/sessions/{self.sid}")
+        for cursor in range(len(lesson["script"]["steps"])):
+            response = self.client.put(f"/api/sessions/{self.sid}/progress", json=self.command(
+                f"manual-summary-{cursor}", expected_version=lesson["progress"]["version"],
+                script_id=lesson["script"]["script_id"], cursor=cursor, play_intent="paused"))
+            self.assertEqual(response.status_code, 200)
+            lesson = response.json()
         key = f"practice:{self.sid}"
         with connect(f"ws://127.0.0.1:{self.port}/api/events", proxy=None) as ws:
             self.subscribe(ws, f"quiz_target:{key}")

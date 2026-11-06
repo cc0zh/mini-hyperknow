@@ -13,7 +13,7 @@ from agent_core.types import AgentContext, UserMessage
 from .config import Settings
 from .domain import AppError, Clarification
 from .blueprint_domain import BlueprintDraft, UnitExpansionDraft, planning_context, validate_expansion
-from .lesson_domain import BoardScriptDraft, LessonAnswer
+from .lesson_domain import BoardScriptDraft, LessonAnswer, validate_lesson_coverage
 from .quiz_domain import QuizDraft, validate_sources
 from .prompts.classroom import BOARD_SCRIPT_INSTRUCTION, LESSON_ANSWER_INSTRUCTION
 from .prompts.course import BLUEPRINT_INSTRUCTION, CLARIFICATION_INSTRUCTION, UNIT_INSTRUCTION
@@ -152,8 +152,8 @@ class Generator:
             started = monotonic()
             record = {"phase": phase, "kind": kind, "attempt": attempt + 1,
                       "requested_model": run["model"], "model": run["model"], "provider": "openai",
-                      "prompt_version": f"{kind}-{phase}-v{2 if phase == 'clarifying' else 1}",
-                      "schema_version": 2 if phase == "clarifying" else 1,
+                      "prompt_version": f"{kind}-{phase}-v{2 if kind == 'lesson' or phase == 'clarifying' else 1}",
+                      "schema_version": 2 if kind == "lesson" or phase == "clarifying" else 1,
                       "system_prompt": system, "messages": [m.content for m in messages],
                       "input_basis": user, "started_at": now()}
             if planning:
@@ -192,6 +192,8 @@ class Generator:
                 result = schema.model_validate(parse_json(response.content))
                 if kind == "quiz":
                     validate_sources(result, user)
+                elif kind == "lesson":
+                    validate_lesson_coverage(result, user)
                 elif kind == "course" and phase == "units":
                     validate_expansion(result, user["unit"], user["unit_session_budget"])
             except (ValueError, ValidationError) as exc:
