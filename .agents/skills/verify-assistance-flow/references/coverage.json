@@ -1,0 +1,19 @@
+{
+  "id": "assistance-flow",
+  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "workspace_dirty_at_sync": true,
+  "spec": "assets/AssistanceFlow.tla",
+  "config": "assets/AssistanceFlow.cfg",
+  "view": "assets/view.mjs",
+  "invariant": "AtMostOneArtifactPerTurn",
+  "bounds": {"conversations": 1, "requests": 2, "candidate_artifacts": 2},
+  "sources": [
+    {"path": "src/hyperknow/assistance_storage.py", "sha256": "06744d832859f95bcb124fc093fad494750a4fb6f2fffc4385a01776aa829384", "symbols": ["assistance_turn", "assistance_step", "finish_assistance", "_retry_assistance"]}
+  ],
+  "code_mutation": {
+    "path": "src/hyperknow/assistance_storage.py",
+    "before": "if len(drafts) > 1:",
+    "after": "if len(drafts) > 2:",
+    "tests": ["test_assistance_storage.AssistanceStorageTests.test_a_second_artifact_in_one_turn_is_rejected_without_saving_either"]
+  }
+}

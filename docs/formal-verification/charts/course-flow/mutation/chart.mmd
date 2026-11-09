@@ -1,0 +1,63 @@
+---
+title: "从学习目标到可学习的课程"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: input
+    lg2: stop
+    lg3: work
+    lg4: Breaks ReadyRequiresAllUnits
+    lg5: Path to the ReadyRequiresAllUnits bug
+  }
+  class lg0 teal
+  class lg1 yellow
+  class lg2 orange
+  class lg3 blue
+  class lg4 breaks
+  class lg5 bugPath
+  s0: 目标已提交
+  s1: 任务已停止#65292;需显式重试
+  s2: 分析学习需求
+  s3: 等待必要澄清
+  s4: 搜索并阅读资料
+  s5: 生成全局蓝图
+  s6: 等待你确认蓝图
+  s7: 逐单元展开并保存
+  s8: 只展开部分单元却宣布就绪
+  [*] --> s0
+  s0 --> s1: 任务停止或用户取消
+  s0 --> s2: 提交学习目标
+  s2 --> s1: 任务停止或用户取消
+  s2 --> s3: 需要补充信息
+  s2 --> s4: 无需澄清#65292;直接调研
+  s3 --> s1: 任务停止或用户取消
+  s3 --> s4: 提交澄清答案
+  s4 --> s1: 任务停止或用户取消
+  s4 --> s5: 调研报告已保存
+  s5 --> s1: 任务停止或用户取消
+  s5 --> s6: 保存蓝图草案
+  s6 --> s1: 任务停止或用户取消
+  s6 --> s4: 反馈调整#65292;补充调研
+  s6 --> s7: 明确批准蓝图
+  s7 --> s1: 任务停止或用户取消
+  s7 --> s7: 开始下一单元
+  s7 --> s8: 保存单元#65292;全部完成后就绪
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 blue
+  class s0 bugPath
+  class s1 orange
+  class s2 blue
+  class s2 bugPath
+  class s3 yellow
+  class s4 blue
+  class s4 bugPath
+  class s5 blue
+  class s5 bugPath
+  class s6 yellow
+  class s6 bugPath
+  class s7 blue
+  class s7 bugPath
+  class s8 teal
+  class s8 breaks
+  class s8 bugPath

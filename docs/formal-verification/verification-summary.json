@@ -1,0 +1,168 @@
+{
+  "tool": "TLC 1.7.4",
+  "scope": "bounded model safety, not a proof of the whole product",
+  "systems": [
+    {
+      "id": "assistance-flow",
+      "invariant": "AtMostOneArtifactPerTurn",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 39,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 19,
+          "violated": "AtMostOneArtifactPerTurn"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "classroom-flow",
+      "invariant": "CompletionRequiresSummary",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 18,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 10,
+          "violated": "CompletionRequiresSummary"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "course-flow",
+      "invariant": "ReadyRequiresAllUnits",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 31,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 18,
+          "violated": "ReadyRequiresAllUnits"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "quiz-flow",
+      "invariant": "SubmissionRequiresAllAnswers",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 12,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 10,
+          "violated": "SubmissionRequiresAllAnswers"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "research-flow",
+      "invariant": "ToolBudgetRespected",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 170,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 158,
+          "violated": "ToolBudgetRespected"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "run-lifecycle",
+      "invariant": "NoConflictingReplay",
+      "results": [
+        {
+          "kind": "baseline",
+          "expected_result_observed": true,
+          "states": 25,
+          "violated": null
+        },
+        {
+          "kind": "mutant",
+          "expected_result_observed": true,
+          "states": 5,
+          "violated": "NoConflictingReplay"
+        },
+        {
+          "kind": "real-code-witness",
+          "expected_result_observed": true,
+          "exit_codes": {
+            "baseline": 0,
+            "mutant": 1,
+            "restored": 0
+          }
+        }
+      ]
+    }
+  ]
+}

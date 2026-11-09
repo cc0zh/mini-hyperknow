@@ -1,0 +1,60 @@
+---
+title: "白板课堂与提问和手动完成"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: input
+    lg2: stop
+    lg3: work
+    lg4: Breaks CompletionRequiresSummary
+    lg5: Path to the CompletionRequiresSummary bug
+  }
+  class lg0 teal
+  class lg1 yellow
+  class lg2 orange
+  class lg3 blue
+  class lg4 breaks
+  class lg5 bugPath
+  s0: 进入课堂#65292;只读已有状态
+  s1: 正在准备讲义
+  s2: 讲义任务已停止#65292;等待重试
+  s3: 暂停#65292;可回看
+  s4: 未展示总结就记录完成
+  s5: 正在讲解
+  s6: 提问中#65292;固定教学位置
+  s7: 已确认最后总结
+  s8: 你已手动完成本课
+  [*] --> s0
+  s0 --> s1: 明确准备本课
+  s1 --> s2: 任务停止或用户取消
+  s1 --> s1: 开始生成
+  s2 --> s1: 明确重试讲义生成
+  s1 --> s3: 保存讲义#65292;初始暂停
+  s3 --> s4: 明确完成本课
+  s3 --> s5: 明确播放
+  s3 --> s6: 提交问题并暂停
+  s5 --> s3: 暂停 or 刷新后本地暂停 or 逐步确认#65292;检查点自动暂停
+  s5 --> s4: 明确完成本课
+  s6 --> s3: 回答结束#65292;等待明确继续
+  s3 --> s7: 逐步确认#65292;检查点自动暂停
+  s5 --> s6: 提交问题并暂停
+  s7 --> s6: 提交问题并暂停
+  s7 --> s8: 明确完成本课
+  s5 --> s7: 逐步确认#65292;检查点自动暂停
+  s6 --> s7: 回答结束#65292;等待明确继续
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 blue
+  class s0 bugPath
+  class s1 blue
+  class s1 bugPath
+  class s2 orange
+  class s3 blue
+  class s3 bugPath
+  class s4 teal
+  class s4 breaks
+  class s4 bugPath
+  class s5 blue
+  class s6 yellow
+  class s7 blue
+  class s8 teal

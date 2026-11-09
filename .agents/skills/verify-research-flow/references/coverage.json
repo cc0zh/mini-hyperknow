@@ -1,0 +1,19 @@
+{
+  "id": "research-flow",
+  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "workspace_dirty_at_sync": true,
+  "spec": "assets/ResearchFlow.tla",
+  "config": "assets/ResearchFlow.cfg",
+  "view": "assets/view.mjs",
+  "invariant": "ToolBudgetRespected",
+  "bounds": {"runs": 1, "research_rounds": 1, "steps": 10, "mutant_steps": 11},
+  "sources": [
+    {"path": "src/hyperknow/research_storage.py", "sha256": "175657409fe654cd6666185fb1cc95497b498e3f8e520fcfbfbd4d0dee82dfd1", "symbols": ["research_step", "finish_research", "_research_active"]}
+  ],
+  "code_mutation": {
+    "path": "src/hyperknow/research_storage.py",
+    "before": "if len(round_steps) >= 10:",
+    "after": "if len(round_steps) > 10:",
+    "tests": ["test_research.ResearchStorageTests.test_step_budget_rejection_does_not_append_page_or_increment_version"]
+  }
+}

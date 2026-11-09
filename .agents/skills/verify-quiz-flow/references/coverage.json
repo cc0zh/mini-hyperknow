@@ -1,0 +1,20 @@
+{
+  "id": "quiz-flow",
+  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "workspace_dirty_at_sync": true,
+  "spec": "assets/QuizFlow.tla",
+  "config": "assets/QuizFlow.cfg",
+  "view": "assets/view.mjs",
+  "invariant": "SubmissionRequiresAllAnswers",
+  "bounds": {"quizzes": 1, "attempts": 1, "questions": 2},
+  "sources": [
+    {"path": "src/hyperknow/quiz_storage.py", "sha256": "3a2710d28b3ab12441a7a0302ca34e16fe4871a0941b3024a8fde79500e5b5b4", "symbols": ["prepare_quiz", "finish_quiz", "create_attempt", "answer_quiz", "next_question", "submit_quiz"]},
+    {"path": "web/src/lib/quiz-state.ts", "sha256": "6b5d7aa4ca27221dd938e593dc85a520de04047c4f91ea7be5c3c25665db3d07", "symbols": ["attemptTransition", "answerCommand"]}
+  ],
+  "code_mutation": {
+    "path": "src/hyperknow/quiz_storage.py",
+    "before": "if len(attempt[\"answers\"]) != len(quiz[\"questions\"]):",
+    "after": "if False:",
+    "tests": ["test_quiz.QuizStorageTests.test_invalid_selection_and_noncurrent_question_cannot_write"]
+  }
+}

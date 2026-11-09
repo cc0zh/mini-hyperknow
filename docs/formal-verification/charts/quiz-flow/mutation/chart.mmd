@@ -1,0 +1,59 @@
+---
+title: "逐题作答与显式提交和结果保存"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: input
+    lg2: stop
+    lg3: work
+    lg4: Breaks SubmissionRequiresAllAnswers
+    lg5: Path to the SubmissionRequiresAllAnswers bug
+  }
+  class lg0 teal
+  class lg1 yellow
+  class lg2 orange
+  class lg3 blue
+  class lg4 breaks
+  class lg5 bugPath
+  s0: 进入练习或考核#65292;只读
+  s1: 正在准备题组
+  s2: 出题已停止#65292;等待重试
+  s3: 题组已保存#65292;等待开始
+  s4: 回答第一题
+  s5: 本题反馈#65292;等待下一题
+  s6: 未答完就保存了结果
+  s7: 回答第二题
+  s8: 末题反馈#65292;等待你提交
+  s9: 结果与完成记录已保存
+  [*] --> s0
+  s0 --> s1: 明确准备题组
+  s1 --> s2: 任务停止或用户取消
+  s1 --> s1: 开始出题
+  s2 --> s1: 明确重试出题
+  s1 --> s3: 保存不可变题组
+  s3 --> s4: 明确开始作答
+  s4 --> s5: 保存答案或跳过#65292;停留反馈
+  s4 --> s6: 明确看结果#65292;事务计分并保存
+  s5 --> s7: 明确进入下一题
+  s5 --> s6: 明确看结果#65292;事务计分并保存
+  s7 --> s8: 保存答案或跳过#65292;停留反馈
+  s7 --> s6: 明确看结果#65292;事务计分并保存
+  s8 --> s9: 明确看结果#65292;事务计分并保存
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 blue
+  class s0 bugPath
+  class s1 blue
+  class s1 bugPath
+  class s2 orange
+  class s3 blue
+  class s3 bugPath
+  class s4 yellow
+  class s4 bugPath
+  class s5 yellow
+  class s6 teal
+  class s6 breaks
+  class s6 bugPath
+  class s7 yellow
+  class s8 yellow
+  class s9 teal

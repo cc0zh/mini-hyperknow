@@ -1,0 +1,42 @@
+---
+title: "逐题作答与显式提交和结果保存"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: input
+    lg2: stop
+    lg3: work
+  }
+  class lg0 teal
+  class lg1 yellow
+  class lg2 orange
+  class lg3 blue
+  s0: 进入练习或考核#65292;只读
+  s1: 正在准备题组
+  s2: 出题已停止#65292;等待重试
+  s3: 题组已保存#65292;等待开始
+  s4: 回答第一题
+  s5: 本题反馈#65292;等待下一题
+  s6: 回答第二题
+  s7: 末题反馈#65292;等待你提交
+  s8: 结果与完成记录已保存
+  [*] --> s0
+  s0 --> s1: 明确准备题组
+  s1 --> s2: 任务停止或用户取消
+  s2 --> s1: 明确重试出题
+  s1 --> s3: 保存不可变题组
+  s3 --> s4: 明确开始作答
+  s4 --> s5: 保存答案或跳过#65292;停留反馈
+  s5 --> s6: 明确进入下一题
+  s6 --> s7: 保存答案或跳过#65292;停留反馈
+  s7 --> s8: 明确看结果#65292;事务计分并保存
+  class s0 blue
+  class s1 blue
+  class s2 orange
+  class s3 blue
+  class s4 yellow
+  class s5 yellow
+  class s6 yellow
+  class s7 yellow
+  class s8 teal

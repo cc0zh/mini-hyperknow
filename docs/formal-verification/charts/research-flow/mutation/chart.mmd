@@ -1,0 +1,54 @@
+---
+title: "有预算的网页调研"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: stop
+    lg2: work
+    lg3: Breaks ToolBudgetRespected
+    lg4: Path to the ToolBudgetRespected bug
+  }
+  class lg0 teal
+  class lg1 orange
+  class lg2 blue
+  class lg3 breaks
+  class lg4 bugPath
+  s0: 调研排队
+  s1: 调研已停止
+  s2: 等待有效搜索结果
+  s3: 已有原文#65292;仍需有效搜索
+  s4: 找到候选来源#65292;等待读取
+  s5: 已搜索并读取原文#65292;可生成报告
+  s6: 报告与证据已保存
+  s7: 工具调用超过十次
+  [*] --> s0
+  s0 --> s1: 任务停止或用户取消
+  s0 --> s2: 开始调研
+  s2 --> s1: 任务停止或用户取消
+  s2 --> s3: 成功读取并保存原文
+  s2 --> s4: 搜索找到候选来源
+  s3 --> s1: 任务停止或用户取消
+  s3 --> s5: 搜索找到候选来源
+  s4 --> s1: 任务停止或用户取消
+  s4 --> s4: 搜索找到候选来源
+  s4 --> s5: 成功读取并保存原文
+  s5 --> s1: 任务停止或用户取消
+  s5 --> s6: 合法报告通过校验后保存
+  s2 --> s7: 搜索失败#65292;仍消耗预算 or 成功读取并保存原文 or 搜索找到候选来源
+  s3 --> s7: 成功读取并保存原文 or 搜索失败#65292;仍消耗预算 or 搜索找到候选来源
+  s4 --> s7: 搜索找到候选来源 or 搜索失败#65292;仍消耗预算 or 成功读取并保存原文
+  s5 --> s7: 成功读取并保存原文 or 搜索找到候选来源 or 搜索失败#65292;仍消耗预算
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 blue
+  class s0 bugPath
+  class s1 orange
+  class s2 blue
+  class s2 bugPath
+  class s3 blue
+  class s4 blue
+  class s4 bugPath
+  class s5 blue
+  class s6 teal
+  class s7 breaks
+  class s7 bugPath

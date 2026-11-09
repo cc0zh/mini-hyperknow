@@ -1,0 +1,36 @@
+---
+title: "任务命令与取消和显式重试"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: normal
+    lg1: attention
+  }
+  class lg0 blue
+  class lg1 orange
+  s0: 尚未提交
+  s1: 任务排队
+  s2: 已取消
+  s3: 正在生成
+  s4: 重启后已中断
+  s5: 生成失败
+  s6: 结果已保存
+  [*] --> s0
+  s0 --> s1: 提交命令
+  s1 --> s2: 显式取消
+  s1 --> s3: 开始实际调用
+  s1 --> s4: 服务重启
+  s2 --> s1: 显式重试#65292;新建任务
+  s3 --> s2: 显式取消
+  s3 --> s4: 服务重启
+  s3 --> s5: 生成失败
+  s3 --> s6: 事务保存结果
+  s4 --> s1: 显式重试#65292;新建任务
+  s5 --> s1: 显式重试#65292;新建任务
+  class s0 blue
+  class s1 blue
+  class s2 orange
+  class s3 blue
+  class s4 orange
+  class s5 orange
+  class s6 blue

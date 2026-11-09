@@ -1,0 +1,45 @@
+---
+title: "白板课堂与提问和手动完成"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: input
+    lg2: stop
+    lg3: work
+  }
+  class lg0 teal
+  class lg1 yellow
+  class lg2 orange
+  class lg3 blue
+  s0: 进入课堂#65292;只读已有状态
+  s1: 正在准备讲义
+  s2: 讲义任务已停止#65292;等待重试
+  s3: 暂停#65292;可回看
+  s4: 正在讲解
+  s5: 提问中#65292;固定教学位置
+  s6: 已确认最后总结
+  s7: 你已手动完成本课
+  [*] --> s0
+  s0 --> s1: 明确准备本课
+  s1 --> s2: 任务停止或用户取消
+  s2 --> s1: 明确重试讲义生成
+  s1 --> s3: 保存讲义#65292;初始暂停
+  s3 --> s4: 明确播放
+  s3 --> s5: 提交问题并暂停
+  s4 --> s3: 暂停 or 刷新后本地暂停 or 逐步确认#65292;检查点自动暂停
+  s5 --> s3: 回答结束#65292;等待明确继续
+  s3 --> s6: 逐步确认#65292;检查点自动暂停
+  s4 --> s5: 提交问题并暂停
+  s6 --> s5: 提交问题并暂停
+  s6 --> s7: 明确完成本课
+  s4 --> s6: 逐步确认#65292;检查点自动暂停
+  s5 --> s6: 回答结束#65292;等待明确继续
+  class s0 blue
+  class s1 blue
+  class s2 orange
+  class s3 blue
+  class s4 blue
+  class s5 yellow
+  class s6 blue
+  class s7 teal

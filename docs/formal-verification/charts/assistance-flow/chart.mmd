@@ -1,0 +1,43 @@
+---
+title: "独立即时协助与可选产物"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: done
+    lg1: stop
+    lg2: work
+  }
+  class lg0 teal
+  class lg1 orange
+  class lg2 blue
+  s0: 独立会话#65292;可直接提问
+  s1: 教学轮次排队
+  s2: 已取消#65292;未保存本轮回复
+  s3: 正在教学#65292;产物尚未提交
+  s4: 重启后本轮已中断
+  s5: 本轮失败#65292;未提交产物
+  s6: 回复已保存#65292;无需产物
+  s7: 回复与一个产物同时保存
+  [*] --> s0
+  s0 --> s1: 发送问题或明确继续
+  s1 --> s2: 显式取消
+  s1 --> s3: 开始教学
+  s1 --> s4: 服务重启
+  s2 --> s1: 显式重试当前失败轮次
+  s3 --> s2: 显式取消
+  s3 --> s4: 服务重启
+  s3 --> s5: 生成或校验失败
+  s4 --> s1: 显式重试当前失败轮次
+  s5 --> s1: 显式重试当前失败轮次
+  s3 --> s6: 校验并原子保存回复和可选产物
+  s3 --> s7: 校验并原子保存回复和可选产物
+  s6 --> s1: 发送问题或明确继续
+  s7 --> s1: 发送问题或明确继续
+  class s0 blue
+  class s1 blue
+  class s2 orange
+  class s3 blue
+  class s4 orange
+  class s5 orange
+  class s6 teal
+  class s7 teal

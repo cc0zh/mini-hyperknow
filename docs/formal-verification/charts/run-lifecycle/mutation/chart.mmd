@@ -1,0 +1,53 @@
+---
+title: "任务命令与取消和显式重试"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: normal
+    lg1: attention
+    lg2: Breaks NoConflictingReplay
+    lg3: Path to the NoConflictingReplay bug
+  }
+  class lg0 blue
+  class lg1 orange
+  class lg2 breaks
+  class lg3 bugPath
+  s0: 尚未提交
+  s1: 任务排队
+  s2: 已取消
+  s3: 正在生成
+  s4: 重启后已中断
+  s5: 错误地接受了同标识的不同命令
+  s6: 生成失败
+  s7: 结果已保存
+  [*] --> s0
+  s0 --> s1: 提交命令
+  s1 --> s2: 显式取消
+  s1 --> s3: 开始实际调用
+  s1 --> s4: 服务重启
+  s1 --> s5: 重发同标识的不同内容
+  s2 --> s1: 显式重试#65292;新建任务
+  s2 --> s5: 重发同标识的不同内容
+  s3 --> s2: 显式取消
+  s3 --> s4: 服务重启
+  s3 --> s6: 生成失败
+  s3 --> s7: 事务保存结果
+  s3 --> s5: 重发同标识的不同内容
+  s4 --> s1: 显式重试#65292;新建任务
+  s4 --> s5: 重发同标识的不同内容
+  s6 --> s1: 显式重试#65292;新建任务
+  s6 --> s5: 重发同标识的不同内容
+  s7 --> s5: 重发同标识的不同内容
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 blue
+  class s0 bugPath
+  class s1 blue
+  class s1 bugPath
+  class s2 orange
+  class s3 blue
+  class s4 orange
+  class s5 orange
+  class s5 breaks
+  class s5 bugPath
+  class s6 orange
+  class s7 blue

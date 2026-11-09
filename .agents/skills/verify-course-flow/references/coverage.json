@@ -1,0 +1,21 @@
+{
+  "id": "course-flow",
+  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "workspace_dirty_at_sync": true,
+  "spec": "assets/CourseFlow.tla",
+  "config": "assets/CourseFlow.cfg",
+  "view": "assets/view.mjs",
+  "invariant": "ReadyRequiresAllUnits",
+  "bounds": {"courses": 1, "units": 2, "blueprint_adjustments": 1},
+  "sources": [
+    {"path": "src/hyperknow/storage.py", "sha256": "26187f57106c64f79ee627390ff98a622c8e7c294dca13dc4acf7689a3762cb4", "symbols": ["finish_clarification", "transaction"]},
+    {"path": "src/hyperknow/blueprint_storage.py", "sha256": "7948df69cc97d21819bdbb8a2ecea772e475d1c31822580fe5a86e4b53a69f8c", "symbols": ["finish_blueprint", "blueprint_command", "begin_unit", "finish_unit"]},
+    {"path": "src/hyperknow/research_storage.py", "sha256": "175657409fe654cd6666185fb1cc95497b498e3f8e520fcfbfbd4d0dee82dfd1", "symbols": ["finish_research"]}
+  ],
+  "code_mutation": {
+    "path": "src/hyperknow/blueprint_storage.py",
+    "before": "if all(u[\"generation_status\"] == \"ready\" for u in course[\"units\"]):",
+    "after": "if any(u[\"generation_status\"] == \"ready\" for u in course[\"units\"]):",
+    "tests": ["test_blueprint.BlueprintStorageTests.test_two_units_commit_incrementally_without_changing_existing_ids"]
+  }
+}

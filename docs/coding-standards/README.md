@@ -6,7 +6,14 @@
 
 只登记已实际安装并适用于本项目工作流的 Skill；没有条目时不要求安装。
 
-（项目初始化后按实际安装情况填写。格式：`skill 名称` — 功能 — 路径）
+项目本地形式验证技能见[验证入口](../formal-verification/README.md)。每个技能有独立模型、覆盖映射和真实源码故障见证。
+
+- [verify-run-lifecycle](../../.agents/skills/verify-run-lifecycle/SKILL.md) 检查命令标识冲突与共享任务生命周期。
+- [verify-course-flow](../../.agents/skills/verify-course-flow/SKILL.md) 检查蓝图确认与全部单元提交后就绪。
+- [verify-research-flow](../../.agents/skills/verify-research-flow/SKILL.md) 检查每轮调研工具预算。
+- [verify-classroom-flow](../../.agents/skills/verify-classroom-flow/SKILL.md) 检查最后总结与手动完成。
+- [verify-quiz-flow](../../.agents/skills/verify-quiz-flow/SKILL.md) 检查全部作答后的显式提交。
+- [verify-assistance-flow](../../.agents/skills/verify-assistance-flow/SKILL.md) 检查一轮最多保存一个产物。
 
 ## Skill 推荐清单
 
