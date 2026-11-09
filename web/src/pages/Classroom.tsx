@@ -1,7 +1,7 @@
-﻿import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { IconArrowRight, IconChevronLeft } from '../components/icons'
-import { Board, SafeText } from '../components/Board'
+import { AssistanceBoardCanvas, Board, SafeText } from '../components/Board'
 import { EmptyState, ErrorNotice, Loading } from '../components/ui'
 import { activeInteraction, activeRun, questionAnchor, summaryIsShown } from '../lib/lesson-state'
 import { confirmedCursor } from '../lib/board-scene'
@@ -10,13 +10,75 @@ import { runLabels } from '../lib/run-state'
 import { useBoardFont } from '../lib/use-board-font'
 import { useLesson } from '../lib/use-lesson'
 import { useLessonPlayer } from '../lib/use-lesson-player'
-import type { BoardStep, Interaction } from '../lib/types'
+import { useTeacherClassroom } from '../lib/use-teacher-classroom'
+import type { BoardFrame, BoardStep, Interaction } from '../lib/types'
 
 const interactionLabels: Record<Interaction['status'], string> = { pending: '正在回答', ready: '回答已保存', failed: '回答失败', cancelled: '回答已取消', interrupted: '回答已中断' }
 const stageLabels: Record<BoardStep['stage'], string> = { opening: '本课路线图', explain: '要点解释', example: '一起看例子', check: '停下来想一想', summary: '回扣与总结' }
 
-function SessionClassroom({ courseId, sessionId }: { courseId: string; sessionId: string }) {
-  const lesson = useLesson(sessionId, courseId)
+function TeacherClassroom({ courseId, sessionId, lesson }: { courseId: string; sessionId: string; lesson: ReturnType<typeof useLesson> }) {
+  const teacherActions = useTeacherClassroom(sessionId, lesson)
+  const font = useBoardFont()
+  const [asideOpen, setAsideOpen] = useState(true)
+  const [answer, setAnswer] = useState('')
+  const snapshot = lesson.snapshot
+  const back = "/courses/" + encodeURIComponent(courseId)
+  if (!snapshot) return <main className="classroom-loading"><Link className="back-link" to={back}><IconChevronLeft size={15} />返回课程</Link>{lesson.error ? <ErrorNotice title="课堂读取失败" message={lesson.error} retry={() => { void lesson.reload() }} /> : <Loading label="正在读取课堂状态…" />}</main>
+  const teacher = snapshot.teacher
+  const generation = snapshot.generation_run
+  const latest = teacher?.turns[teacher.turns.length - 1] || null
+  const frames: BoardFrame[] = teacher && teacher.board.operations.length > 0
+    ? Array.from({ length: Math.ceil(teacher.board.operations.length / 6) }, (_, index) => ({
+      step_id: `teacher-board-${teacher.board.version}-${index + 1}`,
+      title: latest?.action === 'adapt' ? '根据你的回答调整' : snapshot.session.title,
+      narration: latest?.response || '', page: index + 1, column: 1 as const,
+      operations: teacher.board.operations.slice(index * 6, (index + 1) * 6),
+    })) : []
+  const locked = teacherActions.busy || !!teacherActions.pending || !teacherActions.online || !!lesson.error
+  const activeGeneration = !!generation && activeRun(generation)
+  const waiting = teacher?.status === 'awaiting_student'
+  const canTurn = !!teacher?.basis && !activeGeneration && !locked && !teacherActions.pending
+  function submitAnswer(event: FormEvent) {
+    event.preventDefault()
+    if (!canTurn || (waiting && answer.trim().length < 2)) return
+    void teacherActions.turn(answer.trim() || undefined).then(ok => { if (ok) setAnswer('') })
+  }
+  return <main className={"classroom-screen teacher-classroom " + (asideOpen ? '' : 'aside-collapsed')}>
+    <header className="classroom-header">
+      <Link className="classroom-exit" to={back}><IconChevronLeft size={17} /><span>课程</span></Link>
+      <div className="classroom-identity"><span>{snapshot.unit_title} / {snapshot.lecture_title}</span><h1>{snapshot.session.title}</h1></div>
+      <span className="classroom-progress-label">教师课堂 · 已保存 {teacher?.turns.length || 0} 个教学回合</span>
+      <button type="button" className="classroom-toggle" aria-expanded={asideOpen} aria-controls="classroom-sidebar" onClick={() => setAsideOpen(value => !value)}>{asideOpen ? '收起讲解' : '展开讲解'}</button>
+    </header>
+    <div className="classroom-notices">
+      {lesson.error && <ErrorNotice title="同步失败" message={lesson.error} retry={() => { void lesson.reload() }} />}
+      {!teacherActions.online && <p className="classroom-alert" role="alert">网络已断开，课堂不会自动发起新的模型请求。联网后可继续同一回合。</p>}
+      {snapshot.script && !teacher?.basis && <p className="classroom-alert" role="status">检测到已保存的旧版讲义。旧数据原样保留；教师课堂会单独准备教学依据，不会自动改写旧讲义。</p>}
+      {teacherActions.pending && <div className="classroom-alert" role="status"><span>{teacherActions.busy ? '正在确认教师课堂命令…' : '上次命令的响应待确认，保留原命令编号。'}</span><button type="button" disabled={teacherActions.busy || !teacherActions.online} onClick={() => { void teacherActions.retry() }}>重试同一命令</button></div>}
+      {teacherActions.error && <div className="classroom-alert error" role="alert"><span>{teacherActions.error}</span><button type="button" className="text-button" onClick={teacherActions.clearError}>关闭</button></div>}
+      {activeGeneration && <div className="classroom-alert" role="status"><span>{generation?.kind === 'lesson_basis' ? '正在整理有来源的教学依据；不会生成固定讲义。' : '教师正在准备本回合；白板与回答尚未提交。'}</span>{generation && <button type="button" disabled={locked} onClick={() => { void teacherActions.runAction(generation.run_id, 'cancel') }}>取消本次运行</button>}</div>}
+      {teacher?.status === 'stopped' && teacher.stop_reason && <div className="classroom-alert error" role="alert"><span>本回合未完成：{teacher.stop_reason.message}。这不是教师对课程的结束判断。</span>{generation && generation.status !== 'ready' && <button type="button" disabled={locked} onClick={() => { void teacherActions.runAction(generation.run_id, 'retry') }}>明确重试</button>}</div>}
+      {font.state !== 'ready' && frames.length > 0 && <div className="classroom-alert font-notice" role="status"><span>{font.state === 'loading' ? '正在加载白板字体；结构图等待字体就绪。' : '指定手写字体未加载，文字使用可读回退。'}</span>{font.state === 'error' && <button type="button" onClick={font.retry}>重试字体</button>}</div>}
+    </div>
+    <div className="classroom-workspace">
+      <div className="classroom-canvas">
+        {frames.length > 0 ? <AssistanceBoardCanvas title={snapshot.session.title} frames={frames} cursor={frames.length - 1} fontReady={font.state === 'ready'} /> : <section className="classroom-unprepared teacher-empty-board" aria-label="教师课堂白板尚未准备"><div className="unprepared-heading"><span>TEACHER-LED CLASSROOM</span><h2>{snapshot.session.title}</h2><p>教师依据 · 学生回答 · 动态白板</p></div>{activeGeneration ? <Loading label="正在准备课堂…" /> : teacher?.basis ? <p>教师还没有提交需要呈现的白板内容；下一回合由教师判断是否使用白板。</p> : <button type="button" className="button primary" disabled={locked} onClick={() => { void teacherActions.prepare() }}>准备教师课堂依据</button>}</section>}
+      </div>
+      {asideOpen && <aside id="classroom-sidebar" className="classroom-sidebar" aria-label="教师讲解与学生回答">
+        <div className="classroom-sidebar-scroll teacher-sidebar-scroll">
+          <section className="classroom-narration" aria-labelledby="teacher-title"><span className="classroom-stage">{latest ? ({ explain: '解释', demonstrate: '示范', ask: '追问', check: '理解检查', adapt: '调整教学', summarize: '阶段回扣', continue: '继续判断' } as Record<string, string>)[latest.action] : '准备课堂依据'}</span><h2 id="teacher-title">{latest ? '教师回应' : teacher?.basis ? '教师已准备好' : '先准备有来源的教学依据'}</h2><div className="classroom-prose classroom-teacher-talk">{latest ? latest.response.split(/\n\s*\n/).map((paragraph, index) => <p key={index}><SafeText text={paragraph} /></p>) : teacher?.basis ? <p>每个教学回合都会重新读取目标、依据、白板和你的最新回答，由教师决定下一步。</p> : <p>课前只整理目标、知识、例子、推导、常见误解和候选教法。不会预先生成必须播放的完整课堂。</p>}</div>
+            {teacher?.basis && <details className="teacher-basis" open={teacher.turns.length === 0}><summary>教学依据与来源</summary><ul>{teacher.basis.objectives.map((item, index) => <li key={index}>{item}</li>)}</ul><p className="classroom-helper">依据条目 {teacher.basis.knowledge.length + teacher.basis.examples.length + teacher.basis.derivations.length + teacher.basis.misconceptions.length} 项 · 可追溯来源 {teacher.basis.references.length} 条</p><div className="teacher-source-list">{teacher.basis.references.slice(0, 5).map(source => <a key={source.ref_id} href={source.url || undefined} target="_blank" rel="noreferrer">{source.title}<small>{source.quote}</small></a>)}</div></details>}
+          </section>
+          <section className="teacher-turn-history" aria-labelledby="teacher-history-title"><h2 id="teacher-history-title">课堂回合</h2>{teacher?.turns.length ? teacher.turns.map(turn => <article key={turn.turn_id} className="teacher-turn"><span>回合 {turn.index + 1} · {turn.action}</span>{turn.student_answer && <p className="teacher-student-answer"><b>你的回答</b><br /><SafeText text={turn.student_answer} /></p>}<div className="classroom-prose"><SafeText text={turn.response} /></div>{turn.student_prompt && <p className="teacher-prompt"><b>教师想听你说</b><br /><SafeText text={turn.student_prompt} /></p>}</article>) : <p className="classroom-helper">还没有提交教学回合。</p>}</section>
+          {teacher?.basis && <form className="teacher-answer" onSubmit={submitAnswer}><label htmlFor="teacher-answer">{waiting ? (latest?.student_prompt || '请回答教师刚才的问题') : '把你的想法交给教师（可选）'}</label><textarea id="teacher-answer" value={answer} onChange={event => setAnswer(event.target.value)} minLength={2} maxLength={4000} disabled={!canTurn} placeholder={waiting ? '用自己的话说明你的理解…' : '回答会影响下一回合的解释、例子或推进方式…'} /><button type="submit" className="button primary" disabled={!canTurn || (waiting ? answer.trim().length < 2 : answer.trim().length === 1)}>{waiting ? '提交回答' : answer.trim().length >= 2 ? '交给教师判断' : '继续由教师决定'}</button><small>{teacherActions.busy ? '正在保存真实服务端状态…' : '一次提交只产生一个教师回合；刷新不会自动生成。'}</small></form>}
+        </div>
+      </aside>}
+    </div>
+    <footer className="classroom-player teacher-footer" aria-label="教师课堂操作"><div className="classroom-play-state"><b>{activeGeneration ? '教师回合运行中' : teacher?.basis ? (waiting ? '等待你的回答' : '等待下一次教师判断') : '等待准备课堂依据'}</b><span>{lesson.connection}</span><small>课堂推进由教师回合决定，程序只保存已确认状态</small></div><div className="classroom-play-actions">{teacher?.basis && !waiting && <button type="button" className="button primary" disabled={!canTurn} onClick={() => { void teacherActions.turn() }}>{latest ? '继续课堂' : '开始教学'}</button>}{snapshot.script && <Link className="classroom-practice" to={back + '/sessions/' + encodeURIComponent(sessionId) + '/practice'}>课后练习</Link>}</div></footer>
+  </main>
+}
+
+function LegacyClassroom({ courseId, sessionId, lesson }: { courseId: string; sessionId: string; lesson: ReturnType<typeof useLesson> }) {
   const player = useLessonPlayer(sessionId, lesson)
   const font = useBoardFont()
   const [question, setQuestion] = useState('')
@@ -120,4 +182,10 @@ function SessionClassroom({ courseId, sessionId }: { courseId: string; sessionId
 export default function Classroom() {
   const { courseId = '', sessionId = '' } = useParams()
   return <SessionClassroom key={courseId + ':' + sessionId} courseId={courseId} sessionId={sessionId} />
+}
+
+function SessionClassroom({ courseId, sessionId }: { courseId: string; sessionId: string }) {
+  const lesson = useLesson(sessionId, courseId)
+  if (lesson.snapshot?.protocol === 'legacy_script') return <LegacyClassroom courseId={courseId} sessionId={sessionId} lesson={lesson} />
+  return <TeacherClassroom courseId={courseId} sessionId={sessionId} lesson={lesson} />
 }

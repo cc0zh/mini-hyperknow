@@ -5,10 +5,13 @@ import json
 from pydantic import ValidationError
 
 from .domain import AppError, uid
-from .lesson_domain import BoardScript, derive_course, lesson_context, materialize_script, question_context
+from .lesson_domain import (BoardScript, derive_course, lesson_context, materialize_script,
+                             question_context, validate_board_operations)
+from .teacher import TeacherGenerationResult, TeachingBasisDraft, materialize_basis
 
 
 ACTIVE = {"queued", "generating"}
+TEACHER_KINDS = {"lesson_basis", "teacher_turn"}
 
 
 class LessonStorage:
@@ -43,6 +46,22 @@ class LessonStorage:
         return json.loads(row["data"]) if row else {
             "version": 1, "progress": {"script_id": None, "cursor": -1, "play_intent": "paused",
                                         "version": 1, "updated_at": self._locate(conn, session_id)[0]["created_at"]}}
+
+    @staticmethod
+    def _new_teacher_state() -> dict:
+        return {"protocol_version": 1, "status": "unprepared", "version": 1, "basis": None,
+                "board": {"version": 1, "operations": []}, "turns": [], "next_turn_index": 0,
+                "pending_run_id": None, "stop_reason": None}
+
+    def _teacher(self, conn, session_id: str) -> dict | None:
+        return self._state(conn, session_id).get("teacher")
+
+    def _save_teacher(self, conn, session_id: str, teacher: dict, *, bump_session: bool = True):
+        state = self._state(conn, session_id)
+        state["teacher"] = teacher
+        state["version"] += 1
+        teacher["version"] += 1
+        self._write(conn, "lesson_states", session_id, state)
 
     def _bump_session(self, conn, session_id: str, *, progress: dict | None = None):
         from .storage import now
@@ -80,7 +99,9 @@ class LessonStorage:
         state = self._state(conn, session_id)
         completed = session_id in self._completed(conn)
         session["completed"] = completed
-        runs = self._lesson_runs(conn, session_id, "lesson")
+        runs = [run for kind in ("lesson", "lesson_basis", "teacher_turn")
+                for run in self._lesson_runs(conn, session_id, kind)]
+        runs.sort(key=lambda run: run.get("created_at", ""))
         format_error = None
         try:
             script = self._script(conn, session_id)
@@ -91,11 +112,12 @@ class LessonStorage:
         interactions = self._interactions(conn, session_id)
         if script:
             interactions = [item for item in interactions if item["script_id"] == script["script_id"]]
-        return {"course_id": course["course_id"], "course_title": course["title"],
+        return {"protocol": "teacher_led", "course_id": course["course_id"], "course_title": course["title"],
                 "unit_title": unit["title"], "lecture_title": lecture["title"], "session": session,
                 "script": script, "format_error": format_error, "progress": state["progress"],
                 "interactions": interactions,
                 "generation_run": runs[-1] if runs else None, "completed": completed,
+                "teacher": state.get("teacher"),
                 "version": state["version"]}
 
     def get_lesson(self, session_id: str) -> dict:
@@ -139,6 +161,89 @@ class LessonStorage:
             return self._lesson(conn, session_id)
         return self.command(command_id, {"action": "prepare", "session_id": session_id}, prepare,
                             resource_type="session")
+
+    def prepare_teacher_lesson(self, session_id: str, command_id: str, model: str, configured: bool) -> dict:
+        def prepare(conn):
+            course, unit, lecture, session = self._locate(conn, session_id)
+            teacher = self._teacher(conn, session_id)
+            if teacher and (teacher["basis"] or teacher["status"] in {"generating", "awaiting_student", "ready"}):
+                return self._lesson(conn, session_id)
+            self._model_configured(configured)
+            context = lesson_context(course, unit, lecture, session)
+            run = self._new_run(course["goal"], model)
+            run.update(kind="lesson_basis", session_id=session_id, course_id=course["course_id"], input=context)
+            teacher = teacher or self._new_teacher_state()
+            teacher.update(status="generating", pending_run_id=run["run_id"], stop_reason=None)
+            state = self._state(conn, session_id)
+            state["teacher"] = teacher
+            state["version"] += 1
+            teacher["version"] += 1
+            self._write(conn, "lesson_states", session_id, state)
+            self._save_run(conn, run)
+            return self._lesson(conn, session_id)
+        return self.command(command_id, {"action": "prepare_teacher", "session_id": session_id}, prepare,
+                            resource_type="session")
+
+    def _teacher_context(self, conn, session_id: str, student_answer: str | None) -> dict:
+        course, _, _, session = self._locate(conn, session_id)
+        teacher = self._teacher(conn, session_id)
+        if not teacher or not teacher.get("basis"):
+            raise AppError("teacher_basis_missing", "请先准备本课的教学依据", 409)
+        turns = [{key: turn[key] for key in (
+            "index", "student_answer", "action", "response", "student_prompt", "awaits_student", "basis_refs")}
+                 for turn in teacher["turns"][-6:]]
+        input_data = {"course_id": course["course_id"], "course_title": course["title"],
+                      "goal": course["goal"], "language": course["language"],
+                      "session": {key: session[key] for key in ("session_id", "title", "outline", "key_points", "depths")
+                                  if key in session},
+                      "basis": teacher["basis"], "basis_refs": [item["ref_id"] for item in teacher["basis"]["references"]],
+                      "board": teacher["board"], "turns": turns,
+                      "student_answer": student_answer, "turn_index": teacher["next_turn_index"]}
+        if len(json.dumps(input_data, ensure_ascii=False)) > 60000:
+            raise AppError("context_too_large", "课堂依据和近期教学超过保守上下文预算，本回合未发送模型", 422)
+        return input_data
+
+    def start_teacher_turn(self, session_id: str, data: dict, model: str, configured: bool) -> dict:
+        def start(conn):
+            teacher = self._teacher(conn, session_id)
+            if not teacher or not teacher.get("basis"):
+                raise AppError("teacher_basis_missing", "请先准备本课的教学依据", 409)
+            if teacher["version"] != data["expected_version"]:
+                raise AppError("version_conflict", "课堂教学状态已更新，请刷新后再试", 409, True,
+                               latest_version=teacher["version"])
+            if teacher.get("pending_run_id"):
+                raise AppError("teacher_turn_active", "上一教学回合仍在运行，请等待、取消或重试", 409)
+            answer = data.get("student_answer")
+            if answer is not None:
+                answer = answer.strip()
+                if not 2 <= len(answer) <= 4000:
+                    raise AppError("invalid_student_answer", "学生回答须为2–4000字", 422)
+            if teacher["status"] == "awaiting_student" and answer is None:
+                raise AppError("student_answer_required", "本回合正在等待学生回答", 409)
+            self._model_configured(configured)
+            course, _, _, _ = self._locate(conn, session_id)
+            try:
+                input_data = self._teacher_context(conn, session_id, answer)
+            except AppError as exc:
+                if exc.code == "context_too_large":
+                    teacher.update(status="stopped", stop_reason={"code": exc.code, "message": exc.message})
+                    self._save_teacher(conn, session_id, teacher)
+                raise
+            run = self._new_run(course["goal"], model)
+            run.update(kind="teacher_turn", session_id=session_id, course_id=teacher["basis"]["course_id"],
+                       input=input_data,
+                       student_answer=answer)
+            teacher.update(status="generating", pending_run_id=run["run_id"], stop_reason=None)
+            state = self._state(conn, session_id)
+            state["teacher"] = teacher
+            state["version"] += 1
+            teacher["version"] += 1
+            self._write(conn, "lesson_states", session_id, state)
+            run["teacher_version"] = teacher["version"]
+            self._save_run(conn, run)
+            return self._lesson(conn, session_id)
+        return self.command(data["client_command_id"], {"action": "teacher_turn", "session_id": session_id,
+                            **data}, start, resource_type="session")
 
     def regenerate_lesson(self, session_id: str, data: dict, model: str, configured: bool) -> dict:
         """Only an explicit command may replace a lesson; keep the old source verbatim."""
@@ -244,11 +349,33 @@ class LessonStorage:
             interaction.update(status="pending" if run["status"] in ACTIVE else run["status"],
                                error=run["error"])
             self._write(conn, "lesson_interactions", interaction["interaction_id"], interaction)
+        elif run["kind"] in TEACHER_KINDS and run["status"] in {"failed", "cancelled", "interrupted"}:
+            teacher = self._teacher(conn, run["session_id"])
+            if teacher and teacher.get("pending_run_id") == run["run_id"]:
+                teacher.update(status="stopped", pending_run_id=None,
+                               stop_reason={"code": run["error"].get("code", "runtime_stop") if run.get("error") else "runtime_stop",
+                                            "message": run["error"].get("message", "教师回合未完成") if run.get("error") else "教师回合未完成"})
+                self._save_teacher(conn, run["session_id"], teacher)
+                return
         self._bump_session(conn, run["session_id"])
+
+    def _retry_teacher(self, conn, parent: dict, run: dict):
+        teacher = self._teacher(conn, parent["session_id"])
+        if not teacher or teacher.get("pending_run_id") not in {None, parent["run_id"]} or teacher.get("status") != "stopped":
+            raise AppError("state_conflict", "该教师回合已被更新，不能重复重试", 409)
+        for key in ("kind", "course_id", "session_id", "input", "teacher_version", "student_answer"):
+            if key in parent:
+                run[key] = parent[key]
+        teacher.update(status="generating", pending_run_id=run["run_id"], stop_reason=None)
+        self._save_teacher(conn, parent["session_id"], teacher)
+        run["teacher_version"] = teacher["version"]
 
     def _retry_lesson(self, conn, parent: dict, run: dict):
         from .storage import encode
         session_id = parent["session_id"]
+        if parent.get("kind") in TEACHER_KINDS:
+            self._retry_teacher(conn, parent, run)
+            return
         for key in ("kind", "course_id", "session_id", "script_id", "interaction_id", "input"):
             run[key] = parent[key]
         if run["kind"] == "lesson":
@@ -313,5 +440,56 @@ class LessonStorage:
                 interaction["answer"] = result.answer
                 self._write(conn, "lesson_interactions", interaction["interaction_id"], interaction)
             run.update(status="ready", error=None, version=run["version"] + 1, updated_at=now())
+            self._save_run(conn, run)
+            return run
+
+    def finish_lesson_basis(self, run_id: str, result: TeachingBasisDraft) -> dict | None:
+        from .storage import now
+        with self.transaction() as conn:
+            run = self._get(conn, "runs", run_id)
+            if run["status"] != "generating" or run.get("kind") != "lesson_basis":
+                return None
+            teacher = self._teacher(conn, run["session_id"])
+            if not teacher or teacher.get("pending_run_id") != run_id:
+                return None
+            basis = materialize_basis(result, run, run["input"], now())
+            teacher.update(status="ready", basis=basis, board={"version": 1, "operations": []}, turns=[],
+                           next_turn_index=0, pending_run_id=None, stop_reason=None)
+            self._save_teacher(conn, run["session_id"], teacher)
+            run.update(status="ready", basis_id=basis["basis_id"], error=None,
+                       version=run["version"] + 1, updated_at=now())
+            self._save_run(conn, run)
+            return run
+
+    def finish_teacher_turn(self, run_id: str, result: TeacherGenerationResult) -> dict | None:
+        from .storage import encode, now
+        with self.transaction() as conn:
+            run = self._get(conn, "runs", run_id)
+            if run["status"] != "generating" or run.get("kind") != "teacher_turn":
+                return None
+            teacher = self._teacher(conn, run["session_id"])
+            if not teacher or teacher.get("pending_run_id") != run_id:
+                return None
+            if teacher["version"] != run.get("teacher_version", teacher["version"]):
+                return None
+            try:
+                validate_board_operations([*teacher["board"]["operations"], *result.operations])
+            except ValueError as exc:
+                raise AppError("teacher_board_invalid", "教师白板操作未通过保存前校验，本回合未提交", 502, True) from exc
+            timestamp = now()
+            turn = {"turn_id": uid("turn"), "run_id": run_id, "index": teacher["next_turn_index"],
+                    "student_answer": run.get("student_answer"), **result.draft.model_dump(),
+                    "board_object_ids": [item["object_id"] for item in result.operations],
+                    "created_at": timestamp}
+            teacher["board"] = {"version": teacher["board"]["version"] + 1,
+                                "operations": [*teacher["board"]["operations"], *result.operations]}
+            teacher["turns"].append(turn)
+            teacher["next_turn_index"] += 1
+            teacher.update(status="awaiting_student" if result.draft.awaits_student else "ready",
+                           pending_run_id=None, stop_reason=None)
+            self._save_teacher(conn, run["session_id"], teacher)
+            run.update(status="ready", error=None, tool_trace=result.trace,
+                       provider_stop_reason=result.provider_stop_reason,
+                       version=run["version"] + 1, updated_at=timestamp)
             self._save_run(conn, run)
             return run

@@ -52,9 +52,11 @@
 | `command_receipts` | id、fingerprint、run_id、resource_type | client_command_id 主键；run_id 列在 resource_type=session 时实际存 session_id，同 ID 异输入冲突 |
 | `model_calls` | id、run_id、data；实际输入依据／响应、配置、用量和错误 | call_id；关联 run_id，不保存凭据 |
 | `lesson_scripts` | id、session_id、完整脚本 data，含 content_version 与 schema_version | script_id 主键，session_id UNIQUE；当前每课最多一个不可变脚本，content_version=1 |
-| `lesson_states` | id=session_id，data={version, progress} | 课堂聚合版本与 progress.version 分开保存；没有独立 lesson_progress 表 |
+| `lesson_states` | id=session_id，data={version, progress, teacher?} | 课堂聚合版本、旧 progress 与教师协议 version 分开保存；教师依据、白板账本和已提交回合仍在该事实 JSON 中，不新建内存替代 |
 | `lesson_interactions` | id、session_id、问题／回答及状态 data | interaction_id 主键；interactions_session 索引；锚点 script_id／step_id／cursor 在 JSON 内 |
 | `activity_progress` | id=活动ID，data含course_id、type、completed_at | 课时手动完成、练习提交及考核提交写入；存在记录即完成，不表示通过／掌握 |
+
+教师课堂协议不另建内存事实：`lesson_states.data.teacher` 保存 `TeachingBasis`、`TeacherBoard`、已提交 `TeacherTurn[]`、`status`、独立 `version`、`pending_run_id` 和明确 `stop_reason`。依据条目与候选教法必须引用课时上下文中的 `basis_allowed_refs`；`references` 由服务端从实际课时要点和研究证据 materialize。教师回合的临时白板账本只存在于 `teacher_turn` run 的执行过程中，成功时与回答和增量操作同事务提交，失败／取消／中断不提交半回合板书。旧 `lesson_scripts` 字节不迁移、不覆盖、不清理。
 
 迁移已有 v1 库前，使用 sqlite3.Connection.backup 建立 `<数据库名>.v1-backup_*.bak` 一致备份（含已提交 WAL 数据），再在事务中建上述四张课堂表、interactions_session 索引并给 command_receipts 加 resource_type，默认 run；旧 run 补 kind=course 及空课堂引用。这是既有v1→v2迁移步骤；当前新库会继续顺序建到v3，高于v3才拒绝打开，不降级或清空。升级前仍须停止旧服务。
 

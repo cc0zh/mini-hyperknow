@@ -54,6 +54,10 @@ class LessonCommand(ChangeRun):
     script_id: str = Field(min_length=1)
 
 
+class TeacherTurnCommand(ChangeRun):
+    student_answer: str | None = Field(default=None, max_length=4000)
+
+
 class SaveProgress(LessonCommand):
     cursor: int = Field(ge=-1)
     play_intent: Literal["paused", "playing"]
@@ -166,6 +170,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/sessions/{session_id}/prepare", response_model=LessonSnapshot)
     async def prepare(session_id: str, data: Command):
         return await app.state.service.prepare(session_id, data.model_dump())
+
+    @app.post("/api/sessions/{session_id}/teacher/prepare", status_code=202, response_model=LessonSnapshot)
+    async def prepare_teacher(session_id: str, data: Command):
+        return await app.state.service.prepare_teacher(session_id, data.model_dump())
+
+    @app.post("/api/sessions/{session_id}/teacher/turns", status_code=202, response_model=LessonSnapshot)
+    async def teacher_turn(session_id: str, data: TeacherTurnCommand):
+        return await app.state.service.teacher_turn(session_id, data.model_dump())
 
     @app.post("/api/sessions/{session_id}/regenerate", status_code=202, response_model=LessonSnapshot)
     async def regenerate(session_id: str, data: ChangeRun):

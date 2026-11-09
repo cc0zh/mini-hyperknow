@@ -10,6 +10,7 @@ const evidencePath = process.env.HYPERKNOW_CLASSROOM_EVIDENCE
 const evidence = evidencePath ? JSON.parse(readFileSync(resolve(evidencePath), 'utf8')) as {
   course_id: string; sessions: Record<string, { script_id: string; status: string }>
 } : null
+const legacyEvidence = !!evidence && !!evidence.sessions
 const sessions = Object.keys(evidence?.sessions ?? {})
 const allowModel = process.env.HYPERKNOW_CLASSROOM_ALLOW_MODEL === '1'
 
@@ -68,7 +69,7 @@ async function capture(page: Page, testInfo: TestInfo, name: string) {
 }
 
 test.describe('complete classroom on actual generated lessons', () => {
-  test.skip(!evidence, 'Run scripts/verify_classroom.py and explicitly select its evidence first.')
+  test.skip(!legacyEvidence, 'This file only covers retained legacy BoardScript evidence; use teacher-classroom.spec.ts for teacher-led evidence.')
   test.setTimeout(360_000)
 
   test('board and explanation review together; camera and refresh preserve confirmed position', async ({ page }, info) => {

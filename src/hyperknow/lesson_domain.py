@@ -121,6 +121,22 @@ def validate_board_references(steps: list[BoardFrame]):
             raise ValueError("focus IDs must reference already introduced objects or nodes")
 
 
+def validate_board_operations(operations: list[dict] | list[BoardOperation]):
+    """Validate a standalone incremental board prefix used by teacher turns."""
+    seen = set()
+    for raw in operations:
+        operation = raw if isinstance(raw, BoardOperation) else BoardOperation.model_validate(raw)
+        if operation.object_id in seen:
+            raise ValueError("operation object IDs must be unique")
+        if any(target not in seen for target in operation.target_ids):
+            raise ValueError("operation cannot reference a future or unknown object")
+        seen.add(operation.object_id)
+        for node in operation.nodes:
+            if node.id in seen:
+                raise ValueError("all object and node IDs must be unique within a board")
+            seen.add(node.id)
+
+
 class BoardScriptDraft(Schema):
     schema_version: Literal[2]
     title: str = Field(min_length=1, max_length=200)
@@ -236,6 +252,7 @@ class Interaction(Schema):
 
 
 class LessonSnapshot(Schema):
+    protocol: Literal["teacher_led", "legacy_script"] = "teacher_led"
     course_id: str
     course_title: str
     unit_title: str
@@ -246,6 +263,7 @@ class LessonSnapshot(Schema):
     progress: LessonProgress
     interactions: list[Interaction]
     generation_run: dict | None
+    teacher: dict | None = None
     completed: bool
     version: int = Field(ge=1)
 
@@ -267,12 +285,23 @@ def lesson_context(course: dict, unit: dict, lecture: dict, session: dict) -> di
                                               session.get("research_claim_ids", []))
     except ValueError as exc:
         raise AppError("research_evidence_invalid", "本课选择的研究主张缺少课程证据", 409) from exc
+    basis_sources = [{"ref_id": f"keypoint:{index}", "kind": "keypoint",
+                      "title": f"本课要点 {index + 1}", "quote": keypoint}
+                     for index, keypoint in enumerate(session["key_points"])]
+    for claim in research_claims:
+        evidence = claim.get("evidence", [])
+        for item in evidence:
+            basis_sources.append({"ref_id": f"claim:{claim['claim_id']}:{item['evidence_id']}",
+                                  "kind": "claim", "claim_id": claim["claim_id"],
+                                  "title": item["title"], "quote": item["quote"], "url": item["url"]})
     return {"course_id": course["course_id"], "course_title": course["title"],
             "goal": course["goal"], "clarification": course["clarification"],
             "language": course["language"], "unit_title": unit["title"],
             "unit_description": unit["description"], "lecture_title": lecture["title"],
             "session": {k: v for k, v in session.items() if k != "completed"},
             "research_claims": research_claims,
+            "basis_allowed_refs": [item["ref_id"] for item in basis_sources],
+            "basis_sources": basis_sources,
             "previous_session": sessions[index - 1]["title"] if index else None,
             "next_session": sessions[index + 1]["title"] if index + 1 < len(sessions) else None}
 

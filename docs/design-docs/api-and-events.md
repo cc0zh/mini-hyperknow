@@ -10,7 +10,7 @@
 - REST 使用 `/api` 前缀，JSON 字段统一 snake_case；不要求兼容原站 `/api/v1` URL 与字段。
 - 不做公开登录；本地固定身份，默认回环访问。前端开发通过代理同源访问。
 - 查询返回已保存快照及 version；命令返回提交后结果，不阻塞 HTTP 到模型完成。造课／澄清／重试返回 202 和 run；课堂 prepare 返回 200 快照，questions 返回 202 快照，运行引用位于 generation_run 或 interactions[].run_id。
-- 写命令携带 client_command_id；同 ID／输入重试复用已保存资源引用并读取其当前快照，不重复创建或提交，也不保证返回第一次提交时的旧版本；同 ID 异输入返回 409。
+- 写命令携带 client_command_id；同 ID／输入重试复用已保存资源引用并读取其当前快照，不重复创建或提交，也不保证返回第一次提交时的旧版本；同 ID 异输入返回 409。教师回合命令的一个 ID 只对应一个 `teacher_turn` run。
 - 更新 run 携带其 expected_version；课堂 progress／questions／complete 携带 progress.version 和 script_id，prepare 仅需命令 ID。版本冲突返回 409 和 error.latest_version，客户端重新读快照，不静默覆盖。
 - 未知端点返回 404，错误使用相应 4xx／5xx，不返回 `success: true, stubbed: true`。
 
@@ -47,7 +47,9 @@
 | `GET /api/courses` | 课程列表及一致的进度摘要 |
 | `GET /api/courses/{course_id}` | 完整目录、完成情况、课时比例和 next_item |
 | `POST /api/courses/{course_id}/delete` | client_command_id、expected_version（课程 version）；200 返回 `{course_id, deleted:true}`。事务内检查版本并删除课程及其课堂、练习、作答、运行与调研证据；关联任务 queued／clarifying／generating／awaiting_answers／awaiting_blueprint 时返回 409 course_active，需先停止相关任务。未知课程 404；同命令／输入重试在删除后仍返回成功，异输入 409 |
-| `GET /api/sessions/{session_id}` | LessonSnapshot：课时元数据、新协议script、progress、interactions、generation_run、completed、format_error及顶层version；旧格式不解析，script=null并返回明确format_error；不触发模型 |
+| `GET /api/sessions/{session_id}` | LessonSnapshot：除历史 `script`／`progress` 外，返回 `protocol=teacher_led`、`teacher.basis`、`teacher.board`、已提交 `teacher.turns`、教师 version/status/stop_reason；不触发模型 |
+| `POST /api/sessions/{session_id}/teacher/prepare` | 202；只建立课前 `lesson_basis` run，输入包含课程目标、课时依据和来源证据；成功只保存 TeachingBasis，不保存固定讲义顺序 |
+| `POST /api/sessions/{session_id}/teacher/turns` | 202；携带 client_command_id、教师 version 和可选 student_answer；每次只建立一个学生可见教学回合。模型／工具内部轮次不增加课堂回合；成功时教师回答与临时白板账本一次提交 |
 | `POST /api/sessions/{session_id}/prepare` | 200；无讲义及历史生成记录时建立 lesson run，已有脚本／记录复用；失败等状态由显式 run retry 处理 |
 | `POST /api/sessions/{session_id}/regenerate` | 202；client_command_id、expected_version取progress.version；用户显式授权新生成。旧原始脚本保存在run证据，成功前不替换，不做旧格式转换或自动收费；并发／未知结果继续遵循幂等与版本契约 |
 | `GET /api/sessions/{session_id}/lesson` | 与课时 GET 相同的已保存快照，不另造暂停版本 |

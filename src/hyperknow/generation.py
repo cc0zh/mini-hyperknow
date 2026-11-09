@@ -15,8 +15,10 @@ from .domain import AppError, Clarification
 from .blueprint_domain import (BlueprintDraft, UnitExpansionDraft, planning_context,
                                validate_blueprint, validate_expansion)
 from .lesson_domain import BoardScriptDraft, LessonAnswer, validate_lesson_coverage
+from .teacher import TeachingBasisDraft, TeacherGenerator, validate_basis
 from .quiz_domain import QuizDraft, validate_sources
-from .prompts.classroom import BOARD_SCRIPT_INSTRUCTION, LESSON_ANSWER_INSTRUCTION
+from .prompts.classroom import (BOARD_SCRIPT_INSTRUCTION, LESSON_ANSWER_INSTRUCTION,
+                                 LESSON_BASIS_INSTRUCTION)
 from .prompts.course import BLUEPRINT_INSTRUCTION, CLARIFICATION_INSTRUCTION, UNIT_INSTRUCTION
 from .prompts.quiz import QUIZ_INSTRUCTION
 from .storage import Database, now
@@ -114,6 +116,12 @@ class Generator:
             schema = LessonAnswer
             instruction = LESSON_ANSWER_INSTRUCTION
             user = run["input"]
+        elif kind == "lesson_basis":
+            schema = TeachingBasisDraft
+            instruction = LESSON_BASIS_INSTRUCTION
+            user = run["input"]
+        elif kind == "teacher_turn":
+            return TeacherGenerator(self.settings, self.db, self.stopping).generate(run)
         elif phase == "clarifying":
             instruction = CLARIFICATION_INSTRUCTION
             user = {"goal": run["goal"]}
@@ -195,6 +203,8 @@ class Generator:
                     validate_sources(result, user)
                 elif kind == "lesson":
                     validate_lesson_coverage(result, user)
+                elif kind == "lesson_basis":
+                    validate_basis(result, user)
                 elif kind == "course" and phase == "blueprint":
                     validate_blueprint(result, user)
                 elif kind == "course" and phase == "units":

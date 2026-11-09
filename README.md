@@ -6,7 +6,7 @@
 
 ## 当前能力与边界
 
-2026-11-05课堂重建为完整单课教学：本课路线图、逐个要点解释与例子、理解检查和回扣总结；点阵白板为主要视觉，右侧文字补充原因／情境，支持稳定图形对象、两栏累计板书、局部强调、同步图文回看及插问回课。仅使用新课堂协议，不兼容旧讲义；旧格式明确提示，须显式重新生成，不自动转换、不清空数据库、不因刷新收费。最终总结展示后才允许手动结课，提前离开保留位置，不认定掌握；理解检查回答和模型反馈通过真实问答保存。概念、流程和代码真实生成、浏览器及内容核查边界见[课堂重构计划](docs/exec-plans/completed/20261105-complete-classroom.md)。
+2026-11-10课堂改为教师 Agent 驱动：课前只保存有来源的 `TeachingBasis`，课堂由 Teacher Agent 根据目标、依据、已发生教学、当前白板和学生最新回答决定解释、示范、追问、检查、调整或继续；每个学生可见回合内部可有多个真实模型／白板工具轮次。点阵白板仍为主要视觉，右侧保留教师回应、学生回答和来源依据；不再用固定脚本顺序或前端自动播放器决定教学推进。已有 `BoardScript v2`、进度和问答数据原样保留，不自动转换、覆盖或清理。预算／取消／异常写明确停止原因，不冒充教师结束；教师结束权限、旧课堂默认处置和单课自主预算仍待决定。概念、流程和代码的真实模型与浏览器核查边界见[教师课堂执行计划](docs/exec-plans/active/teacher-led-classroom.md)。
 
 2026-10-23新增[调研→全局蓝图确认→逐单元展开](docs/exec-plans/completed/20261023-course-blueprint-workflow.md)，已用一个真实asyncio主题验通调整、确认、局部取消／重试及等待／完成状态冷重启；不要求旧课兼容，不清空用户库。内容核查限制见完成计划，不据此宣称完整产品验收。
 
@@ -76,7 +76,9 @@ uv run --frozen python scripts/verify_classroom.py --execute --course-id <实际
 
 课堂浏览器验收连接同一隔离库的真实前后端，设置`HYPERKNOW_CLASSROOM_EVIDENCE`为上述证据JSON，再运行`npm.cmd --prefix web run test:browser -- classroom.spec.ts`。还可设置`HYPERKNOW_WEB_PORT`及Vite代理的`HYPERKNOW_API_ORIGIN`。测试在写入前核对每课script_id；无证据就skip，不伪通过。`HYPERKNOW_CLASSROOM_ALLOW_MODEL=1`才允许创建真实插问与检查反馈（可能收费）；不设置时只执行不新增回答的场景。使用新生成的样本时要保留原证据，不将历史失败改成成功。
 
-课堂先一次生成完整单课，播放时逐步展开，并非每点“下一步”都调用模型。每步板书按编号紧凑排布、默认整步入镜；点选可放大，“本步全览”恢复所看步骤，“回到当前讲解”返回教学位置。新版教师式讲解只作用于新讲义；旧缓存保持原文，可在同步讲解底部“讲义生成说明与更新”二次确认后显式重新生成（可能收费，成功后从头播放）。
+教师课堂真实验收使用`uv run --frozen python scripts/verify_teacher_classroom.py --execute --course-id <实际课程ID> --session-id <实际课时ID> --data-dir data/validation/teacher-led-classroom-real-<n>`，会产生真实模型费用并保存TeachingBasis、TeacherTurn、学生输入、白板／工具痕迹、取消／重试和停止原因。浏览器设置`HYPERKNOW_TEACHER_CLASSROOM_EVIDENCE`后运行`npm.cmd --prefix web run test:browser -- teacher-classroom.spec.ts`；仅验收桌面窗口，不能把结构通过当作学习效果。
+
+旧脚本兼容视图仍一次生成完整单课并逐步展开；教师课堂则每个“继续／回答”提交一个 `teacher_turn`，不自动播放或预生成后缀。新课堂的白板操作先在回合账本中校验，最终回答与增量对象一起保存；真实模型调用、工具轨迹、输入依据和停止原因保存在 SQLite。`/api/sessions/{id}/teacher/prepare` 只生成依据，`/api/sessions/{id}/teacher/turns` 才让教师基于当前学生回答做下一次教学判断。
 
 即时协助有独立的付费验收入口：先将`HK_DATA_DIR`设为独立验收目录并在8037端口启动后端，再运行`uv run --frozen python scripts/verify_assistance.py --execute`。它验证独立教学、多轮继续和五种真实产物（含结构图），不要求加载Skill，产物断言使用自然语言而不是操作枚举，不接入搜索；可加`--resume`读取上次保存的run ID，重启验收脚本不重复创建已有轮次。证据默认写入忽略的`data/verification/instant-assistance/`；这不是普通CI命令。
 

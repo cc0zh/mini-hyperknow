@@ -48,7 +48,7 @@ export interface Run {
   blueprint_feedback?: string
   stage?: 'clarifying' | 'research' | 'blueprint' | 'units'
   research?: Research | null
-  kind?: 'course' | 'lesson' | 'question' | 'quiz' | 'research'
+  kind?: 'course' | 'lesson' | 'lesson_basis' | 'teacher_turn' | 'question' | 'quiz' | 'research'
   quiz_id?: string | null
   target_type?: 'practice' | 'exam' | null
   target_id?: string | null
@@ -163,6 +163,56 @@ export interface BoardScript {
   steps: BoardStep[]
   created_at: string
 }
+export interface SourceRef {
+  ref_id: string
+  kind: 'keypoint' | 'claim'
+  title: string
+  quote: string
+  url: string
+  claim_id?: string | null
+}
+export interface EvidenceItem { item_id: string; content: string; source_refs: string[] }
+export interface TeachingOption { option_id: string; approach: string; useful_when: string; source_refs: string[] }
+export interface TeachingBasis {
+  basis_id: string
+  session_id: string
+  course_id: string
+  version: number
+  created_at: string
+  schema_version: 1
+  objectives: string[]
+  objective_refs: string[]
+  knowledge: EvidenceItem[]
+  examples: EvidenceItem[]
+  derivations: EvidenceItem[]
+  misconceptions: EvidenceItem[]
+  teaching_options: TeachingOption[]
+  references: SourceRef[]
+}
+export interface TeacherTurn {
+  turn_id: string
+  run_id: string
+  index: number
+  student_answer: string | null
+  action: 'explain' | 'demonstrate' | 'ask' | 'check' | 'adapt' | 'summarize' | 'continue'
+  response: string
+  student_prompt: string
+  awaits_student: boolean
+  board_object_ids: string[]
+  basis_refs: string[]
+  created_at: string
+}
+export interface TeacherState {
+  protocol_version: 1
+  status: 'unprepared' | 'generating' | 'ready' | 'awaiting_student' | 'stopped' | 'failed'
+  version: number
+  basis: TeachingBasis | null
+  board: { version: number; operations: BoardOperation[] }
+  turns: TeacherTurn[]
+  next_turn_index: number
+  pending_run_id: string | null
+  stop_reason: { code: string; message: string } | null
+}
 export interface LessonProgress {
   script_id: string | null
   cursor: number
@@ -186,6 +236,7 @@ export interface Interaction {
   created_at: string
 }
 export interface LessonSnapshot {
+  protocol?: 'teacher_led' | 'legacy_script'
   version: number
   course_id: string
   course_title: string
@@ -197,6 +248,7 @@ export interface LessonSnapshot {
   progress: LessonProgress
   interactions: Interaction[]
   generation_run: Run | null
+  teacher?: TeacherState | null
   completed: boolean
 }
 

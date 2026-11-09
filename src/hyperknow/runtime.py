@@ -116,6 +116,25 @@ class CourseService:
         await self.notify_lesson(snapshot)
         return snapshot
 
+    async def prepare_teacher(self, session_id: str, data: dict):
+        snapshot = self.db.prepare_teacher_lesson(session_id, data["client_command_id"], self.settings.model,
+                                                  bool(self.settings.api_key))
+        if snapshot["generation_run"]:
+            run = snapshot["generation_run"]
+            if run.get("kind") == "lesson_basis" and run["status"] in {"queued", "generating"}:
+                self.enqueue(run)
+        await self.notify_lesson(snapshot)
+        return snapshot
+
+    async def teacher_turn(self, session_id: str, data: dict):
+        snapshot = self.db.start_teacher_turn(session_id, data, self.settings.model, bool(self.settings.api_key))
+        if snapshot["generation_run"]:
+            run = snapshot["generation_run"]
+            if run.get("kind") == "teacher_turn" and run["status"] in {"queued", "generating"}:
+                self.enqueue(run)
+        await self.notify_lesson(snapshot)
+        return snapshot
+
     async def regenerate(self, session_id: str, data: dict):
         snapshot = self.db.regenerate_lesson(session_id, data, self.settings.model, bool(self.settings.api_key))
         if snapshot["generation_run"]:
@@ -278,6 +297,8 @@ class CourseService:
 
                     researcher = Researcher(self.settings, self.db, self.generator.stopping, changed)
                     result = await asyncio.to_thread(researcher.generate, run)
+                elif run.get("kind") in {"lesson_basis", "teacher_turn"}:
+                    result = await asyncio.to_thread(self.generator.generate, run, phase)
                 else:
                     result = await asyncio.to_thread(self.generator.generate, run, phase)
                 if not self.accepting:
@@ -294,6 +315,10 @@ class CourseService:
                     updated = self.db.finish_quiz(run_id, result)
                 elif run.get("kind") == "assistance":
                     updated = self.db.finish_assistance(run_id, result)
+                elif run.get("kind") == "lesson_basis":
+                    updated = self.db.finish_lesson_basis(run_id, result)
+                elif run.get("kind") == "teacher_turn":
+                    updated = self.db.finish_teacher_turn(run_id, result)
                 else:
                     updated = self.db.finish_lesson(run_id, result)
                 committed = updated is not None
