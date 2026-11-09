@@ -37,7 +37,8 @@ class ResearchAdmissionTests(unittest.TestCase):
         self.researcher.require_active()
         self.stopping.set()
         with self.assertRaises(AppError) as raised:
-            self.researcher._execute("read_webpage", {"url": "https://example.com/"})
+            self.researcher._execute("read_webpage", {"question_id": "q1", "url": "https://example.com/",
+                                                       "query": "asyncio tasks", "provider": "page"})
         self.assertEqual(raised.exception.code, "run_inactive")
         self.stopping.clear()
         cancelled = self.db.transition(self.run["run_id"], {"generating"}, status="cancelled")
@@ -59,7 +60,8 @@ class ResearchAdmissionTests(unittest.TestCase):
 
     def test_actual_loopback_tool_error_is_saved_not_promoted_to_source(self):
         result = self.researcher._tools().execute(ToolCall(
-            "loopback-call", "read_webpage", {"url": "http://127.0.0.1/"}))
+            "loopback-call", "read_webpage", {"question_id": "q1", "url": "http://127.0.0.1/",
+                                                  "query": "asyncio tasks", "provider": "page"}))
         self.assertTrue(result.is_error)
         self.assertIn("unsafe_url", result.content)
         research = self.db.get_run(self.run["run_id"])["research"]
@@ -70,13 +72,17 @@ class ResearchAdmissionTests(unittest.TestCase):
     def test_search_and_read_budgets_include_failures_and_never_exceed_ten(self):
         # Missing key and literal loopback both fail before opening a socket.
         for _ in range(4):
-            self.assertFalse(self.researcher._execute("web_search", {"query": "asyncio"}).success)
+            self.assertFalse(self.researcher._execute("web_search", {"question_id": "q1", "query": "asyncio",
+                                                                      "provider": "tavily"}).success)
         for _ in range(6):
-            self.assertFalse(self.researcher._execute("read_webpage", {"url": "http://127.0.0.1/"}).success)
+            self.assertFalse(self.researcher._execute("read_webpage", {"question_id": "q1",
+                "url": "http://127.0.0.1/", "query": "asyncio", "provider": "page"}).success)
         before = self.db.get_run(self.run["run_id"])
         self.assertEqual(len(before["research"]["steps"]), 10)
-        for tool, arguments in (("web_search", {"query": "asyncio"}),
-                                 ("read_webpage", {"url": "https://example.com/"})):
+        for tool, arguments in (("web_search", {"question_id": "q1", "query": "asyncio",
+                                                  "provider": "tavily"}),
+                                 ("read_webpage", {"question_id": "q1", "url": "https://example.com/",
+                                                    "query": "asyncio", "provider": "page"})):
             result = self.researcher._execute(tool, arguments)
             self.assertFalse(result.success)
             self.assertIn("budget", result.error)
@@ -85,17 +91,34 @@ class ResearchAdmissionTests(unittest.TestCase):
 
     def test_tool_schema_rejects_invalid_arguments_without_spending_budget(self):
         tools = self.researcher._tools()
-        for call in (ToolCall("short-query", "web_search", {"query": "x"}),
-                     ToolCall("extra-argument", "read_webpage", {"url": "https://example.com", "execute": True}),
+        for call in (ToolCall("short-query", "web_search", {"question_id": "q1", "query": "x",
+                                                               "provider": "tavily"}),
+                     ToolCall("extra-argument", "read_webpage", {"question_id": "q1",
+                         "url": "https://example.com", "query": "asyncio", "provider": "page", "execute": True}),
                      ToolCall("unknown-tool", "bash", {"command": "never executed"})):
             self.assertTrue(tools.execute(call).is_error)
         self.assertEqual(self.researcher.counts, {"web_search": 0, "read_webpage": 0})
         self.assertEqual(self.db.get_run(self.run["run_id"])["research"]["steps"], [])
 
     def test_keys_are_excluded_from_configuration_repr(self):
-        settings = Settings(data_dir=Path("data"), api_key="model-key-not-sent", tavily_api_key="search-key-not-sent")
+        settings = Settings(data_dir=Path("data"), api_key="model-key-not-sent",
+                            tavily_api_key="search-key-not-sent", exa_api_key="exa-key-not-sent")
         self.assertNotIn("model-key-not-sent", repr(settings))
         self.assertNotIn("search-key-not-sent", repr(settings))
+        self.assertNotIn("exa-key-not-sent", repr(settings))
+
+    def test_exa_provider_is_exposed_without_networking_and_still_rejects_loopback(self):
+        settings = Settings(data_dir=Path(self.db.path).parent, exa_api_key="exa-local-test-key")
+        researcher = Researcher(settings, self.db, self.stopping)
+        researcher.run = self.run
+        researcher.deadline = monotonic() + 300
+        result = researcher._tools().execute(ToolCall("unsafe-exa", "read_webpage", {
+            "question_id": "q1", "url": "http://127.0.0.1/private", "query": "asyncio",
+            "provider": "exa"}))
+        self.assertTrue(result.is_error)
+        self.assertIn("unsafe_url", result.content)
+        self.assertNotIn("exa-local-test-key", result.content)
+        self.assertEqual(researcher.counts["read_webpage"], 1)
 
     def test_maximum_chinese_input_fits_but_escaped_input_is_rejected_before_calls(self):
         self.researcher.validate_input("中" * 4000, "文" * 6000)

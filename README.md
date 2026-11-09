@@ -28,7 +28,7 @@ npm.cmd --prefix web ci
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
-在本仓库本地.env设置OPENAI_API_KEY及造课调研必需的TAVILY_API_KEY，可选OPENAI_MODEL、OPENAI_BASE_URL。不要覆盖已有配置、把密钥放入web或发到聊天。HK_DATA_DIR默认data，数据库为data/hyperknow.sqlite3；HK_MODEL_TIMEOUT_SECONDS默认120。修改配置后重启后端。
+在本仓库本地.env设置OPENAI_API_KEY，以及至少一个搜索源密钥TAVILY_API_KEY或EXA_API_KEY；两个搜索源都可配置。可选OPENAI_MODEL、OPENAI_BASE_URL。不要覆盖已有配置、把密钥放入web或发到聊天。HK_DATA_DIR默认data，数据库为data/hyperknow.sqlite3；HK_MODEL_TIMEOUT_SECONDS默认120。修改配置后重启后端。
 
 ## 启动
 
@@ -82,7 +82,7 @@ uv run --frozen python scripts/verify_classroom.py --execute --course-id <实际
 
 研发评测已从零重写为[学习任务评测](evals/README.md)：`validate`检查17项跨学科开发任务，`run`真实执行业务，`judge`对冻结证据追加独立评分，`calibrate`运行作者控制，`report`／`compare`离线报告及严格配对比较。收费操作必须显式`--execute`，学生／评分模型分别指定；默认每个trial拥有独立空SQLite和真实后端。分别报告业务完成、工程不变量与教学维度，不用保存成功或模拟学生自述证明学习收益。旧框架／旧命令已撤换，无自动历史迁移或全局目录扫描；现有`eval_result/2026-10-29/`为禁止访问的保护目录。实际覆盖、预算失败、用量和未完成的独立人工校准见[验收计划](docs/exec-plans/completed/20261029-learning-evaluation-rewrite.md)。
 
-当前造课分为澄清、网页调研、全局蓝图、确认后逐单元展开，需同时配置本地 `TAVILY_API_KEY`。上述脚本默认停在蓝图等待确认；明确自动验收时使用 `uv run --frozen python scripts/verify_model.py --approve-blueprint`，否则在创建页审阅后点击确认。不要求旧课兼容，不主动清空已有本地数据；契约及当前验收边界见[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)。
+当前造课分为澄清、网页调研、全局蓝图、确认后逐单元展开，至少配置本地 `TAVILY_API_KEY` 或 `EXA_API_KEY`。上述脚本默认停在蓝图等待确认；明确自动验收时使用 `uv run --frozen python scripts/verify_model.py --approve-blueprint`，否则在创建页审阅后点击确认。不要求旧课兼容，不主动清空已有本地数据；契约及当前验收边界见[蓝图工作流](docs/design-docs/course-blueprint-workflow.md)。
 
 脚本走真实HTTP，默认回答每题首选项，完成真实研究后停在蓝图；只有显式--approve-blueprint才确认并连续展开。可加--data-dir指定本次后端数据目录，额外核对model_calls实际收到研究报告／摘录及预算。证据写入忽略的data/validation/；缺配置或等待确认退出2，实际失败退出1。只验证模型／API切片，不代替浏览器、第二组需求或重启验收。
 

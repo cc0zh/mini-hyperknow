@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from .domain import (AppError, ExamDraft, LectureDraft, ProjectDraft, Schema, StageDraft, uid)
+from .research_domain import build_claim_context
 
 
 class UnitBlueprint(Schema):
@@ -13,6 +14,7 @@ class UnitBlueprint(Schema):
     description: str = Field(min_length=1, max_length=1200)
     learning_objectives: list[str] = Field(min_length=1, max_length=8)
     estimated_sessions: int = Field(ge=1, le=24)
+    research_claim_ids: list[str] = Field(default_factory=list, max_length=12)
     project_keys: list[str] = Field(default_factory=list, max_length=3)
     exam_goal: str = Field(default="", max_length=1200)
 
@@ -63,6 +65,15 @@ def validate_expansion(draft: UnitExpansionDraft, unit: dict, session_budget: in
         raise ValueError("new sessions require unique, nonempty teaching depths")
     if any(any(not point.strip() for point in session.key_points) for session in sessions):
         raise ValueError("session key points cannot be empty")
+    allowed_claim_ids = set(unit.get("research_claim_ids", []))
+    for session in sessions:
+        if (len(set(session.research_claim_ids)) != len(session.research_claim_ids)
+                or not set(session.research_claim_ids) <= allowed_claim_ids):
+            raise ValueError("sessions may select only unique research claims assigned to their unit")
+    for exam in draft.exams:
+        if (len(set(exam.research_claim_ids)) != len(exam.research_claim_ids)
+                or not set(exam.research_claim_ids) <= allowed_claim_ids):
+            raise ValueError("exams may select only unique research claims assigned to their unit")
     stage_keys = [stage.project_key for stage in draft.project_stages]
     if len(set(stage_keys)) != len(stage_keys) or set(stage_keys) != set(unit["project_keys"]):
         raise ValueError("each approved unit project key needs exactly one stage")
@@ -93,7 +104,17 @@ def materialize_blueprint(draft: BlueprintDraft, run: dict, timestamp: str,
         old_unit = previous["units"][index] if previous and index < len(previous["units"]) else None
         unit.update(unit_id=old_unit["unit_id"] if old_unit else uid("unit"),
                     generation_status="pending", lectures=[], exams=[], project_stages=[])
-    return {**course, "course_id": previous["course_id"] if previous else uid("course"),
+    research_report = run.get("research", {}).get("report") or {}
+    selected_claim_ids = {claim_id for unit in course["units"]
+                          for claim_id in unit.get("research_claim_ids", [])}
+    research_claims = [{key: finding[key] for key in ("claim_id", "question_ids", "title", "summary")}
+                       for finding in research_report.get("findings", [])
+                       if finding.get("claim_id") in selected_claim_ids]
+    research_evidence = [item for item in run.get("research", {}).get("evidence", [])
+                         if item["claim_id"] in selected_claim_ids]
+    return {**course, "research_claims": research_claims,
+            "research_evidence": research_evidence,
+            "course_id": previous["course_id"] if previous else uid("course"),
             "goal": run["goal"], "clarification": {"questions": run["questions"],
                 "answers": run["answers"], "skipped": run["skipped"]},
             "created_at": previous["created_at"] if previous else timestamp,
@@ -126,24 +147,46 @@ def _sequence_excerpt(items: list[dict]) -> dict:
             "byte_limit": 6000}
 
 
+def validate_blueprint(draft: BlueprintDraft, context: dict) -> BlueprintDraft:
+    allowed_claim_ids = {claim["claim_id"] for claim in context["research_claims"]}
+    for unit in draft.units:
+        if (len(set(unit.research_claim_ids)) != len(unit.research_claim_ids)
+                or not set(unit.research_claim_ids) <= allowed_claim_ids):
+            raise ValueError("units may select only unique claims in the research input")
+        if allowed_claim_ids and not unit.research_claim_ids:
+            raise ValueError("each unit must select at least one relevant research claim")
+    return draft
+
+
 def planning_context(run: dict, course: dict | None = None, *, budget: int = 60000) -> dict:
-    """Use real evidence and bounded excerpts; record precisely what the model receives."""
+    """Pass exact passages attached to course-relevant claims, never arbitrary page prefixes."""
     research = run["research"]
     if not research.get("report") or not research["sources"]:
         raise AppError("research_required", "必须先完成真实调研才能规划课程", 409)
-    sources = []
-    for source in research["sources"]:
-        text = source.get("text", "")
-        sources.append({**{key: value for key, value in source.items() if key != "text"},
-                        "context_excerpt": "", "stored_excerpt_bytes": len(text.encode("utf-8")),
-                        "context_truncated": bool(text)})
+    report = research["report"]
+    claim_metadata = [{key: finding[key] for key in ("claim_id", "question_ids", "title", "summary")}
+                      for finding in report.get("findings", []) if finding.get("claim_id")]
+    evidence_claim_ids = {item["claim_id"] for item in research.get("evidence", [])}
+    if run["stage"] == "blueprint":
+        selected_claim_ids = [claim["claim_id"] for claim in claim_metadata
+                              if claim["claim_id"] in evidence_claim_ids]
+    else:
+        unit = next(unit for unit in course["units"] if unit["unit_id"] == run["current_unit_id"])
+        selected_claim_ids = unit.get("research_claim_ids", [])
+    try:
+        research_claims = build_claim_context(claim_metadata, research.get("evidence", []), selected_claim_ids)
+    except ValueError as exc:
+        raise AppError("research_evidence_invalid", "所选课程主张缺少可验证的来源证据", 409) from exc
     result = {"goal": run["goal"], "questions": run["questions"], "answers": run["answers"],
-              "clarification_skipped": run["skipped"], "research_report": research["report"],
+              "clarification_skipped": run["skipped"],
+              "research_claims": research_claims,
               "feedback": run.get("blueprint_feedback", ""),
-              "sources": sources, "source_excerpt_byte_limit": 6000, "budget_bytes": budget,
-              "course_session_budget": 60}
+              "budget_bytes": budget, "course_session_budget": 60}
     optional_sequences = {}
     if run["stage"] == "blueprint":
+        result["research_report"] = {"summary": report.get("summary", ""), "questions": report.get("questions", []),
+                                     "suggested_sequence": report.get("suggested_sequence", []),
+                                     "limitations": report.get("limitations", [])}
         if course:
             result["previous_blueprint"] = {key: course[key] for key in (
                 "title", "description", "target_learner", "difficulty", "tags", "language", "projects", "units")}
@@ -169,9 +212,7 @@ def planning_context(run: dict, course: dict | None = None, *, budget: int = 600
     size = lambda: _json_bytes(result)
     if size() > budget:
         raise AppError("context_too_large", "课程规划输入超过保守上下文预算，未发起模型请求", 422)
-    # Required evidence metadata, report and the exact approved current unit win over
-    # optional history. Each sequence gets at most a quarter of the free space,
-    # leaving at least half for source excerpts; the 6000-byte caps include JSON.
+    # Required claims and exact passages win over optional course history.
     allowance = (budget - size()) // 4
     for key, items in optional_sequences.items():
         excerpt = result[key]
@@ -183,18 +224,4 @@ def planning_context(run: dict, course: dict | None = None, *, budget: int = 600
                 excerpt["items"].pop()
                 excerpt["context_truncated"] = True
                 break
-    for index, source in enumerate(sources):
-        raw = research["sources"][index].get("text", "").encode("utf-8")
-        target = size() + (budget - size()) // (len(sources) - index)
-        low, high = 0, min(6000, len(raw))
-        while low < high:
-            middle = (low + high + 1) // 2
-            source["context_excerpt"] = raw[:middle].decode("utf-8", errors="ignore")
-            source["context_truncated"] = middle < len(raw)
-            if size() <= target:
-                low = middle
-            else:
-                high = middle - 1
-        source["context_excerpt"] = raw[:low].decode("utf-8", errors="ignore")
-        source["context_truncated"] = len(source["context_excerpt"].encode("utf-8")) < len(raw)
     return result

@@ -4,6 +4,7 @@ import hashlib
 import json
 from time import monotonic
 import unittest
+from unittest.mock import patch
 
 from hyperknow.research_web import (
     _PinnedConnection, TavilySearch, WebError, extract_page, fetch_page, parse_search, public_ip,
@@ -101,3 +102,20 @@ class PublicWebRulesTests(unittest.TestCase):
             TavilySearch("").search("asyncio")
         self.assertEqual(raised.exception.code, "search_not_configured")
         self.assertEqual(str(raised.exception), raised.exception.message)
+
+    def test_tavily_depth_is_explicit_bounded_and_uses_the_requested_mode(self):
+        calls = []
+
+        def request(url, **kwargs):
+            calls.append(json.loads(kwargs["body"]))
+            return 200, {}, b'{"results": []}'
+
+        with patch("hyperknow.research_web._request", side_effect=request):
+            TavilySearch("test-key").search("asyncio cancellation", search_depth="basic")
+            TavilySearch("test-key").search("asyncio cancellation", search_depth="advanced")
+        self.assertEqual([call["search_depth"] for call in calls], ["basic", "advanced"])
+        for mode in ("deep", "", None):
+            with patch("hyperknow.research_web._request", side_effect=AssertionError("must not request")):
+                with self.assertRaises(WebError) as raised:
+                    TavilySearch("test-key").search("asyncio cancellation", search_depth=mode)
+            self.assertEqual(raised.exception.code, "invalid_query")

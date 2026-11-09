@@ -81,7 +81,7 @@ def main():
         path.write_text(json.dumps(pending, ensure_ascii=False, indent=2), encoding="utf-8")
         created = client.post("/api/course-runs", json=command)
         if created.status_code == 503 and created.json().get("error", {}).get("code") == "search_not_configured":
-            print("BLOCKED: configure TAVILY_API_KEY locally and restart the backend. No run was created.")
+            print("BLOCKED: configure TAVILY_API_KEY or EXA_API_KEY locally and restart the backend. No run was created.")
             return 2
         created.raise_for_status()
         pending.update(run_id=created.json()["run_id"], status="accepted")

@@ -239,7 +239,7 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage, As
                        approved_blueprint_version=None, blueprint_pending=False,
                        blueprint_feedback="", current_unit_id=None,
                        input={"goal": goal, "context": ""},
-                       research={"steps": [], "sources": [], "report": None})
+                        research={"steps": [], "sources": [], "report": None, "evidence": [], "round": 1})
             self._save_run(conn, run)
             return run
         return self.command(command_id, {"action": "create", "goal": goal}, create)
@@ -290,7 +290,7 @@ class Database(BlueprintStorage, ResearchStorage, QuizStorage, LessonStorage, As
             if parent.get("kind") == "research":
                 self._search_configured(search_configured)
                 run.update(kind="research", input=parent["input"],
-                           research={"steps": [], "sources": [], "report": None})
+                            research={"steps": [], "sources": [], "report": None, "evidence": [], "round": 1})
             elif parent.get("kind", "course") == "course":
                 self._retry_blueprint(conn, parent, run, search_configured=search_configured)
             elif parent.get("kind") == "quiz":

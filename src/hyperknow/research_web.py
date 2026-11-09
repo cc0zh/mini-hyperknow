@@ -1,4 +1,4 @@
-"""Real Tavily search and bounded public-web text extraction, without a browser."""
+"""Real Tavily/Exa retrieval and bounded public-web text extraction, without a browser."""
 
 from datetime import datetime, timezone
 import hashlib
@@ -316,12 +316,13 @@ class TavilySearch:
     def __init__(self, api_key: str, timeout: float = 20):
         self.api_key, self.timeout = api_key, timeout
 
-    def search(self, query: str, max_results: int = 5) -> list[dict]:
+    def search(self, query: str, max_results: int = 5, search_depth: str = "basic") -> list[dict]:
         if not self.api_key:
             raise WebError("search_not_configured", "未配置TAVILY_API_KEY")
-        if not isinstance(query, str) or not 2 <= len(query.strip()) <= 400 or not 1 <= max_results <= 5:
+        if (not isinstance(query, str) or not 2 <= len(query.strip()) <= 400
+                or not 1 <= max_results <= 5 or search_depth not in {"basic", "advanced"}):
             raise WebError("invalid_query", "搜索词或结果数量超出预算")
-        body = json.dumps({"query": query, "search_depth": "basic", "max_results": max_results,
+        body = json.dumps({"query": query, "search_depth": search_depth, "max_results": max_results,
                            "include_answer": False, "include_raw_content": False}).encode("utf-8")
         try:
             status, _, raw = _request("https://api.tavily.com/search", deadline=monotonic() + self.timeout,
@@ -333,3 +334,144 @@ class TavilySearch:
         if status != 200:
             raise WebError("search_http_error", "搜索服务拒绝请求，请检查凭据、限额或服务状态")
         return parse_search(raw, max_results)
+
+
+def _require_exa_key(api_key: str):
+    if (not isinstance(api_key, str) or not api_key.strip()
+            or any(ord(char) <= 32 or ord(char) == 127 for char in api_key)):
+        raise WebError("search_not_configured", "未配置EXA_API_KEY")
+
+
+def _exa_post(endpoint: str, api_key: str, timeout: float, payload: dict,
+              failure: tuple[str, str], http_error: tuple[str, str]) -> bytes:
+    # The key stays in one header. Vendor bodies and transport errors are not chained.
+    body = json.dumps(payload).encode("utf-8")
+    try:
+        status, _, raw = _request(endpoint, deadline=monotonic() + timeout, max_bytes=256000,
+                                  method="POST", body=body,
+                                  headers={"Content-Type": "application/json", "x-api-key": api_key})
+    except WebError:
+        status, raw = None, b""
+    if status is None:
+        raise WebError(*failure)
+    if status != 200:
+        raise WebError(*http_error)
+    return raw
+
+
+def _vendor_object(raw: bytes, code: str, message: str) -> dict:
+    payload = None
+    if isinstance(raw, bytes):
+        try:
+            payload = json.loads(raw)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            payload = None
+    if not isinstance(payload, dict):
+        raise WebError(code, message)
+    return payload
+
+
+def _published_at(item: dict):
+    if "publishedDate" not in item or item["publishedDate"] is None:
+        return None
+    if not isinstance(item["publishedDate"], str):
+        raise ValueError("invalid published date")
+    return item["publishedDate"]
+
+
+def _parse_exa_search(raw: bytes, max_results: int) -> list[dict]:
+    payload = _vendor_object(raw, "search_invalid_response", "搜索服务返回的结果结构不符合要求")
+    parsed = None
+    try:
+        results = payload["results"]
+        if not isinstance(results, list):
+            raise ValueError("invalid results")
+        parsed = []
+        for item in results[:max_results]:
+            if not isinstance(item, dict) or not isinstance(item.get("highlights"), list):
+                raise ValueError("invalid search item")
+            if any(not isinstance(part, str) for part in item["highlights"]):
+                raise ValueError("invalid highlights")
+            title = item.get("title") or ""
+            if not isinstance(title, str):
+                raise ValueError("invalid title")
+            highlights = list(item["highlights"])
+            parsed.append({"provider": "exa", "url": validate_url(item["url"]).geturl(),
+                           "title": title[:300], "snippet": "\n".join(highlights)[:800],
+                           "highlights": highlights, "published_at": _published_at(item)})
+    except (KeyError, TypeError, ValueError, WebError):
+        parsed = None
+    if parsed is None:
+        raise WebError("search_invalid_response", "搜索服务返回的结果结构不符合要求")
+    return parsed
+
+
+def _content_excerpt(payload: dict, url: str):
+    results = payload["results"]
+    if not isinstance(results, list) or (results and not isinstance(results[0], dict)):
+        raise ValueError("invalid results")
+    if not results:
+        return None
+    item = results[0]
+    found = url if item.get("url") is None else validate_url(item["url"]).geturl()
+    if found != url:
+        raise ValueError("url mismatch")
+    highlights = item["highlights"]
+    if not isinstance(highlights, list) or any(not isinstance(part, str) for part in highlights):
+        raise ValueError("invalid highlights")
+    title = item.get("title") or ""
+    if not isinstance(title, str):
+        raise ValueError("invalid title")
+    return (found, title[:300] or urlsplit(found).hostname or "网页", "\n".join(highlights))
+
+
+def _parse_exa_contents(raw: bytes, url: str, max_chars: int) -> dict:
+    payload = _vendor_object(raw, "content_invalid_response", "内容服务返回的结果结构不符合要求")
+    try:
+        excerpt = _content_excerpt(payload, url)
+    except (KeyError, TypeError, ValueError, WebError):
+        excerpt = False
+    if excerpt is False:
+        raise WebError("content_invalid_response", "内容服务返回的结果结构不符合要求")
+    if excerpt is None or not excerpt[2].strip():
+        raise WebError("empty_page", "网页没有可读取正文，可能需要脚本或登录；未尝试绕过")
+    found, title, text = excerpt
+    truncated = True
+    text = text[:max_chars]
+    return {"url": found, "title": title, "text": text,
+            "fetched_at": datetime.now(timezone.utc).isoformat(), "truncated": truncated,
+            "content_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            "provider": "exa", "content_mode": "highlights"}
+
+
+class ExaSearch:
+    def __init__(self, api_key: str, timeout: float = 20):
+        self.api_key, self.timeout = api_key, timeout
+
+    def search(self, query: str, max_results: int = 5) -> list[dict]:
+        _require_exa_key(self.api_key)
+        if not isinstance(query, str) or not 2 <= len(query.strip()) <= 400 or not 1 <= max_results <= 5:
+            raise WebError("invalid_query", "搜索词或结果数量超出预算")
+        raw = _exa_post("https://api.exa.ai/search", self.api_key, self.timeout,
+                        {"query": query, "numResults": max_results, "contents": {"highlights": True}},
+                        ("search_request_failed", "搜索服务请求失败，未自动重试；请检查网络和配置"),
+                        ("search_http_error", "搜索服务拒绝请求，请检查凭据、限额或服务状态"))
+        return _parse_exa_search(raw, max_results)
+
+
+class ExaContents:
+    def __init__(self, api_key: str, timeout: float = 20):
+        self.api_key, self.timeout = api_key, timeout
+
+    def read(self, url: str, query: str, max_chars: int = 6000) -> dict:
+        _require_exa_key(self.api_key)
+        if not isinstance(query, str) or not 2 <= len(query.strip()) <= 400:
+            raise WebError("invalid_query", "搜索词超出预算")
+        if max_chars < 1:
+            raise ValueError("page budgets must be positive")
+        current = validate_url(url).geturl()
+        raw = _exa_post("https://api.exa.ai/contents", self.api_key, self.timeout,
+                        {"ids": [current], "highlights": {"query": query}},
+                        ("content_request_failed", "内容服务请求失败，未自动重试；请检查网络和配置"),
+                        ("content_http_error", "内容服务拒绝请求，请检查凭据、限额或服务状态"))
+        return _parse_exa_contents(raw, current, max_chars)

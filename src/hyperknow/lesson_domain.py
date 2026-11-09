@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import ConfigDict, Field, model_validator
 
 from .domain import AppError, Schema, uid
+from .research_domain import build_claim_context
 
 
 class BoardNode(Schema):
@@ -95,6 +96,7 @@ class BoardStepDraft(BoardFrame):
     stage: Literal["opening", "explain", "example", "check", "summary"]
     keypoint_id: str | None = Field(default=None, min_length=1, max_length=80)
     focus_ids: list[str] = Field(default_factory=list, max_length=24)
+    research_claim_ids: list[str] = Field(default_factory=list, max_length=8)
     check: BoardCheck | None = None
 
 
@@ -177,6 +179,13 @@ class BoardScriptDraft(Schema):
 def validate_lesson_coverage(draft: BoardScriptDraft, context: dict):
     if [item.source_keypoint_index for item in draft.roadmap] != list(range(len(context["session"]["key_points"]))):
         raise ValueError("roadmap source indices must cover every session keypoint exactly once in order")
+    allowed_claim_ids = {claim["claim_id"] for claim in context.get("research_claims", [])}
+    for step in draft.steps:
+        if (len(set(step.research_claim_ids)) != len(step.research_claim_ids)
+                or not set(step.research_claim_ids) <= allowed_claim_ids):
+            raise ValueError("lesson steps may cite only unique claims selected for this session")
+    if allowed_claim_ids and not any(step.research_claim_ids for step in draft.steps):
+        raise ValueError("lesson must attach its selected research claims to relevant teaching steps")
 
 
 class BoardStep(BoardStepDraft):
@@ -252,11 +261,18 @@ def materialize_script(draft: BoardScriptDraft, run: dict, timestamp: str) -> di
 def lesson_context(course: dict, unit: dict, lecture: dict, session: dict) -> dict:
     sessions = [s for u in course["units"] for l in u["lectures"] for s in l["sessions"]]
     index = next(i for i, s in enumerate(sessions) if s["session_id"] == session["session_id"])
+    try:
+        research_claims = build_claim_context(course.get("research_claims", []),
+                                              course.get("research_evidence", []),
+                                              session.get("research_claim_ids", []))
+    except ValueError as exc:
+        raise AppError("research_evidence_invalid", "本课选择的研究主张缺少课程证据", 409) from exc
     return {"course_id": course["course_id"], "course_title": course["title"],
             "goal": course["goal"], "clarification": course["clarification"],
             "language": course["language"], "unit_title": unit["title"],
             "unit_description": unit["description"], "lecture_title": lecture["title"],
             "session": {k: v for k, v in session.items() if k != "completed"},
+            "research_claims": research_claims,
             "previous_session": sessions[index - 1]["title"] if index else None,
             "next_session": sessions[index + 1]["title"] if index + 1 < len(sessions) else None}
 

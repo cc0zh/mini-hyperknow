@@ -30,7 +30,7 @@ class AssistanceHTTPTests(unittest.TestCase):
             sock.bind(("127.0.0.1", 0))
             cls.port = sock.getsockname()[1]
         env = {**os.environ, "HK_DATA_DIR": cls.directory.name,
-               "OPENAI_API_KEY": "", "TAVILY_API_KEY": ""}
+               "OPENAI_API_KEY": "", "TAVILY_API_KEY": "", "EXA_API_KEY": ""}
         cls.process = subprocess.Popen(
             [sys.executable, "-m", "uvicorn", "hyperknow.main:app", "--host", "127.0.0.1",
              "--port", str(cls.port), "--log-level", "warning"],

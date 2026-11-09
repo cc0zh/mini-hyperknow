@@ -62,19 +62,16 @@ class PlanningBudgetTests(unittest.TestCase):
                     self.assertEqual(sum(u["estimated_sessions"] for u in course["units"]), 60)
                     for key, value in (("goal", run["goal"]), ("questions", run["questions"]),
                                        ("answers", run["answers"]), ("feedback", run["blueprint_feedback"]),
-                                       ("research_report", run["research"]["report"]), ("unit", course["units"][-1])):
+                                       ("unit", course["units"][-1])):
                         self.assertEqual(context[key], value)
+                    self.assertNotIn("research_report", context)
+                    self.assertEqual(context["research_claims"], [])
+                    self.assertNotIn("sources", context)
                     history = context["expanded_units_excerpt"]
                     self.assertTrue(history["context_truncated"])
                     self.assertEqual(history["total_items"], 7)
                     self.assertLessEqual(json_bytes(history), history["byte_limit"])
                     self.assertLessEqual(json_bytes(context["unit_sequence_excerpt"]), 6000)
-                    for excerpt, source in zip(context["sources"], run["research"]["sources"]):
-                        self.assertTrue(excerpt["context_excerpt"])
-                        self.assertTrue(excerpt["context_truncated"])
-                        self.assertTrue(source["text"].startswith(excerpt["context_excerpt"]))
-                        self.assertEqual(excerpt["source_id"], source["source_id"])
-                        self.assertEqual(excerpt["content_sha256"], source["content_sha256"])
                     self.assertEqual((run, course), original)
 
     def test_large_global_sequence_is_explicitly_an_excerpt_not_a_changed_approved_unit(self):
@@ -99,28 +96,46 @@ class PlanningBudgetTests(unittest.TestCase):
                 elif field == "feedback":
                     run["blueprint_feedback"] = text
                 elif field == "report":
+                    run["stage"] = "blueprint"
                     run["research"]["report"]["summary"] = text
                 else:
                     course["units"][-1]["learning_objectives"] = [text]
                 original = deepcopy((run, course))
                 with self.assertRaises(AppError) as raised:
-                    planning_context(run, course, budget=6000)
+                    planning_context(run, None if field == "report" else course, budget=6000)
                 self.assertEqual(raised.exception.code, "context_too_large")
                 self.assertEqual((run, course), original)
 
-    def test_source_truncation_counts_json_escapes_and_leaves_original_text_intact(self):
+    def test_large_unscoped_report_does_not_enter_or_overflow_unit_context(self):
+        run, course = planning_inputs(title="短")
+        run["goal"] = "理解异步"
+        course["units"] = course["units"][-1:]
+        marker = "UNASSIGNED_BETA_"
+        run["research"]["report"] = {
+            "summary": marker * 800,
+            "questions": [{"id": "q_beta", "question": marker, "claim_ids": ["claim_beta"]}],
+            "suggested_sequence": [marker],
+            "limitations": [marker],
+        }
+        original = deepcopy((run, course))
+
+        context = planning_context(run, course, budget=6000)
+
+        serialized = json.dumps(context, ensure_ascii=False)
+        self.assertNotIn("research_report", context)
+        self.assertNotIn(marker, serialized)
+        self.assertLessEqual(json_bytes(context), 6000)
+        self.assertEqual((run, course), original)
+
+    def test_planning_uses_no_unselected_page_prefixes_and_leaves_sources_intact(self):
         run, _ = planning_inputs()
         run.update(stage="blueprint", goal="理解任务取消")
         original = deepcopy(run)
         context = planning_context(run, budget=4000)
         self.assertLessEqual(json_bytes(context), 4000)
-        self.assertEqual(context["research_report"], run["research"]["report"])
-        for excerpt, source in zip(context["sources"], run["research"]["sources"]):
-            self.assertTrue(excerpt["context_truncated"])
-            self.assertTrue(excerpt["context_excerpt"])
-            self.assertLessEqual(len(excerpt["context_excerpt"].encode("utf-8")), 6000)
-            self.assertEqual(excerpt["stored_excerpt_bytes"], len(source["text"].encode("utf-8")))
-            self.assertTrue(source["text"].startswith(excerpt["context_excerpt"]))
+        self.assertEqual(context["research_report"]["summary"], run["research"]["report"]["summary"])
+        self.assertEqual(context["research_claims"], [])
+        self.assertNotIn("sources", context)
         self.assertEqual(run, original)
 
 

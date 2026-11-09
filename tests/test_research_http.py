@@ -53,6 +53,7 @@ class ResearchLiveServerTests(unittest.TestCase):
         cls.server_log = tempfile.TemporaryFile(mode="w+t", encoding="utf-8")
         repository = Path(__file__).resolve().parents[1]
         env = {**os.environ, "OPENAI_API_KEY": cls.model_configuration, "TAVILY_API_KEY": "",
+               "EXA_API_KEY": "",
                "HK_DATA_DIR": str(root), "PYTHON_DOTENV_DISABLED": "1",
                "PYTHONPATH": str(repository / "src")}
         try:

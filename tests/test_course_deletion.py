@@ -248,7 +248,8 @@ class CourseDeletionHTTPTests(unittest.TestCase):
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
-        env = {**os.environ, "HK_DATA_DIR": cls.directory.name, "OPENAI_API_KEY": "", "TAVILY_API_KEY": ""}
+        env = {**os.environ, "HK_DATA_DIR": cls.directory.name, "OPENAI_API_KEY": "", "TAVILY_API_KEY": "",
+               "EXA_API_KEY": ""}
         cls.process = subprocess.Popen([sys.executable, "-m", "uvicorn", "hyperknow.main:app",
             "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"],
             cwd=Path(__file__).resolve().parents[1], env=env,

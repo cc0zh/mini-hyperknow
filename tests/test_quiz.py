@@ -56,6 +56,29 @@ def persisted_quiz(db, target_type, target_id, command="domain-quiz-prepare"):
 
 
 class QuizSchemaTests(unittest.TestCase):
+    def test_quiz_requires_citations_to_target_selected_research_claims(self):
+        course = {"course_id": "course", "title": "Asyncio", "language": "zh-CN",
+                  "research_claims": [{"claim_id": "claim_await", "question_ids": ["q1"],
+                                       "title": "await", "summary": "await suspends a coroutine."}],
+                  "research_evidence": [{"evidence_id": "evidence-1", "claim_id": "claim_await",
+                      "question_ids": ["q1"], "source_id": "source-1", "relation": "supports",
+                      "quote": "await suspends a coroutine", "start_char": 0, "end_char": 26,
+                      "url": "https://docs.python.org/asyncio", "title": "Asyncio", "fetched_at": "now",
+                      "content_sha256": "a" * 64, "provider": "tavily", "content_mode": "page_text"}]}
+        unit = {"unit_id": "unit", "title": "Await", "research_claim_ids": ["claim_await"],
+                "lectures": [], "exams": []}
+        target = {"session_id": "session", "title": "Await practice", "description": "Practice",
+                  "research_claim_ids": ["claim_await"]}
+        context = quiz_context(course, unit, target, "practice", {
+            "session": {"script_id": "script", "steps": []}})
+        self.assertIn("claim:claim_await", context["allowed_source_refs"])
+        self.assertEqual(context["research_claims"][0]["evidence"][0]["source_id"], "source-1")
+        cited = QuizDraft.model_validate(quiz_input("claim:claim_await"))
+        self.assertIs(validate_sources(cited, context), cited)
+        uncited = QuizDraft.model_validate(quiz_input("script:script"))
+        with self.assertRaises(ValueError):
+            validate_sources(uncited, context)
+
     def test_question_shapes_and_chinese_boolean_labels(self):
         draft = QuizDraft.model_validate(quiz_input("script:real"))
         self.assertEqual(draft.questions[-1].options[0].text, "是")

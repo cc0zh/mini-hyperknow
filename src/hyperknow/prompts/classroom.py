@@ -24,6 +24,8 @@ BOARD_SCRIPT_INSTRUCTION = (
     "工具循环必须先保留模型本轮的assistant工具调用消息，再逐个追加带匹配tool_call_id的tool结果；"
     "不能只追加tool结果，不能隐含依靠call_model修改传入历史。轮次、终止与结果回传的顺序应能按示例逐步核对。"
     "这是一次完整JSON生成，不是实时流式讲课，不声称音频或真实授课时长。"
+    "research_claims是针对本课选定的逐字来源证据；事实陈述只在该证据范围内表达，"
+    "确实使用某主张的教学步骤须将其claim_id写入research_claim_ids，不得引用未提供或仅靠记忆的事实。"
     "本课session.depths是教学深度要求：intuition直觉、definition定义、derivation推导、"
     "theory理论、practice实操；必须在本课讲义中实际体现给定标签，不只罗列标签。"
     "操作支持text/list/code/formula/box/arrow/highlight/circle/mermaid/table/diagram。"

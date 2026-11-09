@@ -6,18 +6,18 @@
 
 蓝图是同一份Course结构的早期状态。先确定课程目标、全局项目与单元顺序／目标／边界，再补充各单元的讲次、小节、考核及项目阶段；不会另存一份可以独立修改的“蓝图目录”。预计课时数是规划估计，不是已生成数量。
 
-本阶段不要求旧课程或旧运行兼容，不增加旧格式转换或单次造课降级路径，也不主动清空用户数据；运行及验收使用新的独立数据目录。项目仍只生成要求，成果提交保持暂缓。范围与验收事实见[完成计划](../exec-plans/completed/20261023-course-blueprint-workflow.md)。
+本阶段不做旧格式迁移，也不主动清空用户数据；历史研究JSON可读，但没有claim/evidence字段时不补造证据。项目仍只生成要求，成果提交保持暂缓。蓝图流程基础验收见[原完成计划](../exec-plans/completed/20261023-course-blueprint-workflow.md)，本次证据路由与反馈补研实现见[证据驱动计划](../exec-plans/completed/20261109-evidence-driven-research.md)。
 
 ## 工作流与保存屏障
 
 | 阶段 | 模型及输入 | 保存与后续动作 |
 | --- | --- | --- |
 | 澄清 | 原始目标；仅缺失信息实质影响课程时提问 | 允许0–5问；零问题原子进入research，不等待空表单，不记为用户跳过；非空保留实际答案与显式跳过 |
-| research | 目标、澄清快照；实际搜索／阅读工具 | 来源、摘录、工具过程和结构报告；失败不生成伪蓝图 |
-| blueprint | 需求与已保存调研依据 | Course骨架与稳定unit_id，run进入awaiting_blueprint，不占执行槽 |
-| 蓝图调整 | 用户实际反馈、原目标及调研 | 同一course_id重做尚未确认的规划，blueprint_version递增，再次等待用户确认 |
+| research | 目标、澄清快照及（反馈时）用户意见／旧证据；单一Agent按问题调用Tavily或Exa | 工具过程、来源摘录、问题／主张／逐字证据报告；失败不生成伪蓝图 |
+| blueprint | 需求、研究摘要及带原文证据的research_claims | Course骨架与稳定unit_id；每单元选定允许的research_claim_ids，run进入awaiting_blueprint，不占执行槽 |
+| 蓝图调整 | 用户实际反馈、旧报告和有界旧证据 | 同一run先回到research；仅教学表达调整复用证据，新增事实主题或事实质疑时缺口定向补搜；随后仍由同一course_id形成新蓝图、递增blueprint_version并再次等待用户确认 |
 | 蓝图确认 | 显式命令、当前run版本及已保存蓝图 | 保存确认事实，开始units阶段；未确认或过期命令不能展开 |
-| units | 全局规划、当前单元、相关来源和已有单元摘要 | 单个单元通过校验后局部提交并推送通知，再自动生成下一单元 |
+| units | 全局规划、当前单元分配的主张及精确来源摘录、已有单元摘要 | session与exam只可选择当前unit的研究主张；单个单元通过校验后局部提交并推送通知，再自动生成下一单元 |
 | ready | 所有单元均已保存 | 完整目录就绪；不等于讲义或题组已生成 |
 
 结构化结果仍采用有限一次修复。模型输入、输出、用量与失败沿用model_calls记录；合法JSON不等于教学正确。已确认后不开放修改整门蓝图，不能用重试替换已经开始学习的内容。
@@ -28,6 +28,9 @@
 - Unit保存generation_status（pending／generating／ready／failed／cancelled／interrupted），生成状态不是用户审批状态。
 - 小节depths表达教学方式与深度：intuition建立直觉、definition正式定义、derivation公式推导、theory进阶理论、practice应用实操；可多选，不代替课程整体难度。标签进入真实讲义上下文，不仅用于装饰。
 - 全局项目key必须有明确单元阶段归属，单元展开只能使用已批准项目引用，考核必须遵循已批准范围；持久ID由代码分配。
+- 新研究报告以问题／主张／证据契约保存：每个claim关联research questions和真实已读source，quote必须逐字存在保存摘录；服务器派生引用字符偏移、URL、抓取时间、正文hash与provider元数据。该结构校验不证明来源语义支持主张。
+- Course仅复制claim元数据和精确证据bundle，不在规划输入中按来源顺序分配网页前缀。蓝图阶段选择claim，单元展开接收本单元已选claim；课时讲义步骤只能标注本session的claim，练习／考核每道题在存在证据时必须引用本目标已选的`claim:<id>`，并通过allowed refs校验。
+- 新的报告／课程持久字段沿用SQLite JSON，无迁移；历史记录可照常读取，但缺少主张或证据字段时不补造证据。实现也未进行真实Exa/Tavily比较或付费教学质量评测。
 - 部分课程progress为null，页面显示目录完善中，不误用已生成课时作为整门分母。完整目录后恢复课时完成比例，仍不代表掌握度。
 - next_item支持generation及run_id，指向确认／生成页。已有讲次、小节可从目录进入；进入课堂仍只读，明确准备才生成讲义。项目／考核既有完成语义不变。
 

@@ -15,8 +15,9 @@ from hyperknow.storage import Database
 
 async def verify(goal: str, context: str) -> int:
     settings = Settings.load()
-    missing = [name for name, configured in (("OPENAI_API_KEY", settings.api_key),
-                                              ("TAVILY_API_KEY", settings.tavily_api_key)) if not configured]
+    missing = ["OPENAI_API_KEY"] if not settings.api_key else []
+    if not (settings.tavily_api_key or settings.exa_api_key):
+        missing.append("TAVILY_API_KEY or EXA_API_KEY")
     if missing:
         print("BLOCKED: configure " + ", ".join(missing) + " locally; no paid requests were made.")
         return 2

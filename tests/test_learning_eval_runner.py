@@ -30,7 +30,7 @@ class ManagedRunnerTests(unittest.TestCase):
     def test_actual_managed_backend_is_isolated_blocked_without_credentials_and_stopped(self):
         with tempfile.TemporaryDirectory(prefix="learning-runner-") as temporary:
             output = Path(temporary) / "trial"
-            environment = {**os.environ, "OPENAI_API_KEY": "", "TAVILY_API_KEY": "",
+            environment = {**os.environ, "OPENAI_API_KEY": "", "TAVILY_API_KEY": "", "EXA_API_KEY": "",
                            "PYTHON_DOTENV_DISABLED": "1", "PYTHONPATH": str(ROOT / "src")}
             script = ("from pathlib import Path; import sys; "
                       "from hyperknow_eval.cases import load_suite; "
@@ -76,7 +76,7 @@ with ManagedBackend(root / 'owned-server') as backend:
     assert record['environment']['database'] == str((backend.data_dir / 'hyperknow.sqlite3').resolve())
     assert record['actions'] == []
 """
-            environment = {**os.environ, "OPENAI_API_KEY": "", "TAVILY_API_KEY": "",
+            environment = {**os.environ, "OPENAI_API_KEY": "", "TAVILY_API_KEY": "", "EXA_API_KEY": "",
                            "PYTHON_DOTENV_DISABLED": "1", "PYTHONPATH": str(ROOT / "src")}
             process = subprocess.run([sys.executable, "-c", script, str(root)], cwd=ROOT,
                                      env=environment, capture_output=True, timeout=45)

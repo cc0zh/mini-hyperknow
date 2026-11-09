@@ -185,7 +185,7 @@ class CourseService:
 
     async def create(self, goal: str, command_id: str):
         run = self.db.create_run(command_id, goal, self.settings.model, configured=bool(self.settings.api_key),
-                                  search_configured=bool(self.settings.tavily_api_key))
+                                  search_configured=bool(self.settings.tavily_api_key or self.settings.exa_api_key))
         self.enqueue(run)
         return run
 
@@ -193,7 +193,7 @@ class CourseService:
         Researcher(self.settings, self.db, self.generator.stopping).validate_input(goal, context)
         run = self.db.create_research(command_id, goal, context, self.settings.model,
                                       configured=bool(self.settings.api_key),
-                                      search_configured=bool(self.settings.tavily_api_key))
+                                      search_configured=bool(self.settings.tavily_api_key or self.settings.exa_api_key))
         self.enqueue(run)
         return run
 
@@ -232,7 +232,7 @@ class CourseService:
     async def retry(self, run_id: str, data: dict):
         run = self.db.retry_run(data["client_command_id"], run_id, data["expected_version"],
                                 configured=bool(self.settings.api_key),
-                                search_configured=bool(self.settings.tavily_api_key))
+                                search_configured=bool(self.settings.tavily_api_key or self.settings.exa_api_key))
         self.enqueue(run)
         await self.notify_run(run)
         return run

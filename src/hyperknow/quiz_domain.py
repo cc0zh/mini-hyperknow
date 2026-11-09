@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from .domain import AppError, Schema, uid
+from .research_domain import build_claim_context
 
 
 TargetType = Literal["practice", "exam"]
@@ -138,6 +139,9 @@ def validate_sources(draft: QuizDraft, context: dict) -> QuizDraft:
     allowed = set(context["allowed_source_refs"])
     if not set(draft.source_refs) <= allowed:
         raise ValueError("quiz source refs must belong to this generation input")
+    claim_refs = {f"claim:{claim['claim_id']}" for claim in context.get("research_claims", [])}
+    if claim_refs and any(not set(question.source_refs) & claim_refs for question in draft.questions):
+        raise ValueError("each question must cite a selected research claim when evidence is available")
     return draft
 
 
@@ -156,13 +160,24 @@ def quiz_context(course: dict, unit: dict, target: dict, target_type: str,
               "language": course["language"], "unit_id": unit["unit_id"],
               "unit_title": unit["title"], "target_type": target_type,
               "target": target, "sources": [], "allowed_source_refs": []}
+    claim_ids = target.get("research_claim_ids", [])
+    try:
+        research_claims = build_claim_context(course.get("research_claims", []),
+                                              course.get("research_evidence", []), claim_ids)
+    except ValueError as exc:
+        raise AppError("research_evidence_invalid", "测验选择的研究主张缺少课程证据", 409) from exc
+    result["research_claims"] = research_claims
+    for claim in research_claims:
+        ref = f"claim:{claim['claim_id']}"
+        result["sources"].append({"ref": ref, "research_claim": claim})
+        result["allowed_source_refs"].append(ref)
     if target_type == "practice":
         script = scripts.get(target["session_id"])
         if script is None:
             raise AppError("lesson_required", "请先准备本课真实讲义，再生成课后练习", 409)
-        result["sources"] = [{"ref": f"script:{script['script_id']}", "script": script}]
-        result["allowed_source_refs"] = [f"script:{script['script_id']}"] + [
-            f"step:{step['step_id']}" for step in script["steps"]]
+        result["sources"].append({"ref": f"script:{script['script_id']}", "script": script})
+        result["allowed_source_refs"].extend([f"script:{script['script_id']}"] + [
+            f"step:{step['step_id']}" for step in script["steps"]])
     else:
         result["sources"].append({"ref": f"unit:{unit['unit_id']}", "title": unit["title"],
                                   "description": unit["description"]})

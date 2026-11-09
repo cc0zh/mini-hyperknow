@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from .blueprint_domain import (BlueprintDraft, UnitExpansionDraft, expansion_budget,
                                materialize_blueprint, materialize_expansion, validate_expansion)
-from .domain import AppError
+from .domain import AppError, course_research_input
 
 
 class BlueprintStorage:
@@ -53,7 +53,11 @@ class BlueprintStorage:
             else:
                 if not feedback:
                     raise AppError("feedback_required", "调整蓝图需要填写具体意见", 422)
-                run.update(stage="blueprint", blueprint_feedback=feedback, blueprint_pending=True)
+                previous_research = run["research"]
+                previous_research["round"] = previous_research.get("round", 1) + 1
+                run.update(stage="research", blueprint_feedback=feedback, blueprint_pending=True,
+                           input=course_research_input(run, feedback=feedback,
+                                                       previous_research=previous_research))
             run.update(status="generating", error=None, version=run["version"] + 1, updated_at=now())
             self._save_run(conn, run)
             return run
@@ -142,7 +146,18 @@ class BlueprintStorage:
             return
         if not run["research"].get("report"):
             self._search_configured(search_configured)
-            run.update(stage="research", research={"steps": [], "sources": [], "report": None})
+            run.update(stage="research", research={"steps": [], "sources": [], "report": None,
+                                                    "evidence": [], "round": 1})
+            return
+        if run.get("stage") == "research" and run.get("blueprint_pending"):
+            self._search_configured(search_configured)
+            course = self._get(conn, "courses", run["course_id"])
+            if (course.get("creation_run_id") != parent["run_id"]
+                    or course["structure_status"] != "blueprint"):
+                raise AppError("state_conflict", "不能恢复已替换或已确认的课程蓝图", 409)
+            course.update(creation_run_id=run["run_id"], version=course["version"] + 1)
+            self._write(conn, "courses", course["course_id"], course)
+            run.update(stage="research", status="queued")
             return
         if not run.get("course_id"):
             run.update(stage="blueprint", blueprint_pending=True)

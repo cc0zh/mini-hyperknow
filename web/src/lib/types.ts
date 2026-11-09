@@ -8,6 +8,7 @@ export interface Health {
   status: 'ok'
   database: 'ok'
   model: { configured: boolean; name: string; verified: false }
+  search?: { configured: boolean; verified: false; providers: { tavily: boolean; exa: boolean } }
 }
 
 export interface Question {
@@ -27,9 +28,15 @@ export interface Answer {
 export type RunStatus = 'queued' | 'clarifying' | 'awaiting_answers' | 'awaiting_blueprint' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
 
 export interface Research {
-  steps: { tool: 'web_search' | 'read_webpage'; status: 'ready' | 'failed'; arguments: { query?: string; url?: string }; error?: { code: string; message: string } | null }[]
-  sources: { source_id: string; url: string; title: string; text: string; fetched_at: string; truncated: boolean; content_sha256: string }[]
-  report: { summary: string; findings: { title: string; summary: string; source_ids: string[] }[]; suggested_sequence: string[]; limitations: string[] } | null
+  steps: { tool: 'web_search' | 'read_webpage'; status: 'ready' | 'failed'; research_round?: number; arguments: { question_id?: string; query?: string; url?: string; provider?: string; depth?: string }; error?: { code: string; message: string } | null }[]
+  sources: { source_id: string; url: string; title: string; text: string; fetched_at: string; truncated: boolean; content_sha256: string; provider?: string; content_mode?: string }[]
+  report: {
+    summary: string
+    questions?: { id: string; question: string; priority: number; status: 'answered' | 'partial' | 'unresolved'; claim_ids: string[] }[]
+    findings: { claim_id?: string; question_ids?: string[]; title: string; summary: string; source_ids: string[]; evidence?: { source_id: string; quote: string; relation: 'supports' | 'contradicts' }[] }[]
+    suggested_sequence: string[]
+    limitations: string[]
+  } | null
 }
 
 export interface Run {
@@ -64,6 +71,7 @@ export interface Run {
 }
 
 export interface Session {
+  research_claim_ids?: string[]
   depths?: SessionDepth[]
   completed?: boolean
   session_id: string
@@ -78,6 +86,7 @@ export type SessionDepth = 'intuition' | 'definition' | 'derivation' | 'theory' 
 export type UnitGenerationStatus = 'pending' | 'generating' | 'ready' | 'failed' | 'cancelled' | 'interrupted'
 
 export interface Unit {
+  research_claim_ids?: string[]
   learning_objectives?: string[]
   estimated_sessions?: number
   project_keys?: string[]
@@ -87,7 +96,7 @@ export interface Unit {
   title: string
   description: string
   lectures: { lecture_id: string; title: string; description: string; sessions: Session[] }[]
-  exams: { exam_id: string; title: string; goal: string; completed?: boolean }[]
+  exams: { exam_id: string; title: string; goal: string; research_claim_ids?: string[]; completed?: boolean }[]
   project_stages: { stage_id: string; project_id: string; title: string; description: string; deliverable: string }[]
 }
 
@@ -139,6 +148,7 @@ export interface BoardStep extends BoardFrame {
   stage: 'opening' | 'explain' | 'example' | 'check' | 'summary'
   keypoint_id: string | null
   focus_ids: string[]
+  research_claim_ids?: string[]
   check: { question: string; expected_answer: string } | null
 }
 export interface BoardScript {

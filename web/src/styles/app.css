@@ -297,6 +297,12 @@ fieldset:disabled .answer-option { cursor: default; opacity: .7; }
 .research-step-status.failed, .research-error { color: var(--clay-500) !important; }
 .research-report { border-left: 2px solid var(--sage-200); padding-left: 17px; margin: 22px 0; }
 .research-report ol, .research-report ul { padding-left: 18px; }
+.research-question-status, .finding-evidence > li > span { color: var(--sage-700); font-size: var(--fs-2xs); font-weight: 600; }
+.research-question-status.partial, .research-question-status.unresolved { color: var(--clay-500); }
+.finding-evidence { display: grid; gap: 10px; }
+.finding-evidence > li { border-left: 2px solid var(--line); padding-left: 12px; }
+.finding-evidence blockquote { margin: 5px 0; color: var(--text); white-space: pre-wrap; }
+.finding-evidence a { font-size: var(--fs-2xs); }
 .finding-sources { display: flex; flex-wrap: wrap; gap: 10px; font-size: var(--fs-xs); }
 .research-sources { display: grid; gap: 10px; }
 .research-source { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; background: var(--surface); scroll-margin-top: 24px; }

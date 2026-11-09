@@ -1,7 +1,7 @@
 """Research facts share the existing SQLite run/command transaction boundary."""
 
 from .domain import AppError, uid
-from .research_domain import ResearchReport, validate_report
+from .research_domain import ResearchReport, build_evidence_bundle, validate_report
 
 
 class ResearchStorage:
@@ -19,7 +19,7 @@ class ResearchStorage:
             self._search_configured(search_configured)
             run = self._new_run(goal, model)
             run.update(kind="research", input={"goal": goal, "context": context},
-                       research={"steps": [], "sources": [], "report": None})
+                       research={"steps": [], "sources": [], "report": None, "evidence": [], "round": 1})
             self._save_run(conn, run)
             return run
         return self.command(command_id, {"action": "research", "goal": goal, "context": context}, create)
@@ -27,7 +27,7 @@ class ResearchStorage:
     @staticmethod
     def _search_configured(configured: bool):
         if not configured:
-            raise AppError("search_not_configured", "网页调研需要 TAVILY_API_KEY，请在本地配置后重启", 503)
+            raise AppError("search_not_configured", "网页调研需要配置至少一个搜索源密钥，请在本地配置后重启", 503)
 
     def research_step(self, run_id: str, step: dict, page: dict | None = None) -> dict | None:
         from .storage import now
@@ -37,10 +37,17 @@ class ResearchStorage:
                 raise AppError("run_inactive", "调研已取消或中断，未保存晚到结果", 409)
             source = None
             research = run["research"]
-            if len(research["steps"]) >= 10:
+            round_id = step.get("research_round", research.get("round", 1))
+            round_steps = [s for s in research["steps"]
+                           if s.get("research_round", 1) == round_id]
+            if len(round_steps) >= 10:
                 raise AppError("research_budget_exceeded", "调研工具次数已达上限", 422)
             if page is not None:
-                source = next((s for s in research["sources"] if s["url"] == page["url"]), None)
+                source = next((s for s in research["sources"]
+                               if (s["url"], s["content_sha256"], s.get("provider", "page"),
+                                   s.get("content_mode", "page_text")) ==
+                               (page["url"], page["content_sha256"], page.get("provider", "page"),
+                                page.get("content_mode", "page_text"))), None)
                 if source is None:
                     source = {**page, "source_id": uid("source")}
                     research["sources"].append(source)
@@ -57,7 +64,8 @@ class ResearchStorage:
             if not self._research_active(run):
                 return None
             validate_report(report, run["research"])
-            run["research"]["report"] = report.model_dump()
+            run["research"].update(report=report.model_dump(),
+                                   evidence=build_evidence_bundle(report, run["research"]["sources"]))
             if run.get("kind", "course") == "course":
                 run.update(stage="blueprint", blueprint_pending=True)
             else:

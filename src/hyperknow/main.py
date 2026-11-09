@@ -111,7 +111,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         cfg = app.state.config
         return {"status": "ok", "database": "ok", "storage_id": storage_identity(app.state.db.path), "model": {
             "configured": bool(cfg.api_key), "name": cfg.model, "verified": False},
-            "search": {"configured": bool(cfg.tavily_api_key), "verified": False}}
+            "search": {"configured": bool(cfg.tavily_api_key or cfg.exa_api_key), "verified": False,
+                       "providers": {"tavily": bool(cfg.tavily_api_key), "exa": bool(cfg.exa_api_key)}}}
 
     @app.post("/api/course-runs", status_code=202)
     async def create_run(data: CreateRun):

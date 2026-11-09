@@ -1,9 +1,3 @@
-"""Direct domain inputs and real disk SQLite, not real web/model acceptance.
-
-Page/step/report dictionaries below are explicit rule inputs, never responses
-from a substitute search service or provider. No network requests are made.
-"""
-
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 import hashlib
@@ -17,15 +11,19 @@ from pydantic import ValidationError
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from hyperknow.domain import AppError
-from hyperknow.research_domain import ResearchReport, validate_report
+from hyperknow.research_domain import ResearchReport, build_evidence_bundle, validate_report
 from hyperknow.storage import Database
 
 
 def report_input(source_id="source_test"):
     return {
         "summary": "协程学习顺序的规则测试输入",
-        "findings": [{"title": "暂停与恢复", "summary": "先理解 await，再学习任务调度。",
-                      "source_ids": [source_id]}],
+        "questions": [{"id": "q1", "question": "await 如何暂停协程？", "priority": "high",
+                       "status": "answered", "claim_ids": ["claim_await"]}],
+        "findings": [{"claim_id": "claim_await", "question_ids": ["q1"],
+                      "title": "暂停与恢复", "summary": "await 会暂停当前协程。",
+                      "source_ids": [source_id], "evidence": [{"source_id": source_id,
+                          "quote": "await suspends a coroutine", "relation": "supports"}]}],
         "suggested_sequence": ["认识协程", "理解 await", "比较任务调度"],
         "limitations": ["此内容仅用于校验规则，不代表真实网页调研。"],
     }
@@ -58,13 +56,25 @@ class ResearchReportTests(unittest.TestCase):
         self.assertEqual(report.summary, "协程学习")
         self.assertEqual(ResearchReport.model_validate_json(report.model_dump_json()), report)
 
+    def test_source_ids_are_derived_from_evidence_and_kept_in_serialized_report(self):
+        data = report_input()
+        data["findings"][0]["source_ids"] = ["source_unread"]
+
+        report = ResearchReport.model_validate(data)
+
+        self.assertEqual(report.findings[0].source_ids, ["source_test"])
+        self.assertEqual(report.model_dump()["findings"][0]["source_ids"], ["source_test"])
+        finding_schema = ResearchReport.model_json_schema()["$defs"]["ResearchFinding"]
+        self.assertNotIn("source_ids", finding_schema["properties"])
+
     def test_empty_duplicate_and_extra_fields_are_rejected(self):
         cases = [
             {"summary": " "}, {"findings": []}, {"suggested_sequence": []},
-            {"suggested_sequence": [" "]}, {"limitations": [" "]}, {"unknown": True},
+            {"questions": []}, {"suggested_sequence": [" "]}, {"limitations": [" "]},
+            {"unknown": True},
         ]
-        for patch in ({"title": " "}, {"summary": " "}, {"source_ids": []},
-                      {"source_ids": ["source_test", "source_test"]}, {"unknown": True}):
+        for patch in ({"title": " "}, {"summary": " "}, {"evidence": []},
+                      {"unknown": True}):
             cases.append({"findings": [{**report_input()["findings"][0], **patch}]})
         for patch in cases:
             with self.subTest(patch=patch), self.assertRaises(ValidationError):
@@ -76,8 +86,12 @@ class ResearchReportTests(unittest.TestCase):
             {"summary": "x" * 4001}, {"findings": data["findings"] * 13},
             {"suggested_sequence": ["step"] * 13}, {"limitations": ["limit"] * 13},
         ]
+        too_many_sources = [{"source_id": f"source_{index}", "quote": "await suspends a coroutine",
+                             "relation": "supports"} for index in range(9)]
         for patch in ({"title": "x" * 201}, {"summary": "x" * 2001},
-                      {"source_ids": [f"source_{index}" for index in range(9)]}):
+                      {"evidence": too_many_sources},
+                      {"evidence": [{"source_id": "source_test", "quote": "x" * 1501,
+                                     "relation": "supports"}]}):
             cases.append({"findings": [{**data["findings"][0], **patch}]})
         for patch in cases:
             with self.subTest(field=next(iter(patch))), self.assertRaises(ValidationError):
@@ -91,6 +105,18 @@ class ResearchReportTests(unittest.TestCase):
             with self.subTest(steps=steps, sources=sources), self.assertRaises(ValueError):
                 validate_report(report, {"steps": steps, "sources": sources, "report": None})
 
+    def test_report_question_links_only_constrain_the_current_research_round(self):
+        report = ResearchReport.model_validate(report_input())
+        source = {**page_input(), "source_id": "source_test"}
+        old_search = {**search_step(), "research_round": 1,
+                      "arguments": {"query": "old scope", "question_id": "q-old"}}
+        old_read = {**read_step(), "research_round": 1}
+        current_search = {**search_step(), "research_round": 2,
+                          "arguments": {"query": "current scope", "question_id": "q1"}}
+        research = {"round": 2, "steps": [old_search, old_read, current_search],
+                    "sources": [source], "report": None}
+        self.assertIs(validate_report(report, research), report)
+
     def test_only_read_source_ids_can_be_cited_and_inputs_are_not_mutated(self):
         research = {"steps": [search_step(), read_step()],
                     "sources": [{**page_input(), "source_id": "source_test"}], "report": None}
@@ -101,10 +127,47 @@ class ResearchReportTests(unittest.TestCase):
             with self.subTest(citation=citation), self.assertRaises(ValueError):
                 validate_report(ResearchReport.model_validate(report_input(citation)), research)
         mixed = report_input()
-        mixed["findings"][0]["source_ids"].append("source_unknown")
+        mixed["findings"][0]["evidence"][0]["source_id"] = "source_unknown"
         with self.assertRaises(ValueError):
             validate_report(ResearchReport.model_validate(mixed), research)
         self.assertEqual(research, before)
+
+    def test_questions_and_claims_have_a_bidirectional_typed_relation(self):
+        data = report_input()
+        data["questions"][0]["claim_ids"] = ["claim_missing"]
+        report = ResearchReport.model_validate(data)
+        self.assertEqual(report.questions[0].claim_ids, ["claim_await"])
+        data = report_input()
+        data["questions"][0]["status"] = "unresolved"
+        with self.assertRaises(ValidationError):
+            ResearchReport.model_validate(data)
+        data = report_input()
+        data["findings"][0]["question_ids"] = ["q_unknown"]
+        with self.assertRaises(ValidationError):
+            ResearchReport.model_validate(data)
+
+    def test_claim_evidence_must_quote_saved_page_text(self):
+        research = {"steps": [search_step(), read_step()],
+                    "sources": [{**page_input(), "source_id": "source_test"}], "report": None}
+        for quote in ("a paraphrase of the page", "await suspends a coroutine that is never there"):
+            data = report_input()
+            data["findings"][0]["evidence"][0]["quote"] = quote
+            with self.subTest(quote=quote), self.assertRaises(ValueError):
+                validate_report(ResearchReport.model_validate(data), research)
+
+    def test_evidence_bundle_records_exact_excerpt_offsets_and_source_version(self):
+        source = {**page_input(), "source_id": "source_test", "provider": "exa",
+                  "content_mode": "highlights"}
+        report = ResearchReport.model_validate(report_input())
+        evidence = build_evidence_bundle(report, [source])
+        quote = "await suspends a coroutine"
+        start = source["text"].index(quote)
+        self.assertEqual(evidence, [{"evidence_id": evidence[0]["evidence_id"],
+            "claim_id": "claim_await", "question_ids": ["q1"], "source_id": "source_test",
+            "relation": "supports", "quote": quote, "start_char": start,
+            "end_char": start + len(quote), "url": source["url"], "title": source["title"],
+            "fetched_at": source["fetched_at"], "content_sha256": source["content_sha256"],
+            "provider": "exa", "content_mode": "highlights"}])
 
 
 class ResearchStorageTests(unittest.TestCase):
@@ -131,7 +194,8 @@ class ResearchStorageTests(unittest.TestCase):
         run = self.create()
         self.assertEqual((run["kind"], run["status"], run["version"]), ("research", "queued", 1))
         self.assertEqual(run["input"], {"goal": run["goal"], "context": "会基础 Python，关注调度顺序"})
-        self.assertEqual(run["research"], {"steps": [], "sources": [], "report": None})
+        self.assertEqual(run["research"], {"steps": [], "sources": [], "report": None,
+                                            "evidence": [], "round": 1})
         self.assertIsNone(run["parent_run_id"])
         self.assertIsNone(run["course_id"])
         reopened = Database(self.path)
@@ -260,7 +324,8 @@ class ResearchStorageTests(unittest.TestCase):
         saved = Database(self.path).get_run(run["run_id"])
         self.assertEqual(saved, next(result for result in results if result is not None))
         self.assertEqual((saved["status"], saved["version"]), ("ready", before["version"] + 1))
-        self.assertEqual(saved["research"], {**before["research"], "report": report.model_dump()})
+        self.assertEqual(saved["research"], {**before["research"], "report": report.model_dump(),
+                         "evidence": build_evidence_bundle(report, before["research"]["sources"])})
         self.assertIsNone(saved["course_id"])
         self.assertEqual(self.db.list_records("courses"), [])
 
@@ -330,7 +395,8 @@ class ResearchStorageTests(unittest.TestCase):
                 self.assertNotEqual(child["run_id"], parent["run_id"])
                 self.assertEqual(child["parent_run_id"], parent["run_id"])
                 self.assertEqual((child["input"], child["model"]), (parent["input"], parent["model"]))
-                self.assertEqual(child["research"], {"steps": [], "sources": [], "report": None})
+                self.assertEqual(child["research"], {"steps": [], "sources": [], "report": None,
+                                                       "evidence": [], "round": 1})
                 self.assertIsNone(child["error"])
                 reopened = Database(self.path)
                 self.assertEqual(reopened.get_run(parent["run_id"]), parent)

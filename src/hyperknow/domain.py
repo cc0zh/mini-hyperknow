@@ -61,6 +61,7 @@ class SessionDraft(Schema):
     outline: str = Field(min_length=1, max_length=4000)
     key_points: list[str] = Field(min_length=1, max_length=8)
     estimated_minutes: int = Field(ge=1, le=180)
+    research_claim_ids: list[str] = Field(default_factory=list, max_length=8)
     depths: list[Literal["intuition", "definition", "derivation", "theory", "practice"]] = Field(
         default_factory=list, max_length=5)
 
@@ -74,6 +75,7 @@ class LectureDraft(Schema):
 class ExamDraft(Schema):
     title: str = Field(min_length=1, max_length=200)
     goal: str = Field(min_length=1, max_length=1200)
+    research_claim_ids: list[str] = Field(default_factory=list, max_length=8)
 
 
 class ProjectDraft(Schema):
@@ -163,10 +165,38 @@ def resolve_answers(questions: list[dict], answers: list[dict], skip: bool) -> l
     return resolved
 
 
-def course_research_input(run: dict) -> dict:
-    return {"goal": run["goal"], "context": json.dumps({
-        "questions": run["questions"], "answers": run["answers"],
-        "clarification_skipped": run["skipped"]}, ensure_ascii=False)}
+def course_research_input(run: dict, *, feedback: str = "",
+                          previous_research: dict | None = None) -> dict:
+    context = {"questions": run["questions"], "answers": run["answers"],
+               "clarification_skipped": run["skipped"]}
+    if feedback:
+        context["blueprint_feedback"] = feedback
+    if previous_research:
+        report = previous_research.get("report") or {}
+        questions = report.get("questions", [])
+        claims = report.get("findings", [])
+        evidence = previous_research.get("evidence", [])
+        prior_evidence = []
+        used_chars = 0
+        for item in evidence:
+            quote = item.get("quote", "")
+            if len(prior_evidence) >= 12 or used_chars + len(quote) > 20000:
+                continue
+            prior_evidence.append({key: item[key] for key in (
+                "evidence_id", "claim_id", "question_ids", "source_id", "relation", "quote",
+                "url", "title", "content_sha256", "provider", "content_mode")})
+            used_chars += len(quote)
+        context["previous_research"] = {
+            "summary": report.get("summary", "")[:2000],
+            "questions": [{**question, "question": question.get("question", "")[:300]}
+                          for question in questions[:12]],
+            "claims": [{**{key: claim[key] for key in ("claim_id", "question_ids", "title")},
+                        "summary": claim.get("summary", "")[:500]}
+                       for claim in claims[:12] if claim.get("claim_id")],
+            "evidence": prior_evidence,
+            "evidence_truncated": len(prior_evidence) < len(evidence),
+        }
+    return {"goal": run["goal"], "context": json.dumps(context, ensure_ascii=False)}
 
 
 def materialize_course(draft: CourseDraft, run: dict, created_at: str) -> dict:

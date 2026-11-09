@@ -15,6 +15,7 @@ class Settings:
     base_url: str | None = None
     timeout: float = 120
     tavily_api_key: str = field(default="", repr=False)
+    exa_api_key: str = field(default="", repr=False)
 
     @classmethod
     def load(cls) -> "Settings":
@@ -29,4 +30,5 @@ class Settings:
             base_url=os.getenv("OPENAI_BASE_URL") or None,
             timeout=float(os.getenv("HK_MODEL_TIMEOUT_SECONDS", "120")),
             tavily_api_key=os.getenv("TAVILY_API_KEY", "").strip(),
+            exa_api_key=os.getenv("EXA_API_KEY", "").strip(),
         )

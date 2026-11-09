@@ -13,7 +13,7 @@
 - 内核上下文可显式使用独立 JSONL（默认仍在内存），不替代产品 SQLite；课程、澄清、运行、命令回执、模型调用、讲义、课堂位置、问答和完成事实，以及题组／作答／结果均保存到 SQLite。课堂开放式理解检查复用问答持久化，不提供掌握评分；项目成果提交仍未实现。
 - 2026-11-05课堂以完整单课教学为当前产品优先级：路线图→逐要点解释与例子→检查→总结。新脚本只接受schema_version=2，不兼容旧课堂、不迁移或清库，旧格式通过format_error与显式重新生成处理。前端为白板主导的独立课堂空间，模型负责内容与关系，前端负责对象布局及统一图文时间线。
 - 历史 Mock provider、SDK 注入替身与 Mock／patch 测试已移除；当前为直接函数、真实文件、真实磁盘 SQLite 与实际 HTTP／WS 检查，不冒充真实模型验收。
-- `src/hyperknow/`已有FastAPI与串行生成执行器，支持course／lesson／question／quiz／research／assistance；课程新增研究→蓝图→等待一次确认→自动逐单元展开，独立调研端点仍保留。契约与当前验收见[蓝图工作流](design-docs/course-blueprint-workflow.md)。`web/`已有首页、双栏创建／蓝图、课程库、总览、课堂、练习／考核及独立即时协助/协助白板页面；启动命令见[README](../README.md)。
+- `src/hyperknow/`已有FastAPI与串行生成执行器，支持course／lesson／question／quiz／research／assistance；课程路径为研究→蓝图→等待一次确认→逐单元展开。研究报告现在保存问题、主张、逐字来源证据及provider provenance；蓝图分配claim IDs，课时和题目只能使用被分配的证据。Tavily/Exa适配和离线校验已实现，真实Exa/Tavily A/B及课程质量仍未评测。契约与验收见[调研设计](design-docs/web-research-agent.md)和[蓝图工作流](design-docs/course-blueprint-workflow.md)。`web/`已有首页、双栏创建／蓝图、课程库、总览、课堂、练习／考核及独立即时协助/协助白板页面；启动命令见[README](../README.md)。
 
 ## 2. 已定工程选择
 
@@ -86,9 +86,9 @@ src/
     storage.py            SQLite v3、升级备份、事务、命令幂等及重启
     runtime.py            共用单worker、取消门禁、run/session/course/quiz_target/attempt通知
     research.py           只读网页Agent、每次模型调用记录、有限报告修复
-    research_domain.py    带来源调研报告与实际已读引用校验
+    research_domain.py    问题／主张／逐字证据报告、引用校验与bundle装配
     research_storage.py   独立research run、来源／过程／报告事务
-    research_web.py       Tavily真实搜索、公网固定连接及有界网页提取
+    research_web.py       Tavily与Exa真实适配、公网固定连接及有界网页提取
     assistance_domain.py  教学回复、显式建议动作和五类独立产物校验，不含course_id
     assistance_storage.py 会话/轮次、原子产物提交、白板位置与迟到保存屏障
     assistance_generation.py 有界教学Agent、Skill激活与逐次真实调用记录
@@ -183,11 +183,11 @@ SQLite 当前保存课程、目标与澄清、运行、命令回执、模型调�
 | 业务与真实入口 | 输入依据 → 结果 | 主要改哪里 | 直接影响与消费者 |
 | --- | --- | --- | --- |
 | B01 课程需求澄清：Home创建`/api/course-runs`，CourseRun回答`/api/runs/{id}/answers` | 学习目标 → Clarification；零问题自动进入调研，有问题才等待回答 | [course.py](../src/hyperknow/prompts/course.py)的CLARIFICATION_INSTRUCTION；结构/答案规则看[domain.py](../src/hyperknow/domain.py)，阶段保存看[storage.py](../src/hyperknow/storage.py)的finish_clarification | CourseRun表单、调研输入和后续规划；改变是否提问须同时检查阶段流转，不能只改Prompt |
-| B02 学习资料调研：造课自动阶段；另有独立`/api/research-runs`，无独立前端页 | 目标/澄清上下文 → 真实搜索、读取来源及ResearchReport | 策略看[prompts/research.py](../src/hyperknow/prompts/research.py)；工具/上下文/调用看[research.py](../src/hyperknow/research.py)，引用校验看[research_domain.py](../src/hyperknow/research_domain.py)，抓取看[research_web.py](../src/hyperknow/research_web.py)，保存看[research_storage.py](../src/hyperknow/research_storage.py) | CourseRun调研展示、B03规划输入；成功抓取和合法引用不等于正文充分或结论受来源支持 |
-| B03 全局蓝图与单元展开：CourseRun/BlueprintExplorer确认或调整`/api/runs/{id}/blueprint` | 目标/澄清、报告/来源、反馈或批准蓝图 → BlueprintDraft、逐单元UnitExpansionDraft及课程结构 | [course.py](../src/hyperknow/prompts/course.py)的BLUEPRINT_INSTRUCTION/UNIT_INSTRUCTION；[blueprint_domain.py](../src/hyperknow/blueprint_domain.py)的planning_context/validate_expansion；[blueprint_storage.py](../src/hyperknow/blueprint_storage.py)的确认/局部提交 | CourseRun、CourseOverview/CourseStructure以及后续讲义/考核；不得在展开时暗改已批准单元目标，保存屏障独立于Prompt |
-| B04 课时讲义：Classroom显式准备`/api/sessions/{id}/prepare` | 课程/单元/讲座、完整课时大纲与前后标题 → BoardScriptDraft/不可变讲义 | [classroom.py](../src/hyperknow/prompts/classroom.py)的BOARD_SCRIPT_INSTRUCTION；[lesson_domain.py](../src/hyperknow/lesson_domain.py)的lesson_context/BoardOperation；[lesson_storage.py](../src/hyperknow/lesson_storage.py) | Board播放器、课堂问答前缀、课后练习资料；增加板书操作类型必须联动渲染器，已有讲义不因改Prompt自动重写 |
+| B02 学习资料调研：造课自动阶段；另有独立`/api/research-runs`，无独立前端页 | 目标/澄清/反馈 → 单一Agent选择Tavily或Exa检索与阅读、ResearchReport和verified evidence bundle | 策略看[prompts/research.py](../src/hyperknow/prompts/research.py)；工具/上下文/调用看[research.py](../src/hyperknow/research.py)，引用校验看[research_domain.py](../src/hyperknow/research_domain.py)，抓取看[research_web.py](../src/hyperknow/research_web.py)，保存看[research_storage.py](../src/hyperknow/research_storage.py) | CourseRun调研展示、B03规划输入；引用逐字匹配不等于语义蕴含或来源可靠，真实provider效果未测 |
+| B03 全局蓝图与单元展开：CourseRun/BlueprintExplorer确认或调整`/api/runs/{id}/blueprint` | 目标/澄清、带证据的report/claims、反馈或批准蓝图 → BlueprintDraft、逐单元UnitExpansionDraft及课程结构 | [course.py](../src/hyperknow/prompts/course.py)的BLUEPRINT_INSTRUCTION/UNIT_INSTRUCTION；[blueprint_domain.py](../src/hyperknow/blueprint_domain.py)的planning_context/claim范围校验；[blueprint_storage.py](../src/hyperknow/blueprint_storage.py)的确认/局部提交 | CourseRun、CourseOverview/CourseStructure以及后续讲义/考核；unit/session/exam不可越过上游分配的claim IDs，保存屏障独立于Prompt |
+| B04 课时讲义：Classroom显式准备`/api/sessions/{id}/prepare` | 课程/单元/讲座、完整课时大纲与session已分配的证据claims → BoardScriptDraft/不可变讲义 | [classroom.py](../src/hyperknow/prompts/classroom.py)的BOARD_SCRIPT_INSTRUCTION；[lesson_domain.py](../src/hyperknow/lesson_domain.py)的lesson_context/BoardOperation/claim校验；[lesson_storage.py](../src/hyperknow/lesson_storage.py) | Board播放器、课堂问答前缀、课后练习资料；每步claim只能来自本课选择，已有讲义不因改Prompt自动重写 |
 | B05 课堂问答：Classroom暂停后`/api/sessions/{id}/questions` | 用户问题、权威确认cursor对应讲义前缀及有界近期问答 → LessonAnswer/Interaction | [classroom.py](../src/hyperknow/prompts/classroom.py)的LESSON_ANSWER_INSTRUCTION；[lesson_domain.py](../src/hyperknow/lesson_domain.py)的question_context；[lesson_storage.py](../src/hyperknow/lesson_storage.py) | Classroom回答展示；不改主讲义，回看页不等于回退已确认cursor；“模型不知道某步”先核对输入范围 |
-| B06 课程练习/考核出题：Quiz的practice或exam准备端点 | practice用真实讲义；exam用单元大纲及预算内缓存讲义 → 带合法source_refs的QuizDraft/不可变题组 | [quiz.py](../src/hyperknow/prompts/quiz.py)；[quiz_domain.py](../src/hyperknow/quiz_domain.py)的quiz_context/validate_sources；[quiz_storage.py](../src/hyperknow/quiz_storage.py) | Quiz页面及后续作答/结果；改题型须联动题组Schema、答题规则与前端，引用属于输入集合不代表数学事实正确 |
+| B06 课程练习/考核出题：Quiz的practice或exam准备端点 | practice用真实讲义和session claims；exam用单元大纲、缓存讲义及exam已分配claims → 带合法source_refs的QuizDraft/不可变题组 | [quiz.py](../src/hyperknow/prompts/quiz.py)；[quiz_domain.py](../src/hyperknow/quiz_domain.py)的quiz_context/validate_sources；[quiz_storage.py](../src/hyperknow/quiz_storage.py) | 有研究证据时每题须引用allowed claim ref；改题型须联动题组Schema与答题规则，合法引用不等于事实正确 |
 | B07 即时协助教学：Assistance发送`/api/assistance/conversations/{id}/turns` | 原话、message/continue、有界历史；继续另带权威下一步，白板追问仅带确认前缀 → TeachingResponse | [assistance.py](../src/hyperknow/prompts/assistance.py)维护教学；[assistance_storage.py](../src/hyperknow/assistance_storage.py)构建输入/状态；[assistance_domain.py](../src/hyperknow/assistance_domain.py)维护Schema；[assistance_generation.py](../src/hyperknow/assistance_generation.py)执行/修复 | AssistanceTurns的正文/问题/计划/建议与继续按钮；显式action决定继续，普通文本“继续”不是同一校验路径；不关联课程进度 |
 | B08 即时协助产物：B07同一Agent按需调用五种create工具 | 当前教学输入 → flashcards/quiz/whiteboard/animation/diagram暂存；回复合法后与产物一起提交 | 制作说明/工具执行看[assistance_generation.py](../src/hyperknow/assistance_generation.py)的tools/_create；结构/意图看[assistance_domain.py](../src/hyperknow/assistance_domain.py)，保存/反馈看[assistance_storage.py](../src/hyperknow/assistance_storage.py) | [AssistanceArtifacts](../web/src/components/AssistanceArtifacts.tsx)、[AssistanceBoard](../web/src/pages/AssistanceBoard.tsx)及安全渲染；不是五个独立Agent，工具回执只代表暂存而非保存成功 |
 

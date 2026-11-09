@@ -19,7 +19,8 @@ from hyperknow.config import Settings
 from hyperknow.domain import AppError, CourseDraft
 from hyperknow.generation import Generator
 from hyperknow.lesson_domain import (
-    BoardOperation, BoardScriptDraft, LessonAnswer, LessonSnapshot, derive_course, question_context,
+    BoardOperation, BoardScriptDraft, LessonAnswer, LessonSnapshot, derive_course, lesson_context,
+    question_context, validate_lesson_coverage,
 )
 from hyperknow.main import AskQuestion
 from hyperknow.runtime import CourseService, EventHub
@@ -58,6 +59,38 @@ def persist_domain_input(db):
 
 
 class LessonSchemaTests(unittest.TestCase):
+    def test_lesson_context_and_steps_are_limited_to_selected_source_claims(self):
+        course = course_data()
+        course.update(course_id="course-evidence", goal="Understand asyncio",
+            clarification={"questions": [], "answers": [], "skipped": False},
+            language="zh-CN", research_claims=[{
+            "claim_id": "claim_await", "question_ids": ["q-await"],
+            "title": "await pauses", "summary": "await pauses the coroutine."}],
+            research_evidence=[{"evidence_id": "evidence-1", "claim_id": "claim_await",
+                "question_ids": ["q-await"], "source_id": "source-1", "relation": "supports",
+                "quote": "await suspends a coroutine", "start_char": 0, "end_char": 26,
+                "url": "https://docs.python.org/asyncio", "title": "Asyncio", "fetched_at": "now",
+                "content_sha256": "a" * 64, "provider": "exa", "content_mode": "highlights"}])
+        unit = course["units"][0]
+        unit["research_claim_ids"] = ["claim_await"]
+        lecture = unit["lectures"][0]
+        session = lecture["sessions"][0]
+        session["session_id"] = "session-evidence"
+        session["research_claim_ids"] = ["claim_await"]
+        context = lesson_context(course, unit, lecture, session)
+        self.assertEqual(context["research_claims"][0]["evidence"][0]["quote"],
+                         "await suspends a coroutine")
+        data = script_input()
+        data["steps"][1]["research_claim_ids"] = ["claim_await"]
+        draft = BoardScriptDraft.model_validate(data)
+        self.assertIs(validate_lesson_coverage(draft, context), None)
+        data["steps"][1]["research_claim_ids"] = ["not-selected"]
+        with self.assertRaises(ValueError):
+            validate_lesson_coverage(BoardScriptDraft.model_validate(data), context)
+        data["steps"][1]["research_claim_ids"] = []
+        with self.assertRaises(ValueError):
+            validate_lesson_coverage(BoardScriptDraft.model_validate(data), context)
+
     def test_all_supported_operations_are_preserved(self):
         for kind in ("text", "code", "formula", "box", "arrow", "highlight", "mermaid"):
             op = BoardOperation(object_id="object", kind=kind, content="具体内容")
