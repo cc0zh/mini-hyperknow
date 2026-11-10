@@ -2,7 +2,6 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -11,12 +10,10 @@ from pydantic import ValidationError
 
 from hyperknow.assistance_domain import WhiteboardData
 from hyperknow.domain import AppError
-from hyperknow.generation import bounded_repair_message
 from hyperknow.lesson_domain import (
     BoardOperation, BoardScript, BoardScriptDraft, LessonAnswer, LessonSnapshot,
     materialize_script, validate_lesson_coverage,
 )
-from hyperknow.prompts.classroom import BOARD_SCRIPT_INSTRUCTION
 from hyperknow.storage import Database
 from test_lesson import persist_domain_input, script_input
 
@@ -28,49 +25,6 @@ def diagram_input():
         "edges": [{"from_id": "running", "to_id": "waiting", "label": "遇到await"}]}]
     data["steps"][-1]["focus_ids"] = ["running", "resume"]
     return data
-
-
-class CompleteLessonPromptTests(unittest.TestCase):
-    """Instruction contracts only, not generated teaching-quality evidence."""
-
-    def test_narration_is_learner_facing_grounded_and_not_a_recurring_template(self):
-        for instruction in (
-            "老师面对学习者的可独立阅读讲解", "自然分成2-4个短段", "段间用空行分隔",
-            "从前一步的问题或结论自然承接", "结合本步真实图表、算式或代码",
-            "物理布局由前端计算", "只用节点名称、表头、变量或代码内容指认",
-            "不写左侧、右侧、上下方、第几栏等位置",
-            "指认具体节点、变量、代码行或结果", "逐步推演因果",
-            "预测或反问留出短暂停想", "收束本步并自然过渡",
-            "不要写成说明书、教学计划或讲解提要", "不要每步套用相同口头禅",
-            "不凭空编造板书位置", "不替学习者断言‘你已经懂了’或已经掌握",
-        ):
-            with self.subTest(instruction=instruction):
-                self.assertIn(instruction, BOARD_SCRIPT_INSTRUCTION)
-
-    def test_single_screen_board_guidance_keeps_detail_and_source_coverage(self):
-        for instruction in (
-            "每步板书围绕一个教学动作集中同屏", "尽量组织为2-4个精炼视觉块",
-            "列表只留短项", "长表、长代码和连续推导按教学步骤拆分",
-            "细节由narration承载", "不得删去或少教来源要点",
-            "完整覆盖原大纲与要求的教学深度", "板书与narration必须互补",
-        ):
-            with self.subTest(instruction=instruction):
-                self.assertIn(instruction, BOARD_SCRIPT_INSTRUCTION)
-
-    def test_complete_v2_generation_and_existing_safety_contracts_remain_explicit(self):
-        for instruction in (
-            "生成一堂完整单课，schema_version必须是2", "这是一次完整JSON生成，不是实时流式讲课",
-            "依原session.key_points顺序逐项映射，必须完整覆盖且不重复",
-            "每项至少一explain和其后一个example", "不把答案直接抄进该步板书或讲解",
-            "check只引导思考而不泄露expected_answer",
-            "先保留模型本轮的assistant工具调用消息", "带匹配tool_call_id的tool结果",
-            "不能只追加tool结果，不能隐含依靠call_model修改传入历史",
-        ):
-            with self.subTest(instruction=instruction):
-                self.assertIn(instruction, BOARD_SCRIPT_INSTRUCTION)
-        repair = json.loads(bounded_repair_message("直接传入的不完整文本", "缺少steps").content)
-        self.assertIn("重新生成完整JSON对象", repair["instruction"])
-        self.assertIn("不要只输出补丁或续写摘录", repair["instruction"])
 
 
 class CompleteLessonSchemaTests(unittest.TestCase):

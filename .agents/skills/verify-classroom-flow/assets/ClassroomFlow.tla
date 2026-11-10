@@ -11,7 +11,7 @@ Play == /\ phase = "paused" /\ phase' = "playing" /\ UNCHANGED cursor
 Pause == /\ phase = "playing" /\ phase' = "paused" /\ UNCHANGED cursor
 Advance == /\ phase \in {"paused", "playing"} /\ cursor < 2 /\ cursor' = cursor + 1
            /\ phase' = IF cursor + 1 = 1 THEN "paused" ELSE phase
-Ask == /\ phase \in {"paused", "playing"} /\ cursor >= 0 /\ phase' = "answering" /\ UNCHANGED cursor
+Ask == /\ phase \in {"paused", "playing"} /\ phase' = "answering" /\ UNCHANGED cursor
 Answer == /\ phase = "answering" /\ phase' = "paused" /\ UNCHANGED cursor
 Complete == /\ phase \in {"paused", "playing"} /\ (Broken \/ cursor = 2)
             /\ phase' = "completed" /\ UNCHANGED cursor

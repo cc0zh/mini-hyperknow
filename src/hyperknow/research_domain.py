@@ -7,11 +7,12 @@ from .domain import Schema
 
 
 class ResearchQuestion(Schema):
-    id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z][A-Za-z0-9_-]*$")
+    id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z][A-Za-z0-9_-]*$",
+                    description="Stable identifier used to connect this question to research tool calls and findings.")
     question: str = Field(min_length=1, max_length=800)
     priority: Literal["high", "medium", "low"]
     status: Literal["answered", "partial", "unresolved"]
-    claim_ids: list[str] = Field(default_factory=list, max_length=12)
+    claim_ids: list[str] = Field(default_factory=list, max_length=6)
 
     @model_validator(mode="after")
     def valid_claims(self):
@@ -24,17 +25,23 @@ class ResearchQuestion(Schema):
 
 
 class EvidenceReference(Schema):
-    source_id: str = Field(min_length=1, max_length=80)
-    quote: str = Field(min_length=8, max_length=1500)
-    relation: Literal["supports", "contradicts"]
+    source_id: str = Field(min_length=1, max_length=80,
+                           description="Identifier of a page read during this research run.")
+    quote: str = Field(min_length=8, max_length=1500,
+                       description="A verbatim, continuous passage from the saved page text.")
+    relation: Literal["supports", "contradicts"] = Field(
+        description="Whether the quoted passage supports or contradicts the finding.")
 
 
 class ResearchFinding(Schema):
     claim_id: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z][A-Za-z0-9_-]*$")
-    question_ids: list[str] = Field(min_length=1, max_length=12)
+    question_ids: list[str] = Field(min_length=1, max_length=6,
+                                    description="Research questions this finding answers or informs.")
     title: str = Field(min_length=1, max_length=200)
     summary: str = Field(min_length=1, max_length=2000)
-    evidence: list[EvidenceReference] = Field(min_length=1, max_length=16)
+    evidence: list[EvidenceReference] = Field(
+        min_length=1, max_length=2,
+        description="Verbatim evidence passages supporting or contradicting this finding.")
 
     @model_validator(mode="before")
     @classmethod
@@ -59,8 +66,8 @@ class ResearchFinding(Schema):
 
 class ResearchReport(Schema):
     summary: str = Field(min_length=1, max_length=4000)
-    questions: list[ResearchQuestion] = Field(min_length=1, max_length=12)
-    findings: list[ResearchFinding] = Field(min_length=1, max_length=12)
+    questions: list[ResearchQuestion] = Field(min_length=1, max_length=6)
+    findings: list[ResearchFinding] = Field(min_length=1, max_length=6)
     suggested_sequence: list[str] = Field(min_length=1, max_length=12)
     limitations: list[str] = Field(default_factory=list, max_length=12)
 
@@ -119,13 +126,17 @@ def validate_report(report: ResearchReport, research: dict) -> ResearchReport:
         raise ValueError("research requires an actual successful search and page read")
     question_ids = {question.id for question in report.questions}
     current_round = research.get("round", 1)
+    missing_question_ids: set[str] = set()
     for step in research["steps"]:
         if step.get("research_round", 1) != current_round:
             continue
         arguments = step.get("arguments") or {}
         question_id = arguments.get("question_id") if isinstance(arguments, dict) else None
         if question_id is not None and question_id not in question_ids:
-            raise ValueError("tool calls may reference only declared research questions")
+            missing_question_ids.add(question_id)
+    if missing_question_ids:
+        raise ValueError("tool calls may reference only declared research questions; "
+                         "missing question IDs: " + ", ".join(sorted(missing_question_ids)))
     for finding in report.findings:
         if not set(finding.source_ids) <= sources.keys():
             raise ValueError("claims may cite only sources read in this run")

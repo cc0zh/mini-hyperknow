@@ -1,6 +1,6 @@
 # 检查子系统状态机
 
-每个现有业务子系统有一个开发助手技能。TLA+ 描述有限状态与事件次序，TLC 穷举指定范围内的可达状态。原产品代码没有改动。
+这些开发助手技能检查下表列出的有限性质。TLA+描述有限状态与事件次序，TLC穷举指定范围内的可达状态。课堂项对应保留的脚本式API，不代表新增teacher_led教学回合协议。形式验证工作不修改产品代码。
 
 ## 查看用户流程
 
@@ -13,11 +13,21 @@
 | [verify-run-lifecycle](../../.agents/skills/verify-run-lifecycle/SKILL.md) | 同命令标识不能接受不同内容 | 一个原命令、两种指纹、一次重试 | 25 |
 | [verify-course-flow](../../.agents/skills/verify-course-flow/SKILL.md) | 全部单元保存后才 ready | 一个课程、两个单元、一次反馈 | 31 |
 | [verify-research-flow](../../.agents/skills/verify-research-flow/SKILL.md) | 每轮最多保存十个工具步骤 | 一个 run、一个调研轮次 | 170 |
-| [verify-classroom-flow](../../.agents/skills/verify-classroom-flow/SKILL.md) | 确认最后总结后才能完成 | 一个脚本、三步、一个在途问题 | 18 |
+| [verify-classroom-flow](../../.agents/skills/verify-classroom-flow/SKILL.md) | 确认最后总结后才能完成 | 一个脚本、三步、一个在途问题 | 19 |
 | [verify-quiz-flow](../../.agents/skills/verify-quiz-flow/SKILL.md) | 全部回答或跳过后才能提交 | 一个题组、一个尝试、两题 | 12 |
 | [verify-assistance-flow](../../.agents/skills/verify-assistance-flow/SKILL.md) | 一个教学轮次最多保存一个产物 | 一个会话、两次请求、最多两个候选产物 | 39 |
 
 这些是六个产品业务边界，不等于仓库每个 Python 模块。通用 agent_core 与研发 eval 没有在本次单独形式化。六个性质不构成对所有状态机不变量的完整证明。
+
+## 验证课程恢复与调研报告
+
+[verify-course-research](../../.agents/skills/verify-course-research/SKILL.md)补充两个已有流程的内容保留与报告审计。课程TLC模型检查停止后显式重试不能重置已保存单元。research检查直接穷举有限输入，验证本轮工具已用问题ID闭合、逐字引用和保存原文片段绑定，不以TLA+替代Python字符串行为。
+
+```powershell
+uv run --frozen python scripts/verify_course_research.py
+```
+
+命令复用下方固定TLC配置，并执行四项隔离真实源码故障见证。查看[正常图](charts/course-research/chart.mmd)和[故障最短路径](charts/course-research/mutation/report.md)。具体有限范围、成功搜索及可信快照前提、覆盖函数和同步摘要以该技能的覆盖记录为准。不验证模型内容质量或最终一定成功。
 
 ## 配置验证工具
 
@@ -82,7 +92,7 @@ node scripts/render_statecharts.mjs
 
 ## 阅读故障见证
 
-当前六个正常模型均通过相应性质与死锁检查。下表中的失败由主动修改守卫产生。
+六个基础模型和课程恢复增量模型的既定性质均已重跑通过。课堂模型已补回cursor=-1时的提问路径，完成性质和原常量未改。下表中的失败由主动修改守卫产生，不代表下面独立记录的产品缺陷。
 
 | 故障 | 违反的规则 | statechart 最短路径 |
 | --- | --- | --- |
@@ -97,8 +107,22 @@ node scripts/render_statecharts.mjs
 
 ## 维护范围
 
-覆盖记录保存基准提交、当前工作区是否有未提交内容、源文件 SHA256 和符号。初次核对基准为 `c7a05d71dce441f1ddad8c8be2651f3c3cb39450`，不能用该 HEAD 代替当时脏工作区内容。
+覆盖记录保存基准提交、当前工作区是否有未提交内容、源文件SHA256和符号。本次维护核对至`e42d4cfe5eb79bec9e03ee18794328a6fd295038`。未提交源码仍由覆盖记录的摘要标识，不能用HEAD代替工作区内容。
 
 用 `/maintain-formal-verification-skill` 复核变动。确认动作仍对应真实事务、性质没有被削弱、故障注入仍能失败后，才推进同步提交和摘要。项目技能格式已静态验证，不宣称聊天界面的 slash-command 注册和派发已验证。
 
 不覆盖模型生成内容的事实正确性、教学收益、所有并发执行顺序、数据库实现正确性、生产性能或部署环境。各技能另列局部假设。
+
+## 独立产品缺陷探针
+
+2026-11-10维护的逐项结论见[机器可读结果](maintenance-20261110.json)，提交审阅、故障说明和验收过程见[维护计划](../exec-plans/completed/20261110-maintain-formal-verification.md)。
+
+`e42d4cf`加入teacher任务聚合后，较新的`lesson_basis`任务可能遮蔽仍活跃的讲义再生成任务。旧脚本提问因此被接受，替换脚本后问题从当前交互列表消失。该路径已在真实临时SQLite中重放，不是TLC的Summary性质反例。
+
+```powershell
+uv run --frozen python scripts/verify_classroom_regeneration.py
+```
+
+当前输出`REGENERATION_GUARD_BUG`及`FAILED (failures=1)`，退出1。它是未修复产品缺陷，不是需要计为成功的主动故障。步骤、引入提交和损害见[已知缺陷记录](../../.agents/skills/verify-classroom-flow/references/known-findings.json)。本次维护没有修改产品代码。
+
+通用`verify_state_machines.py`只执行既定TLC性质及其故障见证，不自动运行此独立探针。只看通用命令退出0，不能宣称当前课堂全部安全。按课堂技能执行时必须另外运行探针并报告bug。

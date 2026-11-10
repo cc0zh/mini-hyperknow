@@ -1,6 +1,6 @@
 {
   "id": "run-lifecycle",
-  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "sync_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
   "workspace_dirty_at_sync": true,
   "spec": "assets/RunLifecycle.tla",
   "config": "assets/RunLifecycle.cfg",
@@ -9,7 +9,7 @@
   "bounds": {"command_ids": 1, "payload_fingerprints": 2, "retries": 1},
   "sources": [
     {"path": "src/hyperknow/storage.py", "sha256": "26187f57106c64f79ee627390ff98a622c8e7c294dca13dc4acf7689a3762cb4", "symbols": ["command", "transaction", "transition", "retry_run", "interrupt_inflight"]},
-    {"path": "src/hyperknow/runtime.py", "sha256": "ad805a2336a2a67d4e8b123fdae229abc37f7bcc569b6679b79217d09f0c32d1", "symbols": ["CourseService", "work"]}
+    {"path": "src/hyperknow/runtime.py", "sha256": "3ccf71593be4db6f5fb8012c8df1379036011813bf49e7d27942a802d2e932ca", "symbols": ["CourseService", "work", "prepare_teacher", "teacher_turn"]}
   ],
   "code_mutation": {
     "path": "src/hyperknow/storage.py",

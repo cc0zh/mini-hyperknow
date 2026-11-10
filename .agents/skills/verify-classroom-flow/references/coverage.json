@@ -1,6 +1,6 @@
 {
   "id": "classroom-flow",
-  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "sync_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
   "workspace_dirty_at_sync": true,
   "spec": "assets/ClassroomFlow.tla",
   "config": "assets/ClassroomFlow.cfg",
@@ -8,7 +8,7 @@
   "invariant": "CompletionRequiresSummary",
   "bounds": {"scripts": 1, "steps": 3, "concurrent_questions": 1},
   "sources": [
-    {"path": "src/hyperknow/lesson_storage.py", "sha256": "4289aec0d1fbe16a4e7b55f63728c4d94b8a2c5b8194ae0634fe48ac0948c665", "symbols": ["prepare_lesson", "finish_lesson", "save_progress", "ask_question", "complete_lesson"]},
+    {"path": "src/hyperknow/lesson_storage.py", "sha256": "baa8b608d8fc9462f27221759d2d8788b122f9f68de27cef4021353b01307934", "symbols": ["prepare_lesson", "finish_lesson", "save_progress", "ask_question", "complete_lesson", "_lesson", "_anchor", "regenerate_lesson", "prepare_teacher_lesson", "start_teacher_turn", "finish_lesson_basis", "finish_teacher_turn"]},
     {"path": "web/src/lib/lesson-state.ts", "sha256": "cb8d93e0b613098ba16e3917cbdfdd000ded5dcebdcb5d891a59d28d4d7d1489", "symbols": ["PlaybackClock", "resumeIntent", "summaryIsShown"]}
   ],
   "code_mutation": {

@@ -99,7 +99,6 @@ class TeachingSchemaTests(unittest.TestCase):
         specialized = teaching_prompt(SkillRegistry(test_skill_snapshots()).catalog(), teaching_schema())
         self.assertIn("当前没有可用Skill", plain)
         self.assertIn("不是回答或创建产物的前置条件", specialized)
-        self.assertIn("action=continue", plain)
         self.assertNotIn("skill_hint", plain)
         self.assertNotIn("requested_artifacts", plain)
         self.assertNotIn("forbidden_artifacts", plain)

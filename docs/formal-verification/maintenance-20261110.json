@@ -1,0 +1,125 @@
+{
+  "date": "2026-11-10",
+  "sync_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
+  "workspace_hashes_authoritative": true,
+  "reviewed_commits": [
+    "954568372be1f264119dac04690084636697a710",
+    "3a10fdfd27ea0fcf54c5f68a0f29c0c39043cfe5",
+    "e42d4cfe5eb79bec9e03ee18794328a6fd295038"
+  ],
+  "initial_source_drift": [
+    "classroom-flow",
+    "run-lifecycle"
+  ],
+  "checks": [
+    {
+      "id": "assistance-flow",
+      "outcome": "in sync",
+      "invariant": "AtMostOneArtifactPerTurn",
+      "normal_states": 39,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "classroom-flow",
+      "outcome": "updated",
+      "invariant": "CompletionRequiresSummary",
+      "normal_states": 19,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "course-flow",
+      "outcome": "in sync",
+      "invariant": "ReadyRequiresAllUnits",
+      "normal_states": 31,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "course-research",
+      "outcome": "in sync",
+      "invariant": "CommittedUnitsPreserved",
+      "normal_states": 72,
+      "code_witness_count": 4,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "quiz-flow",
+      "outcome": "in sync",
+      "invariant": "SubmissionRequiresAllAnswers",
+      "normal_states": 12,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "research-flow",
+      "outcome": "in sync",
+      "invariant": "ToolBudgetRespected",
+      "normal_states": 170,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      }
+    },
+    {
+      "id": "run-lifecycle",
+      "outcome": "in sync",
+      "invariant": "NoConflictingReplay",
+      "normal_states": 25,
+      "code_witness_count": 1,
+      "all_code_exit_codes": {
+        "baseline": 0,
+        "mutant": 1,
+        "restored": 0
+      },
+      "reason": "New teacher entry points preserve the command-receipt projection. Only the source digest and correspondence notes changed."
+    }
+  ],
+  "separate_product_bug": {
+    "outcome": "bug",
+    "introduced_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
+    "teacher_run_kind": "lesson_basis",
+    "question_admitted_during_regeneration": true,
+    "script_replaced": true,
+    "visible_interactions_after_replacement": 0,
+    "stored_interactions_after_replacement": 1,
+    "replay_command": "uv run --frozen python scripts/verify_classroom_regeneration.py"
+  },
+  "product_source_changed_by_maintenance": false,
+  "bounds_reduced": false,
+  "properties_weakened": false,
+  "uncovered": [
+    "teacher_led full teaching-turn protocol",
+    "all regeneration and completion interleavings",
+    "infinite retries, SQLite implementation, network authenticity and teaching quality"
+  ],
+  "additional_properties": {
+    "course-research": [
+      "CurrentRoundQuestionsClosed",
+      "VerbatimEvidenceBound"
+    ]
+  }
+}

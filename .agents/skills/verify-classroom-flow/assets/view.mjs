@@ -1,4 +1,4 @@
-export const title = '白板课堂与提问和手动完成';
+export const title = "保留的脚本式课堂播放、提问与完成";
 export const state = v => v.phase === 'completed' && v.cursor !== 2 ? '未展示总结就记录完成' : ['paused','playing'].includes(v.phase) ? v.cursor === 2 ? '已确认最后总结' : v.phase === 'playing' ? '正在讲解' : '暂停，可回看' : ['queued','generating'].includes(v.phase) ? '正在准备讲义' : ['failed','cancelled','interrupted'].includes(v.phase) ? '讲义任务已停止，等待重试' : ({unprepared:'进入课堂，只读已有状态',answering:'提问中，固定教学位置',completed:'你已手动完成本课'}[v.phase]);
 export const step = action => ['Cancel','Fail','Restart'].includes(action) ? '任务停止或用户取消' : ({Prepare:'明确准备本课',Start:'开始生成',SaveScript:'保存讲义，初始暂停',Play:'明确播放',Pause:'暂停',Advance:'逐步确认，检查点自动暂停',Ask:'提交问题并暂停',Answer:'回答结束，等待明确继续',Complete:'明确完成本课',Refresh:'刷新后本地暂停',Retry:'明确重试讲义生成',Done:'保留完成记录'}[action] ?? action);
 export const group = v => v.phase === 'completed' ? 'done' : v.phase === 'answering' ? 'input' : ['failed','cancelled','interrupted'].includes(v.phase) ? 'stop' : 'work';

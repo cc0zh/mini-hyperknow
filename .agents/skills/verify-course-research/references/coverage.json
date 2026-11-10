@@ -1,0 +1,35 @@
+{
+  "id": "course-research",
+  "sync_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
+  "workspace_dirty_at_sync": true,
+  "spec": "assets/CourseRecovery.tla",
+  "config": "assets/CourseRecovery.cfg",
+  "view": "assets/view.mjs",
+  "invariant": "CommittedUnitsPreserved",
+  "bounds": {"courses": 1, "units": 2, "runs": 2, "retries": 1, "payload_symbols": 2},
+  "assumptions": [
+    "The blueprint and research report are already approved and no blueprint revision occurs.",
+    "Draft validation and materialization have succeeded. Each payload symbol represents a full saved content tree.",
+    "Guard checks and writes are one BEGIN IMMEDIATE transaction.",
+    "Stopped abstracts the equivalent non-ready states after cancellation, failure, or interruption.",
+    "Issued results may be delivered repeatedly and arbitrarily late. No fairness is assumed."
+  ],
+  "actions": {
+    "BeginUnit": "BlueprintStorage.begin_unit transaction, first non-ready unit only",
+    "FinishUnit": "BlueprintStorage.finish_unit and _units_active transaction, ready/old-owner results rejected",
+    "Stop": "Database.mutate_command and BlueprintStorage._blueprint_run_changed transaction",
+    "Retry": "Database.retry_run and BlueprintStorage._retry_blueprint transaction with ownership transfer"
+  },
+  "sources": [
+    {"path": "src/hyperknow/blueprint_storage.py", "sha256": "7948df69cc97d21819bdbb8a2ecea772e475d1c31822580fe5a86e4b53a69f8c", "symbols": ["_units_active", "begin_unit", "finish_unit", "_blueprint_run_changed", "_retry_blueprint"]},
+    {"path": "src/hyperknow/storage.py", "sha256": "26187f57106c64f79ee627390ff98a622c8e7c294dca13dc4acf7689a3762cb4", "symbols": ["transaction", "retry_run", "mutate_command"]},
+    {"path": "src/hyperknow/research_domain.py", "sha256": "4ef2cba8f785a78bf8b881e996f6015c6ba52e50bbabbe4174ac2722630ce79e", "symbols": ["ResearchReport", "validate_report", "build_evidence_bundle"]},
+    {"path": "src/hyperknow/blueprint_domain.py", "sha256": "be33be761cf6fae3092285d56f2ed45b4dc76d001c8ec45c88e6945fd6e8706a", "symbols": ["materialize_expansion"]}
+  ],
+  "code_mutation": {
+    "path": "src/hyperknow/blueprint_storage.py",
+    "before": "if unit[\"generation_status\"] != \"ready\":",
+    "after": "if True:",
+    "tests": ["test_blueprint.BlueprintStorageTests.test_cancel_rejects_late_unit_and_retry_reuses_completed_structure"]
+  }
+}

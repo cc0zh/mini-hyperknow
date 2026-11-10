@@ -15,6 +15,7 @@ from .domain import AppError, Clarification
 from .blueprint_domain import (BlueprintDraft, UnitExpansionDraft, planning_context,
                                validate_blueprint, validate_expansion)
 from .lesson_domain import BoardScriptDraft, LessonAnswer, validate_lesson_coverage
+from .model_output import validate_model_output
 from .teacher import TeachingBasisDraft, TeacherGenerator, validate_basis
 from .quiz_domain import QuizDraft, validate_sources
 from .prompts.classroom import (BOARD_SCRIPT_INSTRUCTION, LESSON_ANSWER_INSTRUCTION,
@@ -198,7 +199,8 @@ class Generator:
                 self.db.record_call(run["run_id"], record)
                 raise AppError("model_request_failed", "模型请求失败或未返回完整内容，请检查配置、额度或网络后重试", 502, True)
             try:
-                result = schema.model_validate(parse_json(response.content))
+                raw = parse_json(response.content)
+                result = validate_model_output(schema, raw) if kind == "course" else schema.model_validate(raw)
                 if kind == "quiz":
                     validate_sources(result, user)
                 elif kind == "lesson":

@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-11-09T23:13:56.563Z",
+  "mode": "existing_session_history_restoration_no_new_generation",
+  "original_message_timestamps": [
+    "2026-10-21T08:54:27.451195+00:00"
+  ],
+  "complete": false,
+  "coverage": "interrupted_opening_only",
+  "message_count": 1,
+  "source_action_records": 4,
+  "board_page_count": 1,
+  "redactions": [
+    "learner display name replaced",
+    "UUIDs consistently pseudonymized",
+    "audio URLs and credentials omitted"
+  ],
+  "limits": [
+    "Only an interrupted opening is present in this existing classroom",
+    "Historical action order is stored order, not newly observed emission timing",
+    "No student answer or teacher adaptation exists in this fragment",
+    "Original request and backend prompt are not present",
+    "All generation and whiteboard state-write commands were blocked before network"
+  ]
+}

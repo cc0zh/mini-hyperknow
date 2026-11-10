@@ -1,5 +1,5 @@
 ---
-title: "白板课堂与提问和手动完成"
+title: "保留的脚本式课堂播放ﬂ°°12289¶ß提问与完成"
 ---
 stateDiagram-v2
   state "Legend" as legend {
@@ -20,9 +20,9 @@ stateDiagram-v2
   s1: 正在准备讲义
   s2: 讲义任务已停止#65292;等待重试
   s3: 暂停#65292;可回看
-  s4: 未展示总结就记录完成
-  s5: 正在讲解
-  s6: 提问中#65292;固定教学位置
+  s4: 提问中#65292;固定教学位置
+  s5: 未展示总结就记录完成
+  s6: 正在讲解
   s7: 已确认最后总结
   s8: 你已手动完成本课
   [*] --> s0
@@ -31,18 +31,18 @@ stateDiagram-v2
   s1 --> s1: 开始生成
   s2 --> s1: 明确重试讲义生成
   s1 --> s3: 保存讲义#65292;初始暂停
-  s3 --> s4: 明确完成本课
-  s3 --> s5: 明确播放
-  s3 --> s6: 提交问题并暂停
-  s5 --> s3: 暂停 or 刷新后本地暂停 or 逐步确认#65292;检查点自动暂停
-  s5 --> s4: 明确完成本课
-  s6 --> s3: 回答结束#65292;等待明确继续
+  s3 --> s4: 提交问题并暂停
+  s3 --> s5: 明确完成本课
+  s3 --> s6: 明确播放
+  s4 --> s3: 回答结束#65292;等待明确继续
+  s6 --> s3: 暂停 or 刷新后本地暂停 or 逐步确认#65292;检查点自动暂停
+  s6 --> s4: 提交问题并暂停
+  s6 --> s5: 明确完成本课
   s3 --> s7: 逐步确认#65292;检查点自动暂停
-  s5 --> s6: 提交问题并暂停
-  s7 --> s6: 提交问题并暂停
+  s7 --> s4: 提交问题并暂停
   s7 --> s8: 明确完成本课
-  s5 --> s7: 逐步确认#65292;检查点自动暂停
-  s6 --> s7: 回答结束#65292;等待明确继续
+  s6 --> s7: 逐步确认#65292;检查点自动暂停
+  s4 --> s7: 回答结束#65292;等待明确继续
   classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
   class s0 blue
   class s0 bugPath
@@ -51,10 +51,10 @@ stateDiagram-v2
   class s2 orange
   class s3 blue
   class s3 bugPath
-  class s4 teal
-  class s4 breaks
-  class s4 bugPath
-  class s5 blue
-  class s6 yellow
+  class s4 yellow
+  class s5 teal
+  class s5 breaks
+  class s5 bugPath
+  class s6 blue
   class s7 blue
   class s8 teal

@@ -85,6 +85,7 @@ def run_tlc(item: dict, jar: Path, output: Path, broken: bool) -> dict:
         shutil.copyfile(directory / item["spec"], spec)
         command = [
             os.environ.get("JAVA", "java"), "-XX:+UseParallelGC", "-Xmx512m",
+            f"-Djava.io.tmpdir={work}",
             f"-DTLA-Library={work}", "-cp", str(jar),
             "tlc2.TLC", "-workers", "1", "-seed", "1", "-metadir",
             str(work / "states"), "-config", cfg.name, spec.name,

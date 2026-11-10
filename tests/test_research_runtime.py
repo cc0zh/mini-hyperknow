@@ -12,7 +12,8 @@ from agent_core.types import AgentContext, ToolCall, UserMessage
 from hyperknow.config import Settings
 from hyperknow.domain import AppError
 from hyperknow.research import (
-    CONTEXT_BUDGET, OUTPUT_RESERVE, REPORT_MARGIN, Researcher, fit_page, fit_search,
+    CONTEXT_BUDGET, MAX_RESEARCH_TURNS, OUTPUT_RESERVE, REPORT_MARGIN, RESEARCH_TOOL_LIMITS,
+    Researcher, fit_page, fit_search,
     research_prompt, tool_byte_budget,
 )
 from hyperknow.research_web import WebError
@@ -88,6 +89,15 @@ class ResearchAdmissionTests(unittest.TestCase):
             self.assertIn("budget", result.error)
         self.assertEqual(self.db.get_run(self.run["run_id"]), before)
         self.assertEqual(before["research"]["sources"], [])
+
+    def test_tool_descriptions_and_runtime_share_the_research_budgets(self):
+        definitions = self.researcher._tools().definitions()
+        descriptions = {item["function"]["name"]: item["function"]["description"]
+                        for item in definitions}
+        self.assertEqual(RESEARCH_TOOL_LIMITS, {"web_search": 4, "read_webpage": 6})
+        self.assertEqual(MAX_RESEARCH_TURNS, 10)
+        self.assertIn(f"At most {RESEARCH_TOOL_LIMITS['web_search']} searches", descriptions["web_search"])
+        self.assertIn(f"At most {RESEARCH_TOOL_LIMITS['read_webpage']} reads", descriptions["read_webpage"])
 
     def test_tool_schema_rejects_invalid_arguments_without_spending_budget(self):
         tools = self.researcher._tools()

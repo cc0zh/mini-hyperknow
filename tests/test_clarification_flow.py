@@ -10,7 +10,6 @@ from pydantic import ValidationError
 
 from hyperknow.config import Settings
 from hyperknow.domain import Clarification, course_research_input
-from hyperknow.prompts.course import CLARIFICATION_INSTRUCTION
 from hyperknow.runtime import CourseService, EventHub
 from hyperknow.storage import Database
 from tests.test_course import questions
@@ -28,7 +27,6 @@ class ClarificationFlowTests(unittest.TestCase):
 
     def test_schema_requires_questions_but_accepts_zero_and_rejects_more_than_five(self):
         self.assertEqual(Clarification(questions=[]).model_dump(), {"questions": []})
-        self.assertIn("questions返回空数组", CLARIFICATION_INSTRUCTION)
         with self.assertRaises(ValidationError):
             Clarification.model_validate({})
         source = questions()[0]

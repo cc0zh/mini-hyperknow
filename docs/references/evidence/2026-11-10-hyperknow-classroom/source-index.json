@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "task": "对照 Hyperknow 调查课堂内容生成死板的原因，保存证据，先不写代码",
+  "captured_at_utc": "2026-11-09T23:04:10.363Z",
+  "captured_local_date": "2026-11-10",
+  "local_timezone": "+08:00",
+  "project": {
+    "repository": "mini-hyperknow1",
+    "commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
+    "initial_worktree_clean": true
+  },
+  "reference": {
+    "repository": "hyperknow-clone2",
+    "commit": null,
+    "commit_note": "git rev-parse --verify HEAD failed; content-addressed source hashes are used",
+    "original_capture_date": "not_verified_this_round",
+    "use": "read-only historical frontend artifact, not original backend"
+  },
+  "sources": [
+    {
+      "root": "project",
+      "path": "src/hyperknow/prompts/classroom.py",
+      "sha256": "cd6e91a138dd0def5b7421bdc1ea7d88b3fca69cddaa989c3ca13d097d4c506e",
+      "excerpts": [
+        {
+          "id": "M01",
+          "start_line": 58,
+          "end_line": 82,
+          "meaning": "课前依据与当前教师回合提示，非旧脚本"
+        }
+      ]
+    },
+    {
+      "root": "project",
+      "path": "src/hyperknow/teacher.py",
+      "sha256": "a61ebbfc6f94321371fa5cc39ffa2688a8fe79878a29d3de1a1c2c5abc7ae402",
+      "excerpts": [
+        {
+          "id": "M02",
+          "start_line": 44,
+          "end_line": 77,
+          "meaning": "必填依据分类与教师回合字段"
+        },
+        {
+          "id": "M03",
+          "start_line": 141,
+          "end_line": 176,
+          "meaning": "白板账本校验与追加提交"
+        }
+      ]
+    },
+    {
+      "root": "project",
+      "path": "src/hyperknow/lesson_storage.py",
+      "sha256": "baa8b608d8fc9462f27221759d2d8788b122f9f68de27cef4021353b01307934",
+      "excerpts": [
+        {
+          "id": "M04",
+          "start_line": 187,
+          "end_line": 222,
+          "meaning": "近期六回合上下文与等答门禁"
+        },
+        {
+          "id": "M07",
+          "start_line": 111,
+          "end_line": 121,
+          "meaning": "当前课堂默认协议"
+        }
+      ]
+    },
+    {
+      "root": "project",
+      "path": "web/src/pages/Classroom.tsx",
+      "sha256": "124a95517417ad4bd02e37d389b3c3cd0f1e9e592c965694fc54605f00554c49",
+      "excerpts": [
+        {
+          "id": "M05",
+          "start_line": 27,
+          "end_line": 35,
+          "meaning": "累计六操作切帧并取最新回应"
+        },
+        {
+          "id": "M06",
+          "start_line": 72,
+          "end_line": 78,
+          "meaning": "提交与继续入口"
+        },
+        {
+          "id": "M08",
+          "start_line": 183,
+          "end_line": 192,
+          "meaning": "新旧课堂路由选择"
+        }
+      ]
+    },
+    {
+      "root": "reference",
+      "path": "recon/pretty/WhiteboardPage-BglQN5uo.pretty.js",
+      "sha256": "8ef7d1442027a7d6f72a96a5f8a0e188a6447f1ef3d4e89d4dcbed707f913a43",
+      "excerpts": [
+        {
+          "id": "O01",
+          "start_line": 244,
+          "end_line": 254,
+          "meaning": "原站用户消息与回答载荷"
+        },
+        {
+          "id": "O02",
+          "start_line": 275,
+          "end_line": 280,
+          "meaning": "原站动作完成确认"
+        },
+        {
+          "id": "O03",
+          "start_line": 691,
+          "end_line": 699,
+          "meaning": "原站开放回答与选择回答"
+        },
+        {
+          "id": "O04",
+          "start_line": 2744,
+          "end_line": 2757,
+          "meaning": "原站显式新建页面事件"
+        },
+        {
+          "id": "O05",
+          "start_line": 2895,
+          "end_line": 2905,
+          "meaning": "原站提问事件与动作确认不同语义"
+        },
+        {
+          "id": "O06",
+          "start_line": 3254,
+          "end_line": 3275,
+          "meaning": "原站要点、回合响应与课堂状态分离"
+        },
+        {
+          "id": "O07",
+          "start_line": 3411,
+          "end_line": 3426,
+          "meaning": "原站选择答案结构化回传"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "live-public-protocol.json",
+      "kind": "current_public_frontend_protocol",
+      "scope": "frontend_protocol_only_not_backend_generation_or_learning_effect"
+    },
+    {
+      "path": "source-excerpts.md",
+      "kind": "finite_historical_and_current_source_excerpts"
+    },
+    {
+      "path": "browser-observation.md",
+      "kind": "redacted_navigation_observation_not_a_classroom_generation_trace"
+    },
+    {
+      "path": "verification.json",
+      "kind": "local_source_and_document_integrity_checks_not_teaching_evaluation"
+    }
+  ],
+  "not_collected": [
+    "credentials, tokens, cookies or localStorage values",
+    "raw account/course/user API responses",
+    "new paid model generations or original classroom answer traces",
+    "full supplier source bundle copies"
+  ],
+  "limits": [
+    "Static frontend event branches do not prove backend teaching strategy or learning effects",
+    "Current project deployment and the version seen by the user were not observed",
+    "Original site classroom generation was not started and no account messages were submitted",
+    "No product code, tests, configuration or dependencies were changed"
+  ]
+}

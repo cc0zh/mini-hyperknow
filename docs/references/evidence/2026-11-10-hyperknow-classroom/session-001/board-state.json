@@ -1,0 +1,52 @@
+{
+  "active_page_id": "page-1",
+  "pages": [
+    {
+      "column_layout": {
+        "active_index": 0,
+        "columns": [
+          {
+            "nextY": 456,
+            "w": 744,
+            "x": 54
+          }
+        ],
+        "lp": {
+          "colCount": 3,
+          "exportPixelW": 1308,
+          "gridLeft": 30,
+          "gridTop": 130,
+          "tileGapX": 12,
+          "tileGapY": 12,
+          "tileW": 654,
+          "usableH": 833,
+          "usableW": 1988
+        }
+      },
+      "excalidraw_elements": [],
+      "id": "page-1",
+      "overlay_items": [
+        {
+          "boardUid": 0,
+          "columnIndex": 0,
+          "decorations": [],
+          "h": 324,
+          "id": "id_004",
+          "keypoint": {
+            "column": 1,
+            "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+            "importance": 2,
+            "title": "课程概览",
+            "type": "formula"
+          },
+          "kind": "note_card",
+          "w": 744,
+          "x": 54,
+          "y": 130
+        }
+      ]
+    }
+  ],
+  "revision": 3,
+  "version": 1
+}

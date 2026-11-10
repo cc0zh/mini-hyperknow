@@ -1,0 +1,163 @@
+{
+  "verified_at": "2026-11-09T23:43:17.064Z",
+  "status": "passed",
+  "source": "actual_original_classroom",
+  "complete_live_continuation": true,
+  "events": 173,
+  "request_response_segments": 4,
+  "operator_inputs": 3,
+  "open_questions": 3,
+  "board_snapshots": 17,
+  "animation_html_characters": 19696,
+  "terminal_sequence": 172,
+  "terminal_session": true,
+  "terminal_is_complete": true,
+  "checkpoint_prefix_counts": [
+    16,
+    37,
+    50,
+    86,
+    140
+  ],
+  "source_hashes_checked": 5,
+  "privacy_checks": "passed",
+  "local_links_checked": 64,
+  "png": {
+    "width": 570,
+    "height": 1270,
+    "bytes": 119459
+  },
+  "source_files": [
+    {
+      "file": "animation-artifacts.json",
+      "bytes": 21422,
+      "sha256": "279eabd3853a1932535d24c2f5904d687de30ade7f65f1016dc6f1f47f2f9617"
+    },
+    {
+      "file": "board-during-summary.png",
+      "bytes": 119459,
+      "sha256": "c0f2542c43227b3459b2b223b1d8e68b9d500e291f727c47c6ca890b88212c3a"
+    },
+    {
+      "file": "board-evolution.json",
+      "bytes": 366656,
+      "sha256": "be729979caedafa2ef8d1b489c44a25ebfb9e8da4c483c8fdef83859580b7ac1"
+    },
+    {
+      "file": "checkpoint-001.json",
+      "bytes": 8454,
+      "sha256": "a5ac5e8b1dfeb94798ffdac2ce2973e322c5342fd83dfec7fdb8910a34a9bcc1"
+    },
+    {
+      "file": "checkpoint-002.json",
+      "bytes": 32448,
+      "sha256": "46988f50f2a00eb658591d11314fc615e43dbd90172dcb4e8d322799aba9da4a"
+    },
+    {
+      "file": "checkpoint-003.json",
+      "bytes": 42794,
+      "sha256": "9614d183d323b2c9339bdcdf138f160a0d80d6f294f6a9722c58ce9028f6a863"
+    },
+    {
+      "file": "checkpoint-004.json",
+      "bytes": 199680,
+      "sha256": "25797ffdde9fba96e67c29f86c1d1bc46e4b165870a3d8915931b4bf914f8072"
+    },
+    {
+      "file": "checkpoint-005.json",
+      "bytes": 384246,
+      "sha256": "8960fb77a64e47c2166faaaf976e780457ba62c16ceae98f0eeedb69781ddc1c"
+    },
+    {
+      "file": "events.jsonl",
+      "bytes": 386429,
+      "sha256": "1ea1d57794aa54444db943503db5fb469cd7a8847acd09f19be9092e6baaee84"
+    },
+    {
+      "file": "final-board.json",
+      "bytes": 28902,
+      "sha256": "3f057c15c1e140e64b092d3a403b81d7c0bcc75b7b2b84ab76233da9fa33571b"
+    },
+    {
+      "file": "final-view.md",
+      "bytes": 13298,
+      "sha256": "eb57e318b127968aa5a6dcff9baa3aa76b79e0cce36509415ba09cb19a0eb339"
+    },
+    {
+      "file": "operator-inputs.json",
+      "bytes": 1649,
+      "sha256": "f7f0aacd0c48fd8458a57469b7790329e6a8d0e055ec9106c2a8fe7243942e4c"
+    },
+    {
+      "file": "recording-manifest.json",
+      "bytes": 2421,
+      "sha256": "ee98902d9a4a3d5ed4579f054f269466dc2586cd7a9cad46389bc27a3521cd86"
+    },
+    {
+      "file": "transcript.md",
+      "bytes": 13293,
+      "sha256": "b20af90c8f53412fa8f64b77f0d209e4b05b4d261bd0a77196710a056c657e57"
+    }
+  ],
+  "historical_fragment": {
+    "action_records": 4,
+    "interrupted": true,
+    "source_files": [
+      {
+        "file": "board-state.json",
+        "bytes": 1220,
+        "sha256": "1ba83f811f31e6ca0fc0c397f6adb6077aa9280ee6bbf30b0ae155d97f05ca9b"
+      },
+      {
+        "file": "capture-manifest.json",
+        "bytes": 866,
+        "sha256": "d2891d1b7a951ab69650e96f4106e3742240620443965da5d5dff162f894e364"
+      },
+      {
+        "file": "historical-actions.jsonl",
+        "bytes": 1685,
+        "sha256": "e1e62f92769b5dda40ebb62b46cf2fdfb24063f8355e1d8858a65b6161825a2f"
+      },
+      {
+        "file": "input-context.json",
+        "bytes": 2997,
+        "sha256": "42e08fab41d0bd388f47377fc66ebd7d74389324cd356595fbdddfb9c72476be"
+      },
+      {
+        "file": "process.md",
+        "bytes": 3638,
+        "sha256": "5bd12cb6f600bb6c8165283ff6b93ac1cedefca6cbb10049114bb10a98e56233"
+      },
+      {
+        "file": "restore-wire-events.json",
+        "bytes": 4925,
+        "sha256": "aa364e9d524e906cb2f11aa7cf47996f171c28ba03c6615ca728bae710b6a0ff"
+      },
+      {
+        "file": "restored-session.json",
+        "bytes": 3771,
+        "sha256": "c66d340a2ac293925aa86216afcd02e8c18665208dff89f19247b27ebe4b9a87"
+      }
+    ],
+    "base_directory": ".."
+  },
+  "finalized_at": "2026-11-09T23:46:49.281Z",
+  "transcript_speaks_checked": 35,
+  "transcript_boards_checked": 8,
+  "document_checks": {
+    "verified_at": "2026-11-09T23:46:49.281Z",
+    "status": "passed",
+    "local_links_checked": 64,
+    "transcript_speaks": 35,
+    "transcript_boards": 8,
+    "sha256_files_rechecked": 21,
+    "commands": [
+      "npm run check:docs",
+      "git diff --check"
+    ]
+  },
+  "source_files_base_directory": ".",
+  "verification_file_excluded_from_its_own_hash_inventory": true,
+  "scope_note": "Historical opening plus complete authorized continuation of one existing lesson. Three inputs are capture-operator inputs, not actual learner performance. Hidden backend prompts, fresh course creation, audio bytes and audio URLs are not archived.",
+  "worktree_scope_note": "Concurrent unrelated code and documentation changes are present. This task does not modify, revert, stage, or commit those changes."
+}

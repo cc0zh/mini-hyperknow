@@ -1,0 +1,57 @@
+{
+  "scope": "Exhaustive execution of the stated finite inputs against production Python, not an unbounded proof.",
+  "bounds": {
+    "question_ids": ["q1", "q2"],
+    "event_question_ids": [null, "q1", "q2", "unknown"],
+    "rounds": [1, 2],
+    "extra_tool_events": [0, 1, 2],
+    "event_tools": ["web_search", "read_webpage"],
+    "event_statuses": ["ready", "failed"],
+    "question_cases": 4228,
+    "unicode_corpora": 3,
+    "source_ids": ["s1", "s2"],
+    "source_text_forms": ["single quote", "repeated quote", "changed whitespace", "no quote"],
+    "quote_forms": ["original", "collapsed whitespace", "fabricated suffix"],
+    "citation_sequences": [["s1"], ["s2"], ["unknown"], ["s1", "s2"], ["s1", "s1"]],
+    "relations": ["supports", "contradicts"],
+    "evidence_cases": 8064
+  },
+  "assumptions": [
+    "ResearchReport schema validation precedes domain validation.",
+    "Stored source text and metadata are trusted input snapshots, not proof of a real network read.",
+    "Successful search may belong to an earlier round, as permitted by current validate_report.",
+    "Offsets are Python character offsets, not byte or JavaScript UTF-16 offsets."
+  ],
+  "checks": [
+    {
+      "id": "research-question-closure",
+      "property": "CurrentRoundQuestionsClosed",
+      "code_mutation": {
+        "path": "src/hyperknow/research_domain.py",
+        "before": "if missing_question_ids:",
+        "after": "if False and missing_question_ids:",
+        "tests": ["test_course_research_verification.ResearchQuestionClosureTests"]
+      }
+    },
+    {
+      "id": "research-verbatim-quote",
+      "property": "VerbatimEvidenceBound",
+      "code_mutation": {
+        "path": "src/hyperknow/research_domain.py",
+        "before": "if reference.quote not in source_text:",
+        "after": "if False and reference.quote not in source_text:",
+        "tests": ["test_course_research_verification.ResearchEvidenceBindingTests"]
+      }
+    },
+    {
+      "id": "research-evidence-span",
+      "property": "VerbatimEvidenceBound",
+      "code_mutation": {
+        "path": "src/hyperknow/research_domain.py",
+        "before": "end = start + len(reference.quote)",
+        "after": "end = start",
+        "tests": ["test_course_research_verification.ResearchEvidenceBindingTests"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "initial_static_source_check": {
+    "verified_at": "2026-11-09T23:10:14.268Z",
+    "source_hashes": 5,
+    "exact_source_excerpts": 15,
+    "public_assets": 2,
+    "protocol_markers_found": 12,
+    "local_links_checked": 31,
+    "scope": "documentation_and_evidence_only"
+  },
+  "actual_history_validation": {
+    "status": "passed",
+    "verified_at": "2026-11-09T23:43:17.064Z",
+    "coverage": "historical_opening_only",
+    "complete": false,
+    "source_messages": 1,
+    "source_action_records": 4,
+    "primitive_actions": 5,
+    "board_pages": 1,
+    "board_cards": 1,
+    "allowed_actual_sent_commands": [
+      "resume_or_start_course_session"
+    ],
+    "privacy_checks": "passed",
+    "source_files": [
+      {
+        "file": "board-state.json",
+        "bytes": 1220,
+        "sha256": "1ba83f811f31e6ca0fc0c397f6adb6077aa9280ee6bbf30b0ae155d97f05ca9b"
+      },
+      {
+        "file": "capture-manifest.json",
+        "bytes": 866,
+        "sha256": "d2891d1b7a951ab69650e96f4106e3742240620443965da5d5dff162f894e364"
+      },
+      {
+        "file": "historical-actions.jsonl",
+        "bytes": 1685,
+        "sha256": "e1e62f92769b5dda40ebb62b46cf2fdfb24063f8355e1d8858a65b6161825a2f"
+      },
+      {
+        "file": "input-context.json",
+        "bytes": 2997,
+        "sha256": "42e08fab41d0bd388f47377fc66ebd7d74389324cd356595fbdddfb9c72476be"
+      },
+      {
+        "file": "process.md",
+        "bytes": 3638,
+        "sha256": "5bd12cb6f600bb6c8165283ff6b93ac1cedefca6cbb10049114bb10a98e56233"
+      },
+      {
+        "file": "restore-wire-events.json",
+        "bytes": 4925,
+        "sha256": "aa364e9d524e906cb2f11aa7cf47996f171c28ba03c6615ca728bae710b6a0ff"
+      },
+      {
+        "file": "restored-session.json",
+        "bytes": 3771,
+        "sha256": "c66d340a2ac293925aa86216afcd02e8c18665208dff89f19247b27ebe4b9a87"
+      }
+    ]
+  },
+  "document_checks": {
+    "verified_at": "2026-11-09T23:46:49.281Z",
+    "status": "passed",
+    "local_links_checked": 64,
+    "transcript_speaks": 35,
+    "transcript_boards": 8,
+    "sha256_files_rechecked": 21,
+    "commands": [
+      "npm run check:docs",
+      "git diff --check"
+    ]
+  },
+  "scope_note": "The current archive contains the historical opening and a complete authorized live continuation until the original site reports lesson completion. Earlier interrupted-opening coverage applies only to the historical segment, not to the complete current archive.",
+  "live_classroom_validation": {
+    "status": "passed",
+    "verified_at": "2026-11-09T23:43:17.064Z",
+    "complete_live_continuation": true,
+    "events": 173,
+    "operator_inputs": 3,
+    "board_snapshots": 17,
+    "animation_html_characters": 19696,
+    "terminal_sequence": 172,
+    "terminal_session": true,
+    "terminal_is_complete": true,
+    "verification_file": "session-001/live-continuation/verification.json"
+  }
+}

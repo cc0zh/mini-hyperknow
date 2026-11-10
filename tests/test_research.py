@@ -97,6 +97,29 @@ class ResearchReportTests(unittest.TestCase):
             with self.subTest(field=next(iter(patch))), self.assertRaises(ValidationError):
                 ResearchReport.model_validate({**data, **patch})
 
+    def test_prompt_report_collection_limits_accept_boundary_and_reject_one_above(self):
+        data = report_input()
+        data["questions"] = [{"id": f"q{i}", "question": f"问题{i}", "priority": "high",
+                              "status": "answered"} for i in range(6)]
+        data["findings"] = [{"claim_id": f"claim{i}", "question_ids": [f"q{i}"],
+                             "title": f"结论{i}", "summary": f"摘要{i}",
+                             "evidence": [{"source_id": "source_test", "quote": "supporting quote",
+                                           "relation": "supports"} for _ in range(2)]}
+                            for i in range(6)]
+
+        self.assertEqual(len(ResearchReport.model_validate(data).findings), 6)
+
+        for patch in (
+            {"questions": data["questions"] + [{"id": "q6", "question": "问题", "priority": "low",
+                                                   "status": "unresolved"}],
+             "limitations": ["超出研究范围"]},
+            {"findings": data["findings"] + [{**data["findings"][0], "claim_id": "claim6"}]},
+            {"findings": [{**data["findings"][0], "evidence": data["findings"][0]["evidence"] +
+                            [{"source_id": "source_test", "quote": "another quote", "relation": "supports"}]}]},
+        ):
+            with self.subTest(patch=patch), self.assertRaises(ValidationError):
+                ResearchReport.model_validate({**data, **patch})
+
     def test_report_requires_successful_search_and_read_page_not_snippets(self):
         report = ResearchReport.model_validate(report_input())
         source = {**page_input(), "source_id": "source_test"}
@@ -104,6 +127,41 @@ class ResearchReportTests(unittest.TestCase):
                                ([search_step("failed")], [source])):
             with self.subTest(steps=steps, sources=sources), self.assertRaises(ValueError):
                 validate_report(report, {"steps": steps, "sources": sources, "report": None})
+
+    def test_report_error_lists_all_missing_current_round_question_ids(self):
+        report = ResearchReport.model_validate(report_input())
+        source = {**page_input(), "source_id": "source_test"}
+        old_search = {**search_step(), "research_round": 1,
+                      "arguments": {"query": "old scope", "question_id": "old_scope"}}
+        current_search = {**search_step(), "research_round": 2,
+                          "arguments": {"query": "scratch API", "question_id": "scratch_api"}}
+        current_read = {**read_step(), "research_round": 2, "status": "failed",
+                        "arguments": {"url": page_input()["url"], "question_id": "safety"}}
+        research = {"round": 2, "steps": [old_search, current_search, current_read],
+                    "sources": [source], "report": None}
+
+        with self.assertRaises(ValueError) as raised:
+            validate_report(report, research)
+
+        error = str(raised.exception)
+        for question_id in ("scratch_api", "safety"):
+            with self.subTest(question_id=question_id):
+                self.assertIn(question_id, error)
+        self.assertNotIn("old_scope", error)
+
+    def test_report_keeps_used_question_ids_even_for_failed_tool_calls(self):
+        data = report_input()
+        data["questions"].append({"id": "scratch_api", "question": "Scratch API 的边界？",
+                                  "priority": "medium", "status": "unresolved"})
+        report = ResearchReport.model_validate(data)
+        current_search = {**search_step(),
+                          "arguments": {"query": "await", "question_id": "q1"}}
+        failed_read = {**read_step(), "status": "failed",
+                       "arguments": {"url": page_input()["url"], "question_id": "scratch_api"}}
+        research = {"steps": [current_search, read_step(), failed_read],
+                    "sources": [{**page_input(), "source_id": "source_test"}], "report": None}
+
+        self.assertIs(validate_report(report, research), report)
 
     def test_report_question_links_only_constrain_the_current_research_round(self):
         report = ResearchReport.model_validate(report_input())

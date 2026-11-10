@@ -13,7 +13,9 @@
 - 阅读：`page` 读取公开HTTP／HTTPS HTML或纯文本；Exa Contents按query提取相关片段（适用于PDF、脚本页面等），但不是网页全文。两者都提供稳定`source_id`、最终URL、抓取时间、实际摘录SHA-256、provider与content_mode；所有高亮均标为非全文。不登录或绕过访问限制。
 - 报告：按 `ResearchQuestion` 表示优先级和answered／partial／unresolved状态；每个 `ResearchFinding` 是带稳定claim_id的主张，关联问题并逐条保存原文quote和supports／contradicts关系。`source_ids`由服务器从evidence引用派生，保留在报告存储和API输出中。服务器确认引用逐字包含于本轮已保存来源摘录，派生字符偏移与evidence bundle。该检查不证明语义蕴含或来源可靠；模型自报关系不等于独立证明，仍须人工核查和语义评测。
 
-复用 V1 `Agent`／`ToolManager`，每次运行独立上下文，仅注册 `web_search` 和 `read_webpage`。没有文件、命令、浏览器自动化或用户提供工具。结构输出失败允许一次无工具的报告修复，不能在修复中编造新来源。
+复用 V1 `Agent`／`ToolManager`，每次运行独立上下文，仅注册 `web_search` 和 `read_webpage`。没有文件、命令、浏览器自动化或用户提供工具。报告先按[统一输出边界](agent-workflows.md#4-结构化输出及校验)处理无内容的未知扩展字段；其余结构输出失败允许一次无工具的模型修复，不能在修复中编造新来源。
+
+问题 ID 一旦用于本轮搜索或阅读，最终报告必须保留原 ID，不能改名或因请求失败而删除。未解问题以 partial／unresolved 及 limitations 说明，不能伪造回答。校验错误列出当前轮全部缺失 ID，使既有一次修复拿到必须恢复的标识；旧轮工具不向新轮强加问题，也不由服务器自动补造问题或修改报告。
 
 ## 预算与安全
 

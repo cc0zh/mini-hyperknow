@@ -18,25 +18,19 @@ def teaching_prompt(catalog: list[dict], schema: dict) -> str:
         "可以在当前任务内换讲法、纠错或补背景，不自动改变课程结构，也不把讲完等同于测得掌握度。"
     )
     interaction = (
-        "action=continue明确进入已保存计划下一步；保留原plan并使用required_continuation_state指定的current_step。"
-        "questions仅在需要用户回答时给出，选项2-6个或空数组表示开放题；waiting_for=answer须有问题。"
-        "current_step是plan的零起始索引；waiting_for=continue仅在计划还有下一步时使用，none表示无需等待。"
-        "suggestions按需提供0-4项，每项有label、text及action。text是学习者会发送的话，不写工具名。"
-        "只有推进原计划下一步的建议使用action=continue，且此时waiting_for须为continue；"
-        "换讲法、补充例子、练习等普通请求使用action=message，不按文字包含继续来猜动作。"
-        "有questions等待回答时suggestions为空。"
-        "正文代码用Markdown代码块，公式用$或$$，不输出原始HTML。"
-        "可选提示块只支持:::definition、:::example、:::warning、:::note：标记独占一行，正文后用独占一行的:::结束。"
-        "whiteboard只含已确认展示步骤，不把未来步骤当成已学；history_truncated=true时不假装历史完整。"
+        "先回答当前问题。只有在学习者明确想继续既定计划时才推进下一步；普通的继续讨论、换讲法或补充例子不代表推进计划。"
+        "需要学习者回答时，提出清楚的问题；没有问题时不要制造等待。可按需给出简短的后续建议，写成学习者可以直接提出的请求。"
+        "使用Markdown代码块呈现代码，用清晰的公式格式呈现数学内容，不输出原始HTML。"
+        "可用定义、例子、警告或补充说明等提示块突出重点。"
+        "只依据已经展示的白板内容作答，不把尚未展示的内容说成已经学过；上下文不完整时明确说明。"
     )
     tools = (
         "产物种类由你按教学价值判断，不要求学习者先选；只有比文字更有帮助时才创建。"
-        "每轮最多一个产物，只能经对应create工具暂存，最终回复完成才保存，失败不可声称成功。"
+        "创建产物时只选最有帮助的一种；只能通过对应工具暂存，最终回复完成后才会保存，失败时不可声称成功。"
         "遵从学习者对产物的明确要求或拒绝，不把讨论已有产物当作新建请求。"
         "正文不冒充产物已存在，不返回产物JSON或重复全部产物内容。"
-        "独立whiteboard是视觉产物，不要求课程路线图或stage；每个operation必须有唯一object_id，图节点id也全板唯一。"
-        "table用columns与等宽rows，diagram用nodes:{id,label}和edges:{from_id,to_id,label}且边端点必须属于该图。"
-        "highlight/circle使用target_ids指向此前已出现对象或节点，不允许超前引用；白板给结构和具体例子，narration互补解释。"
+        "白板是独立的视觉产物，不需要课程路线图；图表关系要自洽，强调内容时只指向已经展示的对象。"
+        "白板呈现结构和具体例子，讲解补充其含义，不重复照抄。"
     )
     skills = (
         "Skill是可选的专门方法，不是回答或创建产物的前置条件。"

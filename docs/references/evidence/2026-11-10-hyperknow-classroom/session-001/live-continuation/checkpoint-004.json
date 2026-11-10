@@ -1,0 +1,2138 @@
+{
+  "authorization": "User approved current classroom using existing credits. No purchases.",
+  "blocked_commands": [],
+  "captured_at": "2026-11-09T23:28:11.359Z",
+  "events": [
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:06.498Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 0,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 4,
+          "version": 1
+        }
+      },
+      "sequence": 1
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:06.499Z",
+      "payload": {
+        "type": "resume_generation"
+      },
+      "sequence": 2
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:08.220Z",
+      "payload": {
+        "spoken_text": "好，我们继续。刚刚说到，为什么要学这个？",
+        "step_id": 0,
+        "type": "speak"
+      },
+      "sequence": 3
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:08.222Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sentences": [
+          {
+            "cjk": 5,
+            "display": "好，我们继续。",
+            "latin": 0
+          },
+          {
+            "cjk": 11,
+            "display": "刚刚说到，为什么要学这个？",
+            "latin": 0
+          }
+        ],
+        "sequence": 0,
+        "speed": 1,
+        "step_id": 0,
+        "tts_cjk": 16,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 4
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:13.226Z",
+      "payload": {
+        "step_id": 0,
+        "type": "action_step_complete"
+      },
+      "sequence": 5
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:13.513Z",
+      "payload": {
+        "page_id": "page-1",
+        "step_id": 1,
+        "type": "new_column"
+      },
+      "sequence": 6
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:13.543Z",
+      "payload": {
+        "step_id": 1,
+        "type": "action_step_complete"
+      },
+      "sequence": 7
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:13.832Z",
+      "payload": {
+        "spoken_text": "因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。这能让你从繁重的体力活中解脱出来，专注于最核心的创意。",
+        "step_id": 2,
+        "type": "speak"
+      },
+      "sequence": 8
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:13.832Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 0,
+            "cjk": 37,
+            "kind": "text",
+            "latin": 3,
+            "target": "Vibe Coding"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 65,
+            "display": "因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。",
+            "latin": 13
+          },
+          {
+            "cjk": 25,
+            "display": "这能让你从繁重的体力活中解脱出来，专注于最核心的创意。",
+            "latin": 0
+          }
+        ],
+        "sequence": 1,
+        "speed": 1,
+        "step_id": 2,
+        "tts_cjk": 90,
+        "tts_latin": 13,
+        "type": "tts_segment"
+      },
+      "sequence": 9
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:31.556Z",
+      "payload": {
+        "step_id": 2,
+        "type": "action_step_complete"
+      },
+      "sequence": 10
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:31.844Z",
+      "payload": {
+        "spoken_text": "学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。那我们现在就进入第一个知识点。",
+        "step_id": 3,
+        "type": "speak"
+      },
+      "sequence": 11
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:31.845Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sentences": [
+          {
+            "cjk": 41,
+            "display": "学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。",
+            "latin": 2
+          },
+          {
+            "cjk": 14,
+            "display": "那我们现在就进入第一个知识点。",
+            "latin": 0
+          }
+        ],
+        "sequence": 2,
+        "speed": 1,
+        "step_id": 3,
+        "tts_cjk": 55,
+        "tts_latin": 2,
+        "type": "tts_segment"
+      },
+      "sequence": 12
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:42.776Z",
+      "payload": {
+        "step_id": 3,
+        "type": "action_step_complete"
+      },
+      "sequence": 13
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:43.064Z",
+      "payload": {
+        "index": 0,
+        "type": "keypoint_complete"
+      },
+      "sequence": 14
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:43.065Z",
+      "payload": {
+        "spoken_text": "我们先来看一个很有趣的现象：Vibe Coding 这个词最近在技术圈特别火，它是被一位叫安德烈·卡帕斯的 AI 专家推广开的。",
+        "step_id": 4,
+        "type": "speak"
+      },
+      "sequence": 15
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:43.065Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 0,
+            "cjk": 13,
+            "kind": "text",
+            "latin": 0,
+            "target": "Vibe Coding"
+          }
+        ],
+        "sequence": 3,
+        "speed": 1,
+        "step_id": 4,
+        "tts_cjk": 44,
+        "tts_latin": 12,
+        "type": "tts_segment"
+      },
+      "sequence": 16
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:53.095Z",
+      "payload": {
+        "step_id": 4,
+        "type": "action_step_complete"
+      },
+      "sequence": 17
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:53.386Z",
+      "payload": {
+        "actions": [
+          {
+            "board_content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+            "board_uid": 1,
+            "page_id": "page-1",
+            "step_id": 5,
+            "type": "board"
+          },
+          {
+            "spoken_text": "简单来说，Vibe Coding 就是“氛围感编程”。在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。",
+            "step_id": 6,
+            "type": "speak"
+          }
+        ],
+        "type": "group"
+      },
+      "sequence": 18
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:23:53.386Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 1,
+            "cjk": 4,
+            "kind": "text",
+            "latin": 0,
+            "target": "Vibe Coding"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 11,
+            "display": "简单来说，Vibe Coding 就是“氛围感编程”。",
+            "latin": 10
+          },
+          {
+            "cjk": 40,
+            "display": "在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。",
+            "latin": 0
+          }
+        ],
+        "sequence": 4,
+        "speed": 1,
+        "step_id": 6,
+        "tts_cjk": 51,
+        "tts_latin": 10,
+        "type": "tts_segment"
+      },
+      "sequence": 19
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:54.406Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 1,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 5,
+          "version": 1
+        }
+      },
+      "sequence": 20
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:23:56.561Z",
+      "payload": {
+        "step_id": 5,
+        "type": "action_step_complete"
+      },
+      "sequence": 21
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:04.556Z",
+      "payload": {
+        "step_id": 6,
+        "type": "action_step_complete"
+      },
+      "sequence": 22
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:04.844Z",
+      "payload": {
+        "spoken_text": "但现在，你的主要创作工具变成了你每天都在说的“自然语言”。你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。",
+        "step_id": 7,
+        "type": "speak"
+      },
+      "sequence": 23
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:04.845Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 1,
+            "cjk": 21,
+            "kind": "text",
+            "latin": 0,
+            "target": "自然语言"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 25,
+            "display": "但现在，你的主要创作工具变成了你每天都在说的“自然语言”。",
+            "latin": 0
+          },
+          {
+            "cjk": 34,
+            "display": "你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。",
+            "latin": 0
+          }
+        ],
+        "sequence": 5,
+        "speed": 1,
+        "step_id": 7,
+        "tts_cjk": 59,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 24
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:15.726Z",
+      "payload": {
+        "step_id": 7,
+        "type": "action_step_complete"
+      },
+      "sequence": 25
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:16.015Z",
+      "payload": {
+        "spoken_text": "这就像是盖房子：传统程序员是亲手砌每一块砖的泥瓦匠，而 [ [$Vibe Coder$ Vibe Coder 则是指挥自动化施工队的建筑师。",
+        "step_id": 8,
+        "type": "speak"
+      },
+      "sequence": 26
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:16.016Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sequence": 6,
+        "speed": 1,
+        "step_id": 8,
+        "tts_cjk": 39,
+        "tts_latin": 18,
+        "type": "tts_segment"
+      },
+      "sequence": 27
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:25.714Z",
+      "payload": {
+        "step_id": 8,
+        "type": "action_step_complete"
+      },
+      "sequence": 28
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:26.003Z",
+      "payload": {
+        "spoken_text": "到这里你能感觉到角色的这种变化吗？",
+        "step_id": 9,
+        "type": "speak"
+      },
+      "sequence": 29
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:26.003Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sequence": 7,
+        "speed": 1,
+        "step_id": 9,
+        "tts_cjk": 16,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 30
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:29.224Z",
+      "payload": {
+        "step_id": 9,
+        "type": "action_step_complete"
+      },
+      "sequence": 31
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:29.512Z",
+      "payload": {
+        "mode": "open",
+        "step_id": 10,
+        "type": "ask"
+      },
+      "sequence": 32
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:29.533Z",
+      "payload": {
+        "step_id": 10,
+        "type": "action_step_complete"
+      },
+      "sequence": 33
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:29.821Z",
+      "payload": {
+        "step_id": 11,
+        "type": "action_step_complete"
+      },
+      "sequence": 34
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:29.821Z",
+      "payload": {
+        "step_id": 11,
+        "type": "done"
+      },
+      "sequence": 35
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:24:30.247Z",
+      "payload": {
+        "can_continue": false,
+        "is_complete": true,
+        "session": false,
+        "status": "completed",
+        "type": "response_complete",
+        "voice_turn_id": null
+      },
+      "sequence": 36
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:24:30.255Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 1,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 6,
+          "version": 1
+        }
+      },
+      "sequence": 37
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:18.703Z",
+      "payload": {
+        "lecture_outline_id": "live_id_003:live_id_004",
+        "message": "我理解成只要把想法说出来，AI就能全自动做好，不用我检查。这样理解对吗？能给我一个具体例子吗？",
+        "type": "user_message"
+      },
+      "sequence": 38
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:20.942Z",
+      "payload": {
+        "spoken_text": "你的这个理解非常典型，很多刚接触的人都会这么想。但我要先给你泼一盆冷水：如果你追求的是“全自动、不检查”，那这就不是氛围感编程，而是在玩一场很容易翻车的“开盲盒”。",
+        "step_id": 12,
+        "type": "speak"
+      },
+      "sequence": 39
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:20.943Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sentences": [
+          {
+            "cjk": 22,
+            "display": "你的这个理解非常典型，很多刚接触的人都会这么想。",
+            "latin": 0
+          },
+          {
+            "cjk": 49,
+            "display": "但我要先给你泼一盆冷水：如果你追求的是“全自动、不检查”，那这就不是氛围感编程，而是在玩一场很容易翻车的“开盲盒”。",
+            "latin": 0
+          }
+        ],
+        "sequence": 8,
+        "speed": 1,
+        "step_id": 12,
+        "tts_cjk": 71,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 40
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:37.496Z",
+      "payload": {
+        "step_id": 12,
+        "type": "action_step_complete"
+      },
+      "sequence": 41
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:37.785Z",
+      "payload": {
+        "page_id": "page-1",
+        "step_id": 13,
+        "type": "new_column"
+      },
+      "sequence": 42
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:37.815Z",
+      "payload": {
+        "step_id": 13,
+        "type": "action_step_complete"
+      },
+      "sequence": 43
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:38.105Z",
+      "payload": {
+        "actions": [
+          {
+            "board_content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+            "board_uid": 2,
+            "page_id": "page-1",
+            "step_id": 14,
+            "title": "两种 Vibe Coding 模式",
+            "type": "board"
+          },
+          {
+            "spoken_text": "看这张对比表。如果你当“甩手掌柜”，让 AI 全自动做，AI 很容易陷入“递归幻觉”。简单说，它写错了一个小地方，为了修这个错，它会写出更复杂的代码来掩盖，最后整个程序会变成一团谁也看不懂的乱麻。",
+            "step_id": 15,
+            "type": "speak"
+          }
+        ],
+        "type": "group"
+      },
+      "sequence": 44
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:38.106Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 2,
+            "cjk": 10,
+            "kind": "text",
+            "latin": 0,
+            "target": "甩手掌柜"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 6,
+            "display": "看这张对比表。",
+            "latin": 0
+          },
+          {
+            "cjk": 22,
+            "display": "如果你当“甩手掌柜”，让 AI 全自动做，AI 很容易陷入“递归幻觉”。",
+            "latin": 4
+          },
+          {
+            "cjk": 50,
+            "display": "简单说，它写错了一个小地方，为了修这个错，它会写出更复杂的代码来掩盖，最后整个程序会变成一团谁也看不懂的乱麻。",
+            "latin": 0
+          }
+        ],
+        "sequence": 9,
+        "speed": 1,
+        "step_id": 15,
+        "tts_cjk": 78,
+        "tts_latin": 4,
+        "type": "tts_segment"
+      },
+      "sequence": 45
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:39.140Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 2,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  },
+                  {
+                    "nextY": 513,
+                    "w": 744,
+                    "x": 1614
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                },
+                {
+                  "boardUid": 2,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 381,
+                  "id": "live_id_005",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+                    "importance": 2,
+                    "title": "两种 Vibe Coding 模式",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 7,
+          "version": 1
+        }
+      },
+      "sequence": 46
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:41.496Z",
+      "payload": {
+        "step_id": 14,
+        "type": "action_step_complete"
+      },
+      "sequence": 47
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:53.636Z",
+      "payload": {
+        "step_id": 15,
+        "type": "action_step_complete"
+      },
+      "sequence": 48
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:53.924Z",
+      "payload": {
+        "spoken_text": "所以，我们这节课核心要学的是“人类主导”的模式。你不是打字员，但你是领航员。",
+        "step_id": 16,
+        "type": "speak"
+      },
+      "sequence": 49
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:25:53.925Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 2,
+            "cjk": 13,
+            "kind": "text",
+            "latin": 0,
+            "target": "人类主导"
+          },
+          {
+            "board": 2,
+            "cjk": 18,
+            "kind": "text",
+            "latin": 0,
+            "target": "模式"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 20,
+            "display": "所以，我们这节课核心要学的是“人类主导”的模式。",
+            "latin": 0
+          },
+          {
+            "cjk": 12,
+            "display": "你不是打字员，但你是领航员。",
+            "latin": 0
+          }
+        ],
+        "sequence": 10,
+        "speed": 1,
+        "step_id": 16,
+        "tts_cjk": 32,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 50
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:01.125Z",
+      "payload": {
+        "step_id": 16,
+        "type": "action_step_complete"
+      },
+      "sequence": 51
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:01.413Z",
+      "payload": {
+        "spoken_text": "你说想要一个具体例子，那我们现在就来模拟一个：假设你想做一个最简单的“每日饮水追踪器”。",
+        "step_id": 17,
+        "type": "speak"
+      },
+      "sequence": 52
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:01.454Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sequence": 11,
+        "speed": 1,
+        "step_id": 17,
+        "tts_cjk": 39,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 53
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:09.526Z",
+      "payload": {
+        "step_id": 17,
+        "type": "action_step_complete"
+      },
+      "sequence": 54
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:09.815Z",
+      "payload": {
+        "page_id": "page-1",
+        "placement_step_id": 19,
+        "step_id": 18,
+        "task_preview": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。",
+        "type": "animation_pending"
+      },
+      "sequence": 55
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:09.825Z",
+      "payload": {
+        "step_id": 19,
+        "type": "action_step_complete"
+      },
+      "sequence": 56
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:10.115Z",
+      "payload": {
+        "actions": [
+          {
+            "board_content": "例子：每日饮水追踪器\n\n1. **你的指令**：“做一个极简网页，点一下按钮加 250ml，显示总量。”\n2. **AI 生成**：瞬间写好 HTML 和 JS。\n3. **你的检查**：发现按钮太小了，背景颜色太刺眼。",
+            "board_uid": 3,
+            "page_id": "page-1",
+            "step_id": 20,
+            "type": "board"
+          },
+          {
+            "spoken_text": "你对 AI 说：做一个极简网页，点一下按钮加 250ml。AI 几秒钟就吐出了代码。这时候，必须由你来做“氛围感”的裁判。",
+            "step_id": 21,
+            "type": "speak"
+          }
+        ],
+        "type": "group"
+      },
+      "sequence": 57
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:10.131Z",
+      "payload": {
+        "html": "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>\n*{box-sizing:border-box}\nhtml,body{margin:0;background:#fcfcfc;color:#2C2C2A;font:14px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;-webkit-font-smoothing:antialiased}\n@media (forced-colors:active){:root{forced-color-adjust:none}}\n.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}\n.hk-card{border:1px solid #E5E3DC;border-radius:12px;padding:8px 12px 12px}\n.hk-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}\n.hk-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489}\n.hk-tools{margin-left:auto;position:relative;display:flex;gap:6px;opacity:.55;transition:opacity .15s}\n.hk-card:hover .hk-tools,.hk-tools:focus-within{opacity:1}\n.hk-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;color:#444441;font:inherit;cursor:pointer}\n.hk-btn:hover{border-color:#B4B2A9;color:#2C2C2A}\n.hk-bar svg{width:12px;height:12px;flex:none}\n.hk-btn[aria-pressed=\"true\"] .hk-i-pause,.hk-btn[aria-pressed=\"false\"] .hk-i-play{display:none}\n.hk-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:188px;padding:4px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.08)}\n.hk-menu[hidden]{display:none}\n.hk-menu button{display:block;width:100%;padding:6px 10px;border:0;border-radius:6px;background:none;font:inherit;color:#2C2C2A;text-align:left;cursor:pointer}\n.hk-menu button:hover{background:#F1EFE8}\n.hk-menu small{display:block;font-size:11px;color:#5F5E5A}\n.hk-stage{position:relative}\n.hk-fig{display:block;width:100%;height:auto;overflow:hidden}\n/* A curve left with no class and no stroke is invisible. Zero specificity: a colour group's stroke still wins. */\n:where(.hk-fig path:not([stroke]):not([class])){stroke:#5F5E5A;stroke-width:1.5}\n.hk-readout{font-variant-numeric:tabular-nums}\n.t{font-size:14px;font-weight:400;fill:#2C2C2A}.th{font-size:14px;font-weight:500;fill:#2C2C2A}.ts{font-size:12px;font-weight:400;fill:#5F5E5A}\n.box{fill:#F1EFE8;stroke:#B4B2A9;stroke-width:1}\n.c-purple>rect,rect.c-purple,.c-purple>circle,circle.c-purple,.c-purple>ellipse,ellipse.c-purple,.c-purple>polygon,polygon.c-purple,.c-purple>path,path.c-purple{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}\n.c-purple>line,.c-purple>polyline,line.c-purple,polyline.c-purple{stroke:#534AB7;fill:none}\n.c-purple>.t,.c-purple>.th{fill:#3C3489}.c-purple>.ts{fill:#534AB7}\n.c-purple>.frame,.c-purple>.arr{stroke:#534AB7}\n.c-teal>rect,rect.c-teal,.c-teal>circle,circle.c-teal,.c-teal>ellipse,ellipse.c-teal,.c-teal>polygon,polygon.c-teal,.c-teal>path,path.c-teal{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1}\n.c-teal>line,.c-teal>polyline,line.c-teal,polyline.c-teal{stroke:#0F6E56;fill:none}\n.c-teal>.t,.c-teal>.th{fill:#085041}.c-teal>.ts{fill:#0F6E56}\n.c-teal>.frame,.c-teal>.arr{stroke:#0F6E56}\n.c-coral>rect,rect.c-coral,.c-coral>circle,circle.c-coral,.c-coral>ellipse,ellipse.c-coral,.c-coral>polygon,polygon.c-coral,.c-coral>path,path.c-coral{fill:#FAECE7;stroke:#993C1D;stroke-width:1}\n.c-coral>line,.c-coral>polyline,line.c-coral,polyline.c-coral{stroke:#993C1D;fill:none}\n.c-coral>.t,.c-coral>.th{fill:#712B13}.c-coral>.ts{fill:#993C1D}\n.c-coral>.frame,.c-coral>.arr{stroke:#993C1D}\n.c-pink>rect,rect.c-pink,.c-pink>circle,circle.c-pink,.c-pink>ellipse,ellipse.c-pink,.c-pink>polygon,polygon.c-pink,.c-pink>path,path.c-pink{fill:#FBEAF0;stroke:#993556;stroke-width:1}\n.c-pink>line,.c-pink>polyline,line.c-pink,polyline.c-pink{stroke:#993556;fill:none}\n.c-pink>.t,.c-pink>.th{fill:#72243E}.c-pink>.ts{fill:#993556}\n.c-pink>.frame,.c-pink>.arr{stroke:#993556}\n.c-gray>rect,rect.c-gray,.c-gray>circle,circle.c-gray,.c-gray>ellipse,ellipse.c-gray,.c-gray>polygon,polygon.c-gray,.c-gray>path,path.c-gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}\n.c-gray>line,.c-gray>polyline,line.c-gray,polyline.c-gray{stroke:#5F5E5A;fill:none}\n.c-gray>.t,.c-gray>.th{fill:#444441}.c-gray>.ts{fill:#5F5E5A}\n.c-gray>.frame,.c-gray>.arr{stroke:#5F5E5A}\n.c-blue>rect,rect.c-blue,.c-blue>circle,circle.c-blue,.c-blue>ellipse,ellipse.c-blue,.c-blue>polygon,polygon.c-blue,.c-blue>path,path.c-blue{fill:#E6F1FB;stroke:#185FA5;stroke-width:1}\n.c-blue>line,.c-blue>polyline,line.c-blue,polyline.c-blue{stroke:#185FA5;fill:none}\n.c-blue>.t,.c-blue>.th{fill:#0C447C}.c-blue>.ts{fill:#185FA5}\n.c-blue>.frame,.c-blue>.arr{stroke:#185FA5}\n.c-green>rect,rect.c-green,.c-green>circle,circle.c-green,.c-green>ellipse,ellipse.c-green,.c-green>polygon,polygon.c-green,.c-green>path,path.c-green{fill:#EAF3DE;stroke:#3B6D11;stroke-width:1}\n.c-green>line,.c-green>polyline,line.c-green,polyline.c-green{stroke:#3B6D11;fill:none}\n.c-green>.t,.c-green>.th{fill:#27500A}.c-green>.ts{fill:#3B6D11}\n.c-green>.frame,.c-green>.arr{stroke:#3B6D11}\n.c-amber>rect,rect.c-amber,.c-amber>circle,circle.c-amber,.c-amber>ellipse,ellipse.c-amber,.c-amber>polygon,polygon.c-amber,.c-amber>path,path.c-amber{fill:#FAEEDA;stroke:#854F0B;stroke-width:1}\n.c-amber>line,.c-amber>polyline,line.c-amber,polyline.c-amber{stroke:#854F0B;fill:none}\n.c-amber>.t,.c-amber>.th{fill:#633806}.c-amber>.ts{fill:#854F0B}\n.c-amber>.frame,.c-amber>.arr{stroke:#854F0B}\n.c-red>rect,rect.c-red,.c-red>circle,circle.c-red,.c-red>ellipse,ellipse.c-red,.c-red>polygon,polygon.c-red,.c-red>path,path.c-red{fill:#FCEBEB;stroke:#A32D2D;stroke-width:1}\n.c-red>line,.c-red>polyline,line.c-red,polyline.c-red{stroke:#A32D2D;fill:none}\n.c-red>.t,.c-red>.th{fill:#791F1F}.c-red>.ts{fill:#A32D2D}\n.c-red>.frame,.c-red>.arr{stroke:#A32D2D}\n:is(rect,circle,ellipse,polygon,path)[fill=\"none\"]{fill:none}\n.arr{stroke:#73726c;stroke-width:1.5;fill:none!important;stroke-linecap:round;stroke-linejoin:round}\n.leader{stroke:#888780;stroke-width:1;stroke-dasharray:3 3;fill:none!important}\n.frame{fill:none!important;stroke-width:2;stroke:#5F5E5A}\n.em{stroke-width:2.5!important}\n.hk-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}\n.hk-tile{flex:1 1 96px;min-width:0;padding:8px 10px;border-radius:8px;background:#F1EFE8;border:1px solid #E5E3DC}\n.hk-label{display:block;font-size:12px;color:#5F5E5A}\n.hk-value{display:block;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}\n.hk-tile.c-purple{background:#EEEDFE;border-color:#534AB733}.hk-tile.c-purple .hk-label{color:#534AB7}.hk-tile.c-purple .hk-value{color:#3C3489}\n.hk-tile.c-teal{background:#E1F5EE;border-color:#0F6E5633}.hk-tile.c-teal .hk-label{color:#0F6E56}.hk-tile.c-teal .hk-value{color:#085041}\n.hk-tile.c-coral{background:#FAECE7;border-color:#993C1D33}.hk-tile.c-coral .hk-label{color:#993C1D}.hk-tile.c-coral .hk-value{color:#712B13}\n.hk-tile.c-pink{background:#FBEAF0;border-color:#99355633}.hk-tile.c-pink .hk-label{color:#993556}.hk-tile.c-pink .hk-value{color:#72243E}\n.hk-tile.c-gray{background:#F1EFE8;border-color:#5F5E5A33}.hk-tile.c-gray .hk-label{color:#5F5E5A}.hk-tile.c-gray .hk-value{color:#444441}\n.hk-tile.c-blue{background:#E6F1FB;border-color:#185FA533}.hk-tile.c-blue .hk-label{color:#185FA5}.hk-tile.c-blue .hk-value{color:#0C447C}\n.hk-tile.c-green{background:#EAF3DE;border-color:#3B6D1133}.hk-tile.c-green .hk-label{color:#3B6D11}.hk-tile.c-green .hk-value{color:#27500A}\n.hk-tile.c-amber{background:#FAEEDA;border-color:#854F0B33}.hk-tile.c-amber .hk-label{color:#854F0B}.hk-tile.c-amber .hk-value{color:#633806}\n.hk-tile.c-red{background:#FCEBEB;border-color:#A32D2D33}.hk-tile.c-red .hk-label{color:#A32D2D}.hk-tile.c-red .hk-value{color:#791F1F}\n.hk-caption{margin:6px 0 0;text-align:center;font-size:12px;color:#5F5E5A}\n.hk-formula{margin:8px 0;text-align:center;font-variant-numeric:tabular-nums}\n.hk-dots{display:flex;gap:6px;justify-content:center;margin:8px 0}\n.hk-dots i{width:6px;height:6px;border-radius:50%;background:#D3D1C7}\n.hk-dots i.on{background:#534AB7}\n</style><script>\n(function(){\n  function post(msg){ try { parent.postMessage(msg, '*'); } catch (e) {} }\n  function report(){\n    // Before first layout this reads 0; a 0 would shrink the card to nothing.\n    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);\n    if (height > 0) post({ type: 'hk-anim-height', height: height });\n  }\n\n  var frame = window.requestAnimationFrame.bind(window), clock = performance.now.bind(performance);\n  var paused = false, pausedAt = 0, lost = 0, held = [];\n  function now(){ return clock() - lost - (paused ? clock() - pausedAt : 0); }\n  performance.now = now;\n  window.requestAnimationFrame = function(cb){\n    return frame(function(){ if (paused) held.push(cb); else cb(now()); });\n  };\n  function setPaused(p){\n    if (p === paused) return;\n    if (p) pausedAt = clock(); else lost += clock() - pausedAt;\n    paused = p;\n    try { document.getAnimations().forEach(function(a){ if (p) a.pause(); else a.play(); }); } catch (e) {}\n    if (!p) { var q = held; held = []; q.forEach(function(cb){ frame(function(){ cb(now()); }); }); }\n  }\n\n  // The drawing as a standalone SVG: the host stylesheet does not travel with it, so\n  // every computed paint and type property is written onto the element itself.\n  var PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-dashoffset',\n    'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor', 'dominant-baseline'];\n  function svgMarkup(){\n    var src = document.querySelector('svg.hk-fig');\n    if (!src) return null;\n    var copy = src.cloneNode(true), from = src.querySelectorAll('*'), to = copy.querySelectorAll('*');\n    for (var i = 0; i < from.length; i++) {\n      var cs = getComputedStyle(from[i]);\n      for (var j = 0; j < PROPS.length; j++) to[i].style.setProperty(PROPS[j], cs.getPropertyValue(PROPS[j]));\n    }\n    var vb = src.viewBox.baseVal;\n    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');\n    if (vb && vb.width) { copy.setAttribute('width', vb.width); copy.setAttribute('height', vb.height); }\n    return new XMLSerializer().serializeToString(copy);\n  }\n\n  document.addEventListener('DOMContentLoaded', function(){\n    report();\n    try { new ResizeObserver(report).observe(document.body); } catch (e) {}\n    var menu = document.querySelector('.hk-menu');\n    if (!document.querySelector('svg.hk-fig')) {\n      var svgItem = document.querySelector('[data-hk-format=\"svg\"]');\n      if (svgItem) svgItem.remove();\n    }\n    document.addEventListener('click', function(e){\n      var hit = e.target.closest ? e.target.closest('[data-hk-act],[data-hk-format]') : null;\n      var act = hit && hit.getAttribute('data-hk-act'), format = hit && hit.getAttribute('data-hk-format');\n      if (menu && act !== 'download') menu.hidden = true;\n      if (act === 'replay') post({ type: 'hk-anim-replay' });\n      else if (act === 'pause') {\n        setPaused(!paused);\n        hit.setAttribute('aria-pressed', String(paused));\n        hit.querySelector('span').textContent = hit.getAttribute(paused ? 'data-resume' : 'data-pause');\n      } else if (act === 'download') {\n        menu.hidden = !menu.hidden;\n        hit.setAttribute('aria-expanded', String(!menu.hidden));\n      } else if (format) post({ type: 'hk-anim-download', format: format, svg: format === 'svg' ? svgMarkup() : null });\n    });\n  });\n  window.addEventListener('load', report);\n})();\n</script></head><body><div class=\"hk-card\"><div class=\"hk-bar\" data-hk-chrome><div class=\"hk-tools\"><button type=\"button\" class=\"hk-btn\" data-hk-act=\"download\" aria-haspopup=\"menu\" aria-expanded=\"false\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\" class=\"\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 1.8v6.4M3.4 5.8 6 8.4l2.6-2.6M2 10.2h8\"/></svg><span>下载</span></button><div class=\"hk-menu\" role=\"menu\" hidden><button type=\"button\" data-hk-format=\"png\">图片 PNG<small>贴进笔记或 PPT</small></button><button type=\"button\" data-hk-format=\"svg\">矢量 SVG<small>放大不失真，可再编辑</small></button><button type=\"button\" data-hk-format=\"html\">网页 HTML<small>离线打开，保留动画</small></button></div></div></div><div class=\"hk-stage\"><h2 class=\"sr-only\">Vibe Coding 闭环工作流示意图：从自然语言到代码生成再到原型预览与反馈循环</h2>\n\n<div class=\"hk-row\" style=\"margin-bottom: 8px;\">\n  <div class=\"hk-tile c-purple\">\n    <span class=\"hk-label\">指令输入</span>\n    <span class=\"hk-value\">自然语言</span>\n  </div>\n  <div class=\"hk-tile c-gray\">\n    <span class=\"hk-label\">处理引擎</span>\n    <span class=\"hk-value\">AI 编码模型</span>\n  </div>\n  <div class=\"hk-tile c-blue\">\n    <span class=\"hk-label\">实时呈现</span>\n    <span class=\"hk-value\">应用原型</span>\n  </div>\n</div>\n\n<svg class=\"hk-fig\" viewBox=\"0 0 480 230\" role=\"img\" data-motion=\"none\">\n  <defs>\n    <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\">\n      <path d=\"M2 1L8 5L2 9\" fill=\"none\" stroke=\"context-stroke\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n    </marker>\n  </defs>\n\n  <!-- 左侧：用户提示对话框 -->\n  <g class=\"c-purple\">\n    <rect class=\"box\" x=\"20\" y=\"52\" width=\"124\" height=\"68\" rx=\"8\"/>\n    <!-- 对话小尖角 -->\n    <path d=\"M50 120 L40 128 L56 120 Z\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.2\"/>\n    <text class=\"th\" x=\"82\" y=\"77\" text-anchor=\"middle\">做一个</text>\n    <text class=\"th\" x=\"82\" y=\"99\" text-anchor=\"middle\">饮水追踪器</text>\n    <text class=\"ts\" x=\"82\" y=\"142\" text-anchor=\"middle\">用户指令</text>\n  </g>\n\n  <!-- 提示到AI的箭头 -->\n  <path class=\"arr c-gray\" d=\"M144 86 L188 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 中间：AI 齿轮图标 -->\n  <g class=\"c-gray\" transform=\"translate(216, 86)\">\n    <!-- 齿轮形状 -->\n    <path class=\"box\" d=\"M-6 -22 L6 -22 L8 -16 L16 -16 L19 -21 L28 -14 L23 -9 L25 -1 L31 2 L29 12 L22 13 L20 20 L27 26 L19 32 L14 26 L7 28 L4 34 L-6 34 L-8 28 L-15 27 L-20 32 L-28 25 L-22 19 L-24 12 L-30 9 L-29 -2 L-23 -4 L-20 -12 L-26 -17 L-18 -24 L-12 -19 L-5 -21 Z\" fill=\"#F1EFE8\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <circle cx=\"0\" cy=\"5\" r=\"9\" fill=\"#FFF\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <text class=\"th\" x=\"0\" y=\"9\" text-anchor=\"middle\">AI</text>\n    <text class=\"ts\" x=\"0\" y=\"56\" text-anchor=\"middle\">生成代码</text>\n  </g>\n\n  <!-- AI到原型的箭头 -->\n  <path class=\"arr c-gray\" d=\"M246 86 L292 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 右侧：手机预览屏幕 -->\n  <g class=\"c-blue\">\n    <!-- 手机外框 -->\n    <rect class=\"box\" x=\"300\" y=\"24\" width=\"94\" height=\"136\" rx=\"10\"/>\n    <!-- 听筒横线 -->\n    <line x1=\"337\" y1=\"32\" x2=\"357\" y2=\"32\" stroke=\"#185FA5\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    \n    <!-- 屏幕中大水滴按钮 -->\n    <g transform=\"translate(347, 84)\">\n      <path d=\"M0 -22 C-16 0, -18 14, 0 22 C18 14, 16 0, 0 -22 Z\" fill=\"#185FA5\"/>\n      <path d=\"M-3 -4 C-8 2, -7 8, -2 11\" fill=\"none\" stroke=\"#E6F1FB\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n      <text class=\"th\" x=\"0\" y=\"38\" text-anchor=\"middle\" fill=\"#0C447C\">+250ml</text>\n    </g>\n    <text class=\"ts\" x=\"347\" y=\"176\" text-anchor=\"middle\">实时原型</text>\n  </g>\n\n  <!-- 反馈回路：从原型回到提示框 -->\n  <g class=\"c-coral\">\n    <path class=\"arr\" d=\"M347 186 L347 206 L82 206 L82 154\" fill=\"none\" marker-end=\"url(#arrow)\"/>\n    <rect class=\"box\" x=\"180\" y=\"196\" width=\"76\" height=\"20\" rx=\"4\"/>\n    <text class=\"ts\" x=\"218\" y=\"211\" text-anchor=\"middle\">评估与反馈</text>\n  </g>\n</svg>\n\n<p class=\"hk-caption\">自然语言驱动编码与即时预览构成的持续迭代循环</p></div></div><script>\n(function(){\n  if (window.__hkHostBridge) return;\n  window.__hkHostBridge = 1;\n  var SEL = 'button,[role=\"button\"],[role=\"slider\"],[role=\"switch\"],[role=\"checkbox\"],input,select,textarea,a[href],label,[contenteditable=\"\"],[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"]),[draggable=\"true\"],[data-hk-interactive]';\n  var CURSORS = {\n    pointer: 1,\n    grab: 1,\n    grabbing: 1,\n    move: 1,\n    'ew-resize': 1,\n    'ns-resize': 1,\n    'nesw-resize': 1,\n    'nwse-resize': 1,\n    'col-resize': 1,\n    'row-resize': 1\n  };\n  function post(type, extra) {\n    try {\n      var de = document.documentElement;\n      var msg = {\n        type: type,\n        vw: de && de.clientWidth ? de.clientWidth : 1,\n        vh: de && de.clientHeight ? de.clientHeight : 1\n      };\n      if (extra) {\n        for (var k in extra) msg[k] = extra[k];\n      }\n      parent.postMessage(msg, '*');\n    } catch (e) {}\n  }\n  function addRect(out, r) {\n    if (r && r.width > 0 && r.height > 0) {\n      out.push({ x: r.left, y: r.top, w: r.width, h: r.height });\n    }\n  }\n  function hitRects() {\n    var out = [];\n    var els = document.querySelectorAll(SEL);\n    for (var i = 0; i < els.length; i++) addRect(out, els[i].getBoundingClientRect());\n    var all = document.body ? document.body.querySelectorAll('*') : [];\n    for (var j = 0; j < all.length; j++) {\n      try {\n        var cursor = getComputedStyle(all[j]).cursor;\n        if (CURSORS[cursor]) {\n          var r = all[j].getBoundingClientRect();\n          if (r.width > 4 && r.height > 4) addRect(out, r);\n        }\n      } catch (e) {}\n    }\n    return out;\n  }\n  function hasInteractiveCursor(target) {\n    var node = target;\n    while (node && node !== document.documentElement) {\n      try {\n        if (node.nodeType === 1 && CURSORS[getComputedStyle(node).cursor]) return true;\n      } catch (e) {}\n      node = node.parentElement;\n    }\n    return false;\n  }\n  function closestInteractive(target) {\n    try {\n      if (!target || !target.closest) return false;\n      if (target.closest(SEL)) return true;\n      return hasInteractiveCursor(target);\n    } catch (e) {\n      return false;\n    }\n  }\n  function targetAtPointer(e) {\n    try {\n      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return e.target;\n      return document.elementFromPoint(e.clientX, e.clientY) || e.target;\n    } catch (err) {\n      return e.target;\n    }\n  }\n  function postHover(e, dragState) {\n    var target = targetAtPointer(e);\n    var active = closestInteractive(target);\n    if (!active && dragState) active = true;\n    post('hk-anim-hover', {\n      interactive: active,\n      dragging: !!dragState\n    });\n  }\n  function isInteractiveTarget(target) {\n    return closestInteractive(target);\n  }\n  function reportRects() {\n    post('hk-anim-hitrects', { rects: hitRects() });\n  }\n  var dragging = false;\n  document.addEventListener('pointermove', function(e) {\n    postHover(e, dragging);\n  }, true);\n  document.addEventListener('pointerdown', function(e) {\n    dragging = isInteractiveTarget(targetAtPointer(e));\n    post('hk-anim-hover', { interactive: dragging, dragging: dragging });\n  }, true);\n  window.addEventListener('pointerup', function() {\n    dragging = false;\n    post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  document.addEventListener('mouseleave', function() {\n    if (!dragging) post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  try { new ResizeObserver(reportRects).observe(document.documentElement); } catch (e) {}\n  try {\n    if (document.body) {\n      new MutationObserver(reportRects).observe(document.body, {\n        childList: true,\n        subtree: true,\n        attributes: true\n      });\n    }\n  } catch (e) {}\n  var warmup = 0;\n  (function loop() {\n    reportRects();\n    if (warmup++ < 3) setTimeout(loop, 150);\n  })();\n  setInterval(reportRects, 350);\n  window.addEventListener('load', reportRects);\n})();\n</script></body></html>",
+        "page_id": "page-1",
+        "step_id": 18,
+        "task": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。",
+        "type": "generated_animation"
+      },
+      "sequence": 58
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:10.139Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 3,
+            "cjk": 3,
+            "kind": "text",
+            "latin": 2,
+            "target": "做一个极简网页，点一下按钮加"
+          },
+          {
+            "board": 3,
+            "cjk": 16,
+            "kind": "text",
+            "latin": 2,
+            "target": "250ml"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 22,
+            "display": "你对 AI 说：做一个极简网页，点一下按钮加 250ml。",
+            "latin": 2
+          },
+          {
+            "cjk": 9,
+            "display": "AI 几秒钟就吐出了代码。",
+            "latin": 2
+          },
+          {
+            "cjk": 15,
+            "display": "这时候，必须由你来做“氛围感”的裁判。",
+            "latin": 0
+          }
+        ],
+        "sequence": 12,
+        "speed": 1,
+        "step_id": 21,
+        "tts_cjk": 46,
+        "tts_latin": 4,
+        "type": "tts_segment"
+      },
+      "sequence": 59
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:10.211Z",
+      "payload": {
+        "step_id": 18,
+        "type": "action_step_complete"
+      },
+      "sequence": 60
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:11.145Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 2,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  },
+                  {
+                    "nextY": 1379,
+                    "w": 744,
+                    "x": 1614
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                },
+                {
+                  "boardUid": 2,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 381,
+                  "id": "live_id_005",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+                    "importance": 2,
+                    "title": "两种 Vibe Coding 模式",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 130
+                },
+                {
+                  "boardAnimation": {
+                    "html": "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>\n*{box-sizing:border-box}\nhtml,body{margin:0;background:#fcfcfc;color:#2C2C2A;font:14px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;-webkit-font-smoothing:antialiased}\n@media (forced-colors:active){:root{forced-color-adjust:none}}\n.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}\n.hk-card{border:1px solid #E5E3DC;border-radius:12px;padding:8px 12px 12px}\n.hk-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}\n.hk-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489}\n.hk-tools{margin-left:auto;position:relative;display:flex;gap:6px;opacity:.55;transition:opacity .15s}\n.hk-card:hover .hk-tools,.hk-tools:focus-within{opacity:1}\n.hk-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;color:#444441;font:inherit;cursor:pointer}\n.hk-btn:hover{border-color:#B4B2A9;color:#2C2C2A}\n.hk-bar svg{width:12px;height:12px;flex:none}\n.hk-btn[aria-pressed=\"true\"] .hk-i-pause,.hk-btn[aria-pressed=\"false\"] .hk-i-play{display:none}\n.hk-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:188px;padding:4px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.08)}\n.hk-menu[hidden]{display:none}\n.hk-menu button{display:block;width:100%;padding:6px 10px;border:0;border-radius:6px;background:none;font:inherit;color:#2C2C2A;text-align:left;cursor:pointer}\n.hk-menu button:hover{background:#F1EFE8}\n.hk-menu small{display:block;font-size:11px;color:#5F5E5A}\n.hk-stage{position:relative}\n.hk-fig{display:block;width:100%;height:auto;overflow:hidden}\n/* A curve left with no class and no stroke is invisible. Zero specificity: a colour group's stroke still wins. */\n:where(.hk-fig path:not([stroke]):not([class])){stroke:#5F5E5A;stroke-width:1.5}\n.hk-readout{font-variant-numeric:tabular-nums}\n.t{font-size:14px;font-weight:400;fill:#2C2C2A}.th{font-size:14px;font-weight:500;fill:#2C2C2A}.ts{font-size:12px;font-weight:400;fill:#5F5E5A}\n.box{fill:#F1EFE8;stroke:#B4B2A9;stroke-width:1}\n.c-purple>rect,rect.c-purple,.c-purple>circle,circle.c-purple,.c-purple>ellipse,ellipse.c-purple,.c-purple>polygon,polygon.c-purple,.c-purple>path,path.c-purple{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}\n.c-purple>line,.c-purple>polyline,line.c-purple,polyline.c-purple{stroke:#534AB7;fill:none}\n.c-purple>.t,.c-purple>.th{fill:#3C3489}.c-purple>.ts{fill:#534AB7}\n.c-purple>.frame,.c-purple>.arr{stroke:#534AB7}\n.c-teal>rect,rect.c-teal,.c-teal>circle,circle.c-teal,.c-teal>ellipse,ellipse.c-teal,.c-teal>polygon,polygon.c-teal,.c-teal>path,path.c-teal{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1}\n.c-teal>line,.c-teal>polyline,line.c-teal,polyline.c-teal{stroke:#0F6E56;fill:none}\n.c-teal>.t,.c-teal>.th{fill:#085041}.c-teal>.ts{fill:#0F6E56}\n.c-teal>.frame,.c-teal>.arr{stroke:#0F6E56}\n.c-coral>rect,rect.c-coral,.c-coral>circle,circle.c-coral,.c-coral>ellipse,ellipse.c-coral,.c-coral>polygon,polygon.c-coral,.c-coral>path,path.c-coral{fill:#FAECE7;stroke:#993C1D;stroke-width:1}\n.c-coral>line,.c-coral>polyline,line.c-coral,polyline.c-coral{stroke:#993C1D;fill:none}\n.c-coral>.t,.c-coral>.th{fill:#712B13}.c-coral>.ts{fill:#993C1D}\n.c-coral>.frame,.c-coral>.arr{stroke:#993C1D}\n.c-pink>rect,rect.c-pink,.c-pink>circle,circle.c-pink,.c-pink>ellipse,ellipse.c-pink,.c-pink>polygon,polygon.c-pink,.c-pink>path,path.c-pink{fill:#FBEAF0;stroke:#993556;stroke-width:1}\n.c-pink>line,.c-pink>polyline,line.c-pink,polyline.c-pink{stroke:#993556;fill:none}\n.c-pink>.t,.c-pink>.th{fill:#72243E}.c-pink>.ts{fill:#993556}\n.c-pink>.frame,.c-pink>.arr{stroke:#993556}\n.c-gray>rect,rect.c-gray,.c-gray>circle,circle.c-gray,.c-gray>ellipse,ellipse.c-gray,.c-gray>polygon,polygon.c-gray,.c-gray>path,path.c-gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}\n.c-gray>line,.c-gray>polyline,line.c-gray,polyline.c-gray{stroke:#5F5E5A;fill:none}\n.c-gray>.t,.c-gray>.th{fill:#444441}.c-gray>.ts{fill:#5F5E5A}\n.c-gray>.frame,.c-gray>.arr{stroke:#5F5E5A}\n.c-blue>rect,rect.c-blue,.c-blue>circle,circle.c-blue,.c-blue>ellipse,ellipse.c-blue,.c-blue>polygon,polygon.c-blue,.c-blue>path,path.c-blue{fill:#E6F1FB;stroke:#185FA5;stroke-width:1}\n.c-blue>line,.c-blue>polyline,line.c-blue,polyline.c-blue{stroke:#185FA5;fill:none}\n.c-blue>.t,.c-blue>.th{fill:#0C447C}.c-blue>.ts{fill:#185FA5}\n.c-blue>.frame,.c-blue>.arr{stroke:#185FA5}\n.c-green>rect,rect.c-green,.c-green>circle,circle.c-green,.c-green>ellipse,ellipse.c-green,.c-green>polygon,polygon.c-green,.c-green>path,path.c-green{fill:#EAF3DE;stroke:#3B6D11;stroke-width:1}\n.c-green>line,.c-green>polyline,line.c-green,polyline.c-green{stroke:#3B6D11;fill:none}\n.c-green>.t,.c-green>.th{fill:#27500A}.c-green>.ts{fill:#3B6D11}\n.c-green>.frame,.c-green>.arr{stroke:#3B6D11}\n.c-amber>rect,rect.c-amber,.c-amber>circle,circle.c-amber,.c-amber>ellipse,ellipse.c-amber,.c-amber>polygon,polygon.c-amber,.c-amber>path,path.c-amber{fill:#FAEEDA;stroke:#854F0B;stroke-width:1}\n.c-amber>line,.c-amber>polyline,line.c-amber,polyline.c-amber{stroke:#854F0B;fill:none}\n.c-amber>.t,.c-amber>.th{fill:#633806}.c-amber>.ts{fill:#854F0B}\n.c-amber>.frame,.c-amber>.arr{stroke:#854F0B}\n.c-red>rect,rect.c-red,.c-red>circle,circle.c-red,.c-red>ellipse,ellipse.c-red,.c-red>polygon,polygon.c-red,.c-red>path,path.c-red{fill:#FCEBEB;stroke:#A32D2D;stroke-width:1}\n.c-red>line,.c-red>polyline,line.c-red,polyline.c-red{stroke:#A32D2D;fill:none}\n.c-red>.t,.c-red>.th{fill:#791F1F}.c-red>.ts{fill:#A32D2D}\n.c-red>.frame,.c-red>.arr{stroke:#A32D2D}\n:is(rect,circle,ellipse,polygon,path)[fill=\"none\"]{fill:none}\n.arr{stroke:#73726c;stroke-width:1.5;fill:none!important;stroke-linecap:round;stroke-linejoin:round}\n.leader{stroke:#888780;stroke-width:1;stroke-dasharray:3 3;fill:none!important}\n.frame{fill:none!important;stroke-width:2;stroke:#5F5E5A}\n.em{stroke-width:2.5!important}\n.hk-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}\n.hk-tile{flex:1 1 96px;min-width:0;padding:8px 10px;border-radius:8px;background:#F1EFE8;border:1px solid #E5E3DC}\n.hk-label{display:block;font-size:12px;color:#5F5E5A}\n.hk-value{display:block;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}\n.hk-tile.c-purple{background:#EEEDFE;border-color:#534AB733}.hk-tile.c-purple .hk-label{color:#534AB7}.hk-tile.c-purple .hk-value{color:#3C3489}\n.hk-tile.c-teal{background:#E1F5EE;border-color:#0F6E5633}.hk-tile.c-teal .hk-label{color:#0F6E56}.hk-tile.c-teal .hk-value{color:#085041}\n.hk-tile.c-coral{background:#FAECE7;border-color:#993C1D33}.hk-tile.c-coral .hk-label{color:#993C1D}.hk-tile.c-coral .hk-value{color:#712B13}\n.hk-tile.c-pink{background:#FBEAF0;border-color:#99355633}.hk-tile.c-pink .hk-label{color:#993556}.hk-tile.c-pink .hk-value{color:#72243E}\n.hk-tile.c-gray{background:#F1EFE8;border-color:#5F5E5A33}.hk-tile.c-gray .hk-label{color:#5F5E5A}.hk-tile.c-gray .hk-value{color:#444441}\n.hk-tile.c-blue{background:#E6F1FB;border-color:#185FA533}.hk-tile.c-blue .hk-label{color:#185FA5}.hk-tile.c-blue .hk-value{color:#0C447C}\n.hk-tile.c-green{background:#EAF3DE;border-color:#3B6D1133}.hk-tile.c-green .hk-label{color:#3B6D11}.hk-tile.c-green .hk-value{color:#27500A}\n.hk-tile.c-amber{background:#FAEEDA;border-color:#854F0B33}.hk-tile.c-amber .hk-label{color:#854F0B}.hk-tile.c-amber .hk-value{color:#633806}\n.hk-tile.c-red{background:#FCEBEB;border-color:#A32D2D33}.hk-tile.c-red .hk-label{color:#A32D2D}.hk-tile.c-red .hk-value{color:#791F1F}\n.hk-caption{margin:6px 0 0;text-align:center;font-size:12px;color:#5F5E5A}\n.hk-formula{margin:8px 0;text-align:center;font-variant-numeric:tabular-nums}\n.hk-dots{display:flex;gap:6px;justify-content:center;margin:8px 0}\n.hk-dots i{width:6px;height:6px;border-radius:50%;background:#D3D1C7}\n.hk-dots i.on{background:#534AB7}\n</style><script>\n(function(){\n  function post(msg){ try { parent.postMessage(msg, '*'); } catch (e) {} }\n  function report(){\n    // Before first layout this reads 0; a 0 would shrink the card to nothing.\n    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);\n    if (height > 0) post({ type: 'hk-anim-height', height: height });\n  }\n\n  var frame = window.requestAnimationFrame.bind(window), clock = performance.now.bind(performance);\n  var paused = false, pausedAt = 0, lost = 0, held = [];\n  function now(){ return clock() - lost - (paused ? clock() - pausedAt : 0); }\n  performance.now = now;\n  window.requestAnimationFrame = function(cb){\n    return frame(function(){ if (paused) held.push(cb); else cb(now()); });\n  };\n  function setPaused(p){\n    if (p === paused) return;\n    if (p) pausedAt = clock(); else lost += clock() - pausedAt;\n    paused = p;\n    try { document.getAnimations().forEach(function(a){ if (p) a.pause(); else a.play(); }); } catch (e) {}\n    if (!p) { var q = held; held = []; q.forEach(function(cb){ frame(function(){ cb(now()); }); }); }\n  }\n\n  // The drawing as a standalone SVG: the host stylesheet does not travel with it, so\n  // every computed paint and type property is written onto the element itself.\n  var PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-dashoffset',\n    'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor', 'dominant-baseline'];\n  function svgMarkup(){\n    var src = document.querySelector('svg.hk-fig');\n    if (!src) return null;\n    var copy = src.cloneNode(true), from = src.querySelectorAll('*'), to = copy.querySelectorAll('*');\n    for (var i = 0; i < from.length; i++) {\n      var cs = getComputedStyle(from[i]);\n      for (var j = 0; j < PROPS.length; j++) to[i].style.setProperty(PROPS[j], cs.getPropertyValue(PROPS[j]));\n    }\n    var vb = src.viewBox.baseVal;\n    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');\n    if (vb && vb.width) { copy.setAttribute('width', vb.width); copy.setAttribute('height', vb.height); }\n    return new XMLSerializer().serializeToString(copy);\n  }\n\n  document.addEventListener('DOMContentLoaded', function(){\n    report();\n    try { new ResizeObserver(report).observe(document.body); } catch (e) {}\n    var menu = document.querySelector('.hk-menu');\n    if (!document.querySelector('svg.hk-fig')) {\n      var svgItem = document.querySelector('[data-hk-format=\"svg\"]');\n      if (svgItem) svgItem.remove();\n    }\n    document.addEventListener('click', function(e){\n      var hit = e.target.closest ? e.target.closest('[data-hk-act],[data-hk-format]') : null;\n      var act = hit && hit.getAttribute('data-hk-act'), format = hit && hit.getAttribute('data-hk-format');\n      if (menu && act !== 'download') menu.hidden = true;\n      if (act === 'replay') post({ type: 'hk-anim-replay' });\n      else if (act === 'pause') {\n        setPaused(!paused);\n        hit.setAttribute('aria-pressed', String(paused));\n        hit.querySelector('span').textContent = hit.getAttribute(paused ? 'data-resume' : 'data-pause');\n      } else if (act === 'download') {\n        menu.hidden = !menu.hidden;\n        hit.setAttribute('aria-expanded', String(!menu.hidden));\n      } else if (format) post({ type: 'hk-anim-download', format: format, svg: format === 'svg' ? svgMarkup() : null });\n    });\n  });\n  window.addEventListener('load', report);\n})();\n</script></head><body><div class=\"hk-card\"><div class=\"hk-bar\" data-hk-chrome><div class=\"hk-tools\"><button type=\"button\" class=\"hk-btn\" data-hk-act=\"download\" aria-haspopup=\"menu\" aria-expanded=\"false\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\" class=\"\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 1.8v6.4M3.4 5.8 6 8.4l2.6-2.6M2 10.2h8\"/></svg><span>下载</span></button><div class=\"hk-menu\" role=\"menu\" hidden><button type=\"button\" data-hk-format=\"png\">图片 PNG<small>贴进笔记或 PPT</small></button><button type=\"button\" data-hk-format=\"svg\">矢量 SVG<small>放大不失真，可再编辑</small></button><button type=\"button\" data-hk-format=\"html\">网页 HTML<small>离线打开，保留动画</small></button></div></div></div><div class=\"hk-stage\"><h2 class=\"sr-only\">Vibe Coding 闭环工作流示意图：从自然语言到代码生成再到原型预览与反馈循环</h2>\n\n<div class=\"hk-row\" style=\"margin-bottom: 8px;\">\n  <div class=\"hk-tile c-purple\">\n    <span class=\"hk-label\">指令输入</span>\n    <span class=\"hk-value\">自然语言</span>\n  </div>\n  <div class=\"hk-tile c-gray\">\n    <span class=\"hk-label\">处理引擎</span>\n    <span class=\"hk-value\">AI 编码模型</span>\n  </div>\n  <div class=\"hk-tile c-blue\">\n    <span class=\"hk-label\">实时呈现</span>\n    <span class=\"hk-value\">应用原型</span>\n  </div>\n</div>\n\n<svg class=\"hk-fig\" viewBox=\"0 0 480 230\" role=\"img\" data-motion=\"none\">\n  <defs>\n    <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\">\n      <path d=\"M2 1L8 5L2 9\" fill=\"none\" stroke=\"context-stroke\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n    </marker>\n  </defs>\n\n  <!-- 左侧：用户提示对话框 -->\n  <g class=\"c-purple\">\n    <rect class=\"box\" x=\"20\" y=\"52\" width=\"124\" height=\"68\" rx=\"8\"/>\n    <!-- 对话小尖角 -->\n    <path d=\"M50 120 L40 128 L56 120 Z\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.2\"/>\n    <text class=\"th\" x=\"82\" y=\"77\" text-anchor=\"middle\">做一个</text>\n    <text class=\"th\" x=\"82\" y=\"99\" text-anchor=\"middle\">饮水追踪器</text>\n    <text class=\"ts\" x=\"82\" y=\"142\" text-anchor=\"middle\">用户指令</text>\n  </g>\n\n  <!-- 提示到AI的箭头 -->\n  <path class=\"arr c-gray\" d=\"M144 86 L188 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 中间：AI 齿轮图标 -->\n  <g class=\"c-gray\" transform=\"translate(216, 86)\">\n    <!-- 齿轮形状 -->\n    <path class=\"box\" d=\"M-6 -22 L6 -22 L8 -16 L16 -16 L19 -21 L28 -14 L23 -9 L25 -1 L31 2 L29 12 L22 13 L20 20 L27 26 L19 32 L14 26 L7 28 L4 34 L-6 34 L-8 28 L-15 27 L-20 32 L-28 25 L-22 19 L-24 12 L-30 9 L-29 -2 L-23 -4 L-20 -12 L-26 -17 L-18 -24 L-12 -19 L-5 -21 Z\" fill=\"#F1EFE8\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <circle cx=\"0\" cy=\"5\" r=\"9\" fill=\"#FFF\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <text class=\"th\" x=\"0\" y=\"9\" text-anchor=\"middle\">AI</text>\n    <text class=\"ts\" x=\"0\" y=\"56\" text-anchor=\"middle\">生成代码</text>\n  </g>\n\n  <!-- AI到原型的箭头 -->\n  <path class=\"arr c-gray\" d=\"M246 86 L292 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 右侧：手机预览屏幕 -->\n  <g class=\"c-blue\">\n    <!-- 手机外框 -->\n    <rect class=\"box\" x=\"300\" y=\"24\" width=\"94\" height=\"136\" rx=\"10\"/>\n    <!-- 听筒横线 -->\n    <line x1=\"337\" y1=\"32\" x2=\"357\" y2=\"32\" stroke=\"#185FA5\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    \n    <!-- 屏幕中大水滴按钮 -->\n    <g transform=\"translate(347, 84)\">\n      <path d=\"M0 -22 C-16 0, -18 14, 0 22 C18 14, 16 0, 0 -22 Z\" fill=\"#185FA5\"/>\n      <path d=\"M-3 -4 C-8 2, -7 8, -2 11\" fill=\"none\" stroke=\"#E6F1FB\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n      <text class=\"th\" x=\"0\" y=\"38\" text-anchor=\"middle\" fill=\"#0C447C\">+250ml</text>\n    </g>\n    <text class=\"ts\" x=\"347\" y=\"176\" text-anchor=\"middle\">实时原型</text>\n  </g>\n\n  <!-- 反馈回路：从原型回到提示框 -->\n  <g class=\"c-coral\">\n    <path class=\"arr\" d=\"M347 186 L347 206 L82 206 L82 154\" fill=\"none\" marker-end=\"url(#arrow)\"/>\n    <rect class=\"box\" x=\"180\" y=\"196\" width=\"76\" height=\"20\" rx=\"4\"/>\n    <text class=\"ts\" x=\"218\" y=\"211\" text-anchor=\"middle\">评估与反馈</text>\n  </g>\n</svg>\n\n<p class=\"hk-caption\">自然语言驱动编码与即时预览构成的持续迭代循环</p></div></div><script>\n(function(){\n  if (window.__hkHostBridge) return;\n  window.__hkHostBridge = 1;\n  var SEL = 'button,[role=\"button\"],[role=\"slider\"],[role=\"switch\"],[role=\"checkbox\"],input,select,textarea,a[href],label,[contenteditable=\"\"],[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"]),[draggable=\"true\"],[data-hk-interactive]';\n  var CURSORS = {\n    pointer: 1,\n    grab: 1,\n    grabbing: 1,\n    move: 1,\n    'ew-resize': 1,\n    'ns-resize': 1,\n    'nesw-resize': 1,\n    'nwse-resize': 1,\n    'col-resize': 1,\n    'row-resize': 1\n  };\n  function post(type, extra) {\n    try {\n      var de = document.documentElement;\n      var msg = {\n        type: type,\n        vw: de && de.clientWidth ? de.clientWidth : 1,\n        vh: de && de.clientHeight ? de.clientHeight : 1\n      };\n      if (extra) {\n        for (var k in extra) msg[k] = extra[k];\n      }\n      parent.postMessage(msg, '*');\n    } catch (e) {}\n  }\n  function addRect(out, r) {\n    if (r && r.width > 0 && r.height > 0) {\n      out.push({ x: r.left, y: r.top, w: r.width, h: r.height });\n    }\n  }\n  function hitRects() {\n    var out = [];\n    var els = document.querySelectorAll(SEL);\n    for (var i = 0; i < els.length; i++) addRect(out, els[i].getBoundingClientRect());\n    var all = document.body ? document.body.querySelectorAll('*') : [];\n    for (var j = 0; j < all.length; j++) {\n      try {\n        var cursor = getComputedStyle(all[j]).cursor;\n        if (CURSORS[cursor]) {\n          var r = all[j].getBoundingClientRect();\n          if (r.width > 4 && r.height > 4) addRect(out, r);\n        }\n      } catch (e) {}\n    }\n    return out;\n  }\n  function hasInteractiveCursor(target) {\n    var node = target;\n    while (node && node !== document.documentElement) {\n      try {\n        if (node.nodeType === 1 && CURSORS[getComputedStyle(node).cursor]) return true;\n      } catch (e) {}\n      node = node.parentElement;\n    }\n    return false;\n  }\n  function closestInteractive(target) {\n    try {\n      if (!target || !target.closest) return false;\n      if (target.closest(SEL)) return true;\n      return hasInteractiveCursor(target);\n    } catch (e) {\n      return false;\n    }\n  }\n  function targetAtPointer(e) {\n    try {\n      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return e.target;\n      return document.elementFromPoint(e.clientX, e.clientY) || e.target;\n    } catch (err) {\n      return e.target;\n    }\n  }\n  function postHover(e, dragState) {\n    var target = targetAtPointer(e);\n    var active = closestInteractive(target);\n    if (!active && dragState) active = true;\n    post('hk-anim-hover', {\n      interactive: active,\n      dragging: !!dragState\n    });\n  }\n  function isInteractiveTarget(target) {\n    return closestInteractive(target);\n  }\n  function reportRects() {\n    post('hk-anim-hitrects', { rects: hitRects() });\n  }\n  var dragging = false;\n  document.addEventListener('pointermove', function(e) {\n    postHover(e, dragging);\n  }, true);\n  document.addEventListener('pointerdown', function(e) {\n    dragging = isInteractiveTarget(targetAtPointer(e));\n    post('hk-anim-hover', { interactive: dragging, dragging: dragging });\n  }, true);\n  window.addEventListener('pointerup', function() {\n    dragging = false;\n    post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  document.addEventListener('mouseleave', function() {\n    if (!dragging) post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  try { new ResizeObserver(reportRects).observe(document.documentElement); } catch (e) {}\n  try {\n    if (document.body) {\n      new MutationObserver(reportRects).observe(document.body, {\n        childList: true,\n        subtree: true,\n        attributes: true\n      });\n    }\n  } catch (e) {}\n  var warmup = 0;\n  (function loop() {\n    reportRects();\n    if (warmup++ < 3) setTimeout(loop, 150);\n  })();\n  setInterval(reportRects, 350);\n  window.addEventListener('load', reportRects);\n})();\n</script></body></html>",
+                    "pending": false,
+                    "task": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。"
+                  },
+                  "columnIndex": 2,
+                  "h": 492,
+                  "id": "live_id_006",
+                  "kind": "board_animation",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 513
+                },
+                {
+                  "boardUid": 3,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 370,
+                  "id": "live_id_007",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "例子：每日饮水追踪器\n\n1. **你的指令**：“做一个极简网页，点一下按钮加 250ml，显示总量。”\n2. **AI 生成**：瞬间写好 HTML 和 JS。\n3. **你的检查**：发现按钮太小了，背景颜色太刺眼。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 1007
+                }
+              ]
+            }
+          ],
+          "revision": 8,
+          "version": 1
+        }
+      },
+      "sequence": 61
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:13.536Z",
+      "payload": {
+        "step_id": 20,
+        "type": "action_step_complete"
+      },
+      "sequence": 62
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:20.839Z",
+      "payload": {
+        "step_id": 21,
+        "type": "action_step_complete"
+      },
+      "sequence": 63
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:21.128Z",
+      "payload": {
+        "spoken_text": "你一看预览，发现按钮像指甲盖那么大，颜色还是那种难看的亮绿色。这时候你得说话。",
+        "step_id": 22,
+        "type": "speak"
+      },
+      "sequence": 64
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:21.129Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 3,
+            "cjk": 5,
+            "kind": "text",
+            "latin": 0,
+            "target": "发现按钮"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 28,
+            "display": "你一看预览，发现按钮像指甲盖那么大，颜色还是那种难看的亮绿色。",
+            "latin": 0
+          },
+          {
+            "cjk": 7,
+            "display": "这时候你得说话。",
+            "latin": 0
+          }
+        ],
+        "sequence": 13,
+        "speed": 1,
+        "step_id": 22,
+        "tts_cjk": 35,
+        "tts_latin": 0,
+        "type": "tts_segment"
+      },
+      "sequence": 65
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:28.089Z",
+      "payload": {
+        "step_id": 22,
+        "type": "action_step_complete"
+      },
+      "sequence": 66
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:28.378Z",
+      "payload": {
+        "actions": [
+          {
+            "board_content": "**迭代过程**\n\n- 你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\n- AI 修正：调整样式代码。",
+            "board_uid": 4,
+            "page_id": "page-1",
+            "step_id": 23,
+            "type": "board"
+          },
+          {
+            "spoken_text": "你得告诉它：按钮大一点，用深蓝色，要有呼吸灯效果。AI 才会根据你的审美去修正。这就是为什么你必须检查：AI 能帮你写逻辑，但它不知道你心中的“氛围”到底对不对。",
+            "step_id": 24,
+            "type": "speak"
+          }
+        ],
+        "type": "group"
+      },
+      "sequence": 67
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:28.399Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "points": [
+          {
+            "board": 4,
+            "cjk": 5,
+            "kind": "text",
+            "latin": 0,
+            "target": "按钮大一点，用深蓝色"
+          }
+        ],
+        "sentences": [
+          {
+            "cjk": 21,
+            "display": "你得告诉它：按钮大一点，用深蓝色，要有呼吸灯效果。",
+            "latin": 0
+          },
+          {
+            "cjk": 11,
+            "display": "AI 才会根据你的审美去修正。",
+            "latin": 2
+          },
+          {
+            "cjk": 33,
+            "display": "这就是为什么你必须检查：AI 能帮你写逻辑，但它不知道你心中的“氛围”到底对不对。",
+            "latin": 2
+          }
+        ],
+        "sequence": 14,
+        "speed": 1,
+        "step_id": 24,
+        "tts_cjk": 65,
+        "tts_latin": 4,
+        "type": "tts_segment"
+      },
+      "sequence": 68
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:28.920Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 3,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  },
+                  {
+                    "nextY": 1379,
+                    "w": 744,
+                    "x": 1614
+                  },
+                  {
+                    "nextY": 385,
+                    "w": 744,
+                    "x": 2394
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                },
+                {
+                  "boardUid": 2,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 381,
+                  "id": "live_id_005",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+                    "importance": 2,
+                    "title": "两种 Vibe Coding 模式",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 130
+                },
+                {
+                  "boardAnimation": {
+                    "html": "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>\n*{box-sizing:border-box}\nhtml,body{margin:0;background:#fcfcfc;color:#2C2C2A;font:14px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;-webkit-font-smoothing:antialiased}\n@media (forced-colors:active){:root{forced-color-adjust:none}}\n.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}\n.hk-card{border:1px solid #E5E3DC;border-radius:12px;padding:8px 12px 12px}\n.hk-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}\n.hk-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489}\n.hk-tools{margin-left:auto;position:relative;display:flex;gap:6px;opacity:.55;transition:opacity .15s}\n.hk-card:hover .hk-tools,.hk-tools:focus-within{opacity:1}\n.hk-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;color:#444441;font:inherit;cursor:pointer}\n.hk-btn:hover{border-color:#B4B2A9;color:#2C2C2A}\n.hk-bar svg{width:12px;height:12px;flex:none}\n.hk-btn[aria-pressed=\"true\"] .hk-i-pause,.hk-btn[aria-pressed=\"false\"] .hk-i-play{display:none}\n.hk-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:188px;padding:4px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.08)}\n.hk-menu[hidden]{display:none}\n.hk-menu button{display:block;width:100%;padding:6px 10px;border:0;border-radius:6px;background:none;font:inherit;color:#2C2C2A;text-align:left;cursor:pointer}\n.hk-menu button:hover{background:#F1EFE8}\n.hk-menu small{display:block;font-size:11px;color:#5F5E5A}\n.hk-stage{position:relative}\n.hk-fig{display:block;width:100%;height:auto;overflow:hidden}\n/* A curve left with no class and no stroke is invisible. Zero specificity: a colour group's stroke still wins. */\n:where(.hk-fig path:not([stroke]):not([class])){stroke:#5F5E5A;stroke-width:1.5}\n.hk-readout{font-variant-numeric:tabular-nums}\n.t{font-size:14px;font-weight:400;fill:#2C2C2A}.th{font-size:14px;font-weight:500;fill:#2C2C2A}.ts{font-size:12px;font-weight:400;fill:#5F5E5A}\n.box{fill:#F1EFE8;stroke:#B4B2A9;stroke-width:1}\n.c-purple>rect,rect.c-purple,.c-purple>circle,circle.c-purple,.c-purple>ellipse,ellipse.c-purple,.c-purple>polygon,polygon.c-purple,.c-purple>path,path.c-purple{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}\n.c-purple>line,.c-purple>polyline,line.c-purple,polyline.c-purple{stroke:#534AB7;fill:none}\n.c-purple>.t,.c-purple>.th{fill:#3C3489}.c-purple>.ts{fill:#534AB7}\n.c-purple>.frame,.c-purple>.arr{stroke:#534AB7}\n.c-teal>rect,rect.c-teal,.c-teal>circle,circle.c-teal,.c-teal>ellipse,ellipse.c-teal,.c-teal>polygon,polygon.c-teal,.c-teal>path,path.c-teal{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1}\n.c-teal>line,.c-teal>polyline,line.c-teal,polyline.c-teal{stroke:#0F6E56;fill:none}\n.c-teal>.t,.c-teal>.th{fill:#085041}.c-teal>.ts{fill:#0F6E56}\n.c-teal>.frame,.c-teal>.arr{stroke:#0F6E56}\n.c-coral>rect,rect.c-coral,.c-coral>circle,circle.c-coral,.c-coral>ellipse,ellipse.c-coral,.c-coral>polygon,polygon.c-coral,.c-coral>path,path.c-coral{fill:#FAECE7;stroke:#993C1D;stroke-width:1}\n.c-coral>line,.c-coral>polyline,line.c-coral,polyline.c-coral{stroke:#993C1D;fill:none}\n.c-coral>.t,.c-coral>.th{fill:#712B13}.c-coral>.ts{fill:#993C1D}\n.c-coral>.frame,.c-coral>.arr{stroke:#993C1D}\n.c-pink>rect,rect.c-pink,.c-pink>circle,circle.c-pink,.c-pink>ellipse,ellipse.c-pink,.c-pink>polygon,polygon.c-pink,.c-pink>path,path.c-pink{fill:#FBEAF0;stroke:#993556;stroke-width:1}\n.c-pink>line,.c-pink>polyline,line.c-pink,polyline.c-pink{stroke:#993556;fill:none}\n.c-pink>.t,.c-pink>.th{fill:#72243E}.c-pink>.ts{fill:#993556}\n.c-pink>.frame,.c-pink>.arr{stroke:#993556}\n.c-gray>rect,rect.c-gray,.c-gray>circle,circle.c-gray,.c-gray>ellipse,ellipse.c-gray,.c-gray>polygon,polygon.c-gray,.c-gray>path,path.c-gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}\n.c-gray>line,.c-gray>polyline,line.c-gray,polyline.c-gray{stroke:#5F5E5A;fill:none}\n.c-gray>.t,.c-gray>.th{fill:#444441}.c-gray>.ts{fill:#5F5E5A}\n.c-gray>.frame,.c-gray>.arr{stroke:#5F5E5A}\n.c-blue>rect,rect.c-blue,.c-blue>circle,circle.c-blue,.c-blue>ellipse,ellipse.c-blue,.c-blue>polygon,polygon.c-blue,.c-blue>path,path.c-blue{fill:#E6F1FB;stroke:#185FA5;stroke-width:1}\n.c-blue>line,.c-blue>polyline,line.c-blue,polyline.c-blue{stroke:#185FA5;fill:none}\n.c-blue>.t,.c-blue>.th{fill:#0C447C}.c-blue>.ts{fill:#185FA5}\n.c-blue>.frame,.c-blue>.arr{stroke:#185FA5}\n.c-green>rect,rect.c-green,.c-green>circle,circle.c-green,.c-green>ellipse,ellipse.c-green,.c-green>polygon,polygon.c-green,.c-green>path,path.c-green{fill:#EAF3DE;stroke:#3B6D11;stroke-width:1}\n.c-green>line,.c-green>polyline,line.c-green,polyline.c-green{stroke:#3B6D11;fill:none}\n.c-green>.t,.c-green>.th{fill:#27500A}.c-green>.ts{fill:#3B6D11}\n.c-green>.frame,.c-green>.arr{stroke:#3B6D11}\n.c-amber>rect,rect.c-amber,.c-amber>circle,circle.c-amber,.c-amber>ellipse,ellipse.c-amber,.c-amber>polygon,polygon.c-amber,.c-amber>path,path.c-amber{fill:#FAEEDA;stroke:#854F0B;stroke-width:1}\n.c-amber>line,.c-amber>polyline,line.c-amber,polyline.c-amber{stroke:#854F0B;fill:none}\n.c-amber>.t,.c-amber>.th{fill:#633806}.c-amber>.ts{fill:#854F0B}\n.c-amber>.frame,.c-amber>.arr{stroke:#854F0B}\n.c-red>rect,rect.c-red,.c-red>circle,circle.c-red,.c-red>ellipse,ellipse.c-red,.c-red>polygon,polygon.c-red,.c-red>path,path.c-red{fill:#FCEBEB;stroke:#A32D2D;stroke-width:1}\n.c-red>line,.c-red>polyline,line.c-red,polyline.c-red{stroke:#A32D2D;fill:none}\n.c-red>.t,.c-red>.th{fill:#791F1F}.c-red>.ts{fill:#A32D2D}\n.c-red>.frame,.c-red>.arr{stroke:#A32D2D}\n:is(rect,circle,ellipse,polygon,path)[fill=\"none\"]{fill:none}\n.arr{stroke:#73726c;stroke-width:1.5;fill:none!important;stroke-linecap:round;stroke-linejoin:round}\n.leader{stroke:#888780;stroke-width:1;stroke-dasharray:3 3;fill:none!important}\n.frame{fill:none!important;stroke-width:2;stroke:#5F5E5A}\n.em{stroke-width:2.5!important}\n.hk-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}\n.hk-tile{flex:1 1 96px;min-width:0;padding:8px 10px;border-radius:8px;background:#F1EFE8;border:1px solid #E5E3DC}\n.hk-label{display:block;font-size:12px;color:#5F5E5A}\n.hk-value{display:block;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}\n.hk-tile.c-purple{background:#EEEDFE;border-color:#534AB733}.hk-tile.c-purple .hk-label{color:#534AB7}.hk-tile.c-purple .hk-value{color:#3C3489}\n.hk-tile.c-teal{background:#E1F5EE;border-color:#0F6E5633}.hk-tile.c-teal .hk-label{color:#0F6E56}.hk-tile.c-teal .hk-value{color:#085041}\n.hk-tile.c-coral{background:#FAECE7;border-color:#993C1D33}.hk-tile.c-coral .hk-label{color:#993C1D}.hk-tile.c-coral .hk-value{color:#712B13}\n.hk-tile.c-pink{background:#FBEAF0;border-color:#99355633}.hk-tile.c-pink .hk-label{color:#993556}.hk-tile.c-pink .hk-value{color:#72243E}\n.hk-tile.c-gray{background:#F1EFE8;border-color:#5F5E5A33}.hk-tile.c-gray .hk-label{color:#5F5E5A}.hk-tile.c-gray .hk-value{color:#444441}\n.hk-tile.c-blue{background:#E6F1FB;border-color:#185FA533}.hk-tile.c-blue .hk-label{color:#185FA5}.hk-tile.c-blue .hk-value{color:#0C447C}\n.hk-tile.c-green{background:#EAF3DE;border-color:#3B6D1133}.hk-tile.c-green .hk-label{color:#3B6D11}.hk-tile.c-green .hk-value{color:#27500A}\n.hk-tile.c-amber{background:#FAEEDA;border-color:#854F0B33}.hk-tile.c-amber .hk-label{color:#854F0B}.hk-tile.c-amber .hk-value{color:#633806}\n.hk-tile.c-red{background:#FCEBEB;border-color:#A32D2D33}.hk-tile.c-red .hk-label{color:#A32D2D}.hk-tile.c-red .hk-value{color:#791F1F}\n.hk-caption{margin:6px 0 0;text-align:center;font-size:12px;color:#5F5E5A}\n.hk-formula{margin:8px 0;text-align:center;font-variant-numeric:tabular-nums}\n.hk-dots{display:flex;gap:6px;justify-content:center;margin:8px 0}\n.hk-dots i{width:6px;height:6px;border-radius:50%;background:#D3D1C7}\n.hk-dots i.on{background:#534AB7}\n</style><script>\n(function(){\n  function post(msg){ try { parent.postMessage(msg, '*'); } catch (e) {} }\n  function report(){\n    // Before first layout this reads 0; a 0 would shrink the card to nothing.\n    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);\n    if (height > 0) post({ type: 'hk-anim-height', height: height });\n  }\n\n  var frame = window.requestAnimationFrame.bind(window), clock = performance.now.bind(performance);\n  var paused = false, pausedAt = 0, lost = 0, held = [];\n  function now(){ return clock() - lost - (paused ? clock() - pausedAt : 0); }\n  performance.now = now;\n  window.requestAnimationFrame = function(cb){\n    return frame(function(){ if (paused) held.push(cb); else cb(now()); });\n  };\n  function setPaused(p){\n    if (p === paused) return;\n    if (p) pausedAt = clock(); else lost += clock() - pausedAt;\n    paused = p;\n    try { document.getAnimations().forEach(function(a){ if (p) a.pause(); else a.play(); }); } catch (e) {}\n    if (!p) { var q = held; held = []; q.forEach(function(cb){ frame(function(){ cb(now()); }); }); }\n  }\n\n  // The drawing as a standalone SVG: the host stylesheet does not travel with it, so\n  // every computed paint and type property is written onto the element itself.\n  var PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-dashoffset',\n    'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor', 'dominant-baseline'];\n  function svgMarkup(){\n    var src = document.querySelector('svg.hk-fig');\n    if (!src) return null;\n    var copy = src.cloneNode(true), from = src.querySelectorAll('*'), to = copy.querySelectorAll('*');\n    for (var i = 0; i < from.length; i++) {\n      var cs = getComputedStyle(from[i]);\n      for (var j = 0; j < PROPS.length; j++) to[i].style.setProperty(PROPS[j], cs.getPropertyValue(PROPS[j]));\n    }\n    var vb = src.viewBox.baseVal;\n    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');\n    if (vb && vb.width) { copy.setAttribute('width', vb.width); copy.setAttribute('height', vb.height); }\n    return new XMLSerializer().serializeToString(copy);\n  }\n\n  document.addEventListener('DOMContentLoaded', function(){\n    report();\n    try { new ResizeObserver(report).observe(document.body); } catch (e) {}\n    var menu = document.querySelector('.hk-menu');\n    if (!document.querySelector('svg.hk-fig')) {\n      var svgItem = document.querySelector('[data-hk-format=\"svg\"]');\n      if (svgItem) svgItem.remove();\n    }\n    document.addEventListener('click', function(e){\n      var hit = e.target.closest ? e.target.closest('[data-hk-act],[data-hk-format]') : null;\n      var act = hit && hit.getAttribute('data-hk-act'), format = hit && hit.getAttribute('data-hk-format');\n      if (menu && act !== 'download') menu.hidden = true;\n      if (act === 'replay') post({ type: 'hk-anim-replay' });\n      else if (act === 'pause') {\n        setPaused(!paused);\n        hit.setAttribute('aria-pressed', String(paused));\n        hit.querySelector('span').textContent = hit.getAttribute(paused ? 'data-resume' : 'data-pause');\n      } else if (act === 'download') {\n        menu.hidden = !menu.hidden;\n        hit.setAttribute('aria-expanded', String(!menu.hidden));\n      } else if (format) post({ type: 'hk-anim-download', format: format, svg: format === 'svg' ? svgMarkup() : null });\n    });\n  });\n  window.addEventListener('load', report);\n})();\n</script></head><body><div class=\"hk-card\"><div class=\"hk-bar\" data-hk-chrome><div class=\"hk-tools\"><button type=\"button\" class=\"hk-btn\" data-hk-act=\"download\" aria-haspopup=\"menu\" aria-expanded=\"false\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\" class=\"\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 1.8v6.4M3.4 5.8 6 8.4l2.6-2.6M2 10.2h8\"/></svg><span>下载</span></button><div class=\"hk-menu\" role=\"menu\" hidden><button type=\"button\" data-hk-format=\"png\">图片 PNG<small>贴进笔记或 PPT</small></button><button type=\"button\" data-hk-format=\"svg\">矢量 SVG<small>放大不失真，可再编辑</small></button><button type=\"button\" data-hk-format=\"html\">网页 HTML<small>离线打开，保留动画</small></button></div></div></div><div class=\"hk-stage\"><h2 class=\"sr-only\">Vibe Coding 闭环工作流示意图：从自然语言到代码生成再到原型预览与反馈循环</h2>\n\n<div class=\"hk-row\" style=\"margin-bottom: 8px;\">\n  <div class=\"hk-tile c-purple\">\n    <span class=\"hk-label\">指令输入</span>\n    <span class=\"hk-value\">自然语言</span>\n  </div>\n  <div class=\"hk-tile c-gray\">\n    <span class=\"hk-label\">处理引擎</span>\n    <span class=\"hk-value\">AI 编码模型</span>\n  </div>\n  <div class=\"hk-tile c-blue\">\n    <span class=\"hk-label\">实时呈现</span>\n    <span class=\"hk-value\">应用原型</span>\n  </div>\n</div>\n\n<svg class=\"hk-fig\" viewBox=\"0 0 480 230\" role=\"img\" data-motion=\"none\">\n  <defs>\n    <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\">\n      <path d=\"M2 1L8 5L2 9\" fill=\"none\" stroke=\"context-stroke\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n    </marker>\n  </defs>\n\n  <!-- 左侧：用户提示对话框 -->\n  <g class=\"c-purple\">\n    <rect class=\"box\" x=\"20\" y=\"52\" width=\"124\" height=\"68\" rx=\"8\"/>\n    <!-- 对话小尖角 -->\n    <path d=\"M50 120 L40 128 L56 120 Z\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.2\"/>\n    <text class=\"th\" x=\"82\" y=\"77\" text-anchor=\"middle\">做一个</text>\n    <text class=\"th\" x=\"82\" y=\"99\" text-anchor=\"middle\">饮水追踪器</text>\n    <text class=\"ts\" x=\"82\" y=\"142\" text-anchor=\"middle\">用户指令</text>\n  </g>\n\n  <!-- 提示到AI的箭头 -->\n  <path class=\"arr c-gray\" d=\"M144 86 L188 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 中间：AI 齿轮图标 -->\n  <g class=\"c-gray\" transform=\"translate(216, 86)\">\n    <!-- 齿轮形状 -->\n    <path class=\"box\" d=\"M-6 -22 L6 -22 L8 -16 L16 -16 L19 -21 L28 -14 L23 -9 L25 -1 L31 2 L29 12 L22 13 L20 20 L27 26 L19 32 L14 26 L7 28 L4 34 L-6 34 L-8 28 L-15 27 L-20 32 L-28 25 L-22 19 L-24 12 L-30 9 L-29 -2 L-23 -4 L-20 -12 L-26 -17 L-18 -24 L-12 -19 L-5 -21 Z\" fill=\"#F1EFE8\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <circle cx=\"0\" cy=\"5\" r=\"9\" fill=\"#FFF\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <text class=\"th\" x=\"0\" y=\"9\" text-anchor=\"middle\">AI</text>\n    <text class=\"ts\" x=\"0\" y=\"56\" text-anchor=\"middle\">生成代码</text>\n  </g>\n\n  <!-- AI到原型的箭头 -->\n  <path class=\"arr c-gray\" d=\"M246 86 L292 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 右侧：手机预览屏幕 -->\n  <g class=\"c-blue\">\n    <!-- 手机外框 -->\n    <rect class=\"box\" x=\"300\" y=\"24\" width=\"94\" height=\"136\" rx=\"10\"/>\n    <!-- 听筒横线 -->\n    <line x1=\"337\" y1=\"32\" x2=\"357\" y2=\"32\" stroke=\"#185FA5\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    \n    <!-- 屏幕中大水滴按钮 -->\n    <g transform=\"translate(347, 84)\">\n      <path d=\"M0 -22 C-16 0, -18 14, 0 22 C18 14, 16 0, 0 -22 Z\" fill=\"#185FA5\"/>\n      <path d=\"M-3 -4 C-8 2, -7 8, -2 11\" fill=\"none\" stroke=\"#E6F1FB\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n      <text class=\"th\" x=\"0\" y=\"38\" text-anchor=\"middle\" fill=\"#0C447C\">+250ml</text>\n    </g>\n    <text class=\"ts\" x=\"347\" y=\"176\" text-anchor=\"middle\">实时原型</text>\n  </g>\n\n  <!-- 反馈回路：从原型回到提示框 -->\n  <g class=\"c-coral\">\n    <path class=\"arr\" d=\"M347 186 L347 206 L82 206 L82 154\" fill=\"none\" marker-end=\"url(#arrow)\"/>\n    <rect class=\"box\" x=\"180\" y=\"196\" width=\"76\" height=\"20\" rx=\"4\"/>\n    <text class=\"ts\" x=\"218\" y=\"211\" text-anchor=\"middle\">评估与反馈</text>\n  </g>\n</svg>\n\n<p class=\"hk-caption\">自然语言驱动编码与即时预览构成的持续迭代循环</p></div></div><script>\n(function(){\n  if (window.__hkHostBridge) return;\n  window.__hkHostBridge = 1;\n  var SEL = 'button,[role=\"button\"],[role=\"slider\"],[role=\"switch\"],[role=\"checkbox\"],input,select,textarea,a[href],label,[contenteditable=\"\"],[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"]),[draggable=\"true\"],[data-hk-interactive]';\n  var CURSORS = {\n    pointer: 1,\n    grab: 1,\n    grabbing: 1,\n    move: 1,\n    'ew-resize': 1,\n    'ns-resize': 1,\n    'nesw-resize': 1,\n    'nwse-resize': 1,\n    'col-resize': 1,\n    'row-resize': 1\n  };\n  function post(type, extra) {\n    try {\n      var de = document.documentElement;\n      var msg = {\n        type: type,\n        vw: de && de.clientWidth ? de.clientWidth : 1,\n        vh: de && de.clientHeight ? de.clientHeight : 1\n      };\n      if (extra) {\n        for (var k in extra) msg[k] = extra[k];\n      }\n      parent.postMessage(msg, '*');\n    } catch (e) {}\n  }\n  function addRect(out, r) {\n    if (r && r.width > 0 && r.height > 0) {\n      out.push({ x: r.left, y: r.top, w: r.width, h: r.height });\n    }\n  }\n  function hitRects() {\n    var out = [];\n    var els = document.querySelectorAll(SEL);\n    for (var i = 0; i < els.length; i++) addRect(out, els[i].getBoundingClientRect());\n    var all = document.body ? document.body.querySelectorAll('*') : [];\n    for (var j = 0; j < all.length; j++) {\n      try {\n        var cursor = getComputedStyle(all[j]).cursor;\n        if (CURSORS[cursor]) {\n          var r = all[j].getBoundingClientRect();\n          if (r.width > 4 && r.height > 4) addRect(out, r);\n        }\n      } catch (e) {}\n    }\n    return out;\n  }\n  function hasInteractiveCursor(target) {\n    var node = target;\n    while (node && node !== document.documentElement) {\n      try {\n        if (node.nodeType === 1 && CURSORS[getComputedStyle(node).cursor]) return true;\n      } catch (e) {}\n      node = node.parentElement;\n    }\n    return false;\n  }\n  function closestInteractive(target) {\n    try {\n      if (!target || !target.closest) return false;\n      if (target.closest(SEL)) return true;\n      return hasInteractiveCursor(target);\n    } catch (e) {\n      return false;\n    }\n  }\n  function targetAtPointer(e) {\n    try {\n      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return e.target;\n      return document.elementFromPoint(e.clientX, e.clientY) || e.target;\n    } catch (err) {\n      return e.target;\n    }\n  }\n  function postHover(e, dragState) {\n    var target = targetAtPointer(e);\n    var active = closestInteractive(target);\n    if (!active && dragState) active = true;\n    post('hk-anim-hover', {\n      interactive: active,\n      dragging: !!dragState\n    });\n  }\n  function isInteractiveTarget(target) {\n    return closestInteractive(target);\n  }\n  function reportRects() {\n    post('hk-anim-hitrects', { rects: hitRects() });\n  }\n  var dragging = false;\n  document.addEventListener('pointermove', function(e) {\n    postHover(e, dragging);\n  }, true);\n  document.addEventListener('pointerdown', function(e) {\n    dragging = isInteractiveTarget(targetAtPointer(e));\n    post('hk-anim-hover', { interactive: dragging, dragging: dragging });\n  }, true);\n  window.addEventListener('pointerup', function() {\n    dragging = false;\n    post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  document.addEventListener('mouseleave', function() {\n    if (!dragging) post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  try { new ResizeObserver(reportRects).observe(document.documentElement); } catch (e) {}\n  try {\n    if (document.body) {\n      new MutationObserver(reportRects).observe(document.body, {\n        childList: true,\n        subtree: true,\n        attributes: true\n      });\n    }\n  } catch (e) {}\n  var warmup = 0;\n  (function loop() {\n    reportRects();\n    if (warmup++ < 3) setTimeout(loop, 150);\n  })();\n  setInterval(reportRects, 350);\n  window.addEventListener('load', reportRects);\n})();\n</script></body></html>",
+                    "pending": false,
+                    "task": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。"
+                  },
+                  "columnIndex": 2,
+                  "h": 492,
+                  "id": "live_id_006",
+                  "kind": "board_animation",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 513
+                },
+                {
+                  "boardUid": 3,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 370,
+                  "id": "live_id_007",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "例子：每日饮水追踪器\n\n1. **你的指令**：“做一个极简网页，点一下按钮加 250ml，显示总量。”\n2. **AI 生成**：瞬间写好 HTML 和 JS。\n3. **你的检查**：发现按钮太小了，背景颜色太刺眼。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 1007
+                },
+                {
+                  "boardUid": 4,
+                  "columnIndex": 3,
+                  "decorations": [],
+                  "h": 253,
+                  "id": "live_id_008",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**迭代过程**\n\n- 你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\n- AI 修正：调整样式代码。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 2394,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 9,
+          "version": 1
+        }
+      },
+      "sequence": 69
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:29.487Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 3,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  },
+                  {
+                    "nextY": 1379,
+                    "w": 744,
+                    "x": 1614
+                  },
+                  {
+                    "nextY": 385,
+                    "w": 744,
+                    "x": 2394
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                },
+                {
+                  "boardUid": 2,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 381,
+                  "id": "live_id_005",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+                    "importance": 2,
+                    "title": "两种 Vibe Coding 模式",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 130
+                },
+                {
+                  "boardAnimation": {
+                    "html": "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>\n*{box-sizing:border-box}\nhtml,body{margin:0;background:#fcfcfc;color:#2C2C2A;font:14px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;-webkit-font-smoothing:antialiased}\n@media (forced-colors:active){:root{forced-color-adjust:none}}\n.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}\n.hk-card{border:1px solid #E5E3DC;border-radius:12px;padding:8px 12px 12px}\n.hk-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}\n.hk-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489}\n.hk-tools{margin-left:auto;position:relative;display:flex;gap:6px;opacity:.55;transition:opacity .15s}\n.hk-card:hover .hk-tools,.hk-tools:focus-within{opacity:1}\n.hk-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;color:#444441;font:inherit;cursor:pointer}\n.hk-btn:hover{border-color:#B4B2A9;color:#2C2C2A}\n.hk-bar svg{width:12px;height:12px;flex:none}\n.hk-btn[aria-pressed=\"true\"] .hk-i-pause,.hk-btn[aria-pressed=\"false\"] .hk-i-play{display:none}\n.hk-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:188px;padding:4px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.08)}\n.hk-menu[hidden]{display:none}\n.hk-menu button{display:block;width:100%;padding:6px 10px;border:0;border-radius:6px;background:none;font:inherit;color:#2C2C2A;text-align:left;cursor:pointer}\n.hk-menu button:hover{background:#F1EFE8}\n.hk-menu small{display:block;font-size:11px;color:#5F5E5A}\n.hk-stage{position:relative}\n.hk-fig{display:block;width:100%;height:auto;overflow:hidden}\n/* A curve left with no class and no stroke is invisible. Zero specificity: a colour group's stroke still wins. */\n:where(.hk-fig path:not([stroke]):not([class])){stroke:#5F5E5A;stroke-width:1.5}\n.hk-readout{font-variant-numeric:tabular-nums}\n.t{font-size:14px;font-weight:400;fill:#2C2C2A}.th{font-size:14px;font-weight:500;fill:#2C2C2A}.ts{font-size:12px;font-weight:400;fill:#5F5E5A}\n.box{fill:#F1EFE8;stroke:#B4B2A9;stroke-width:1}\n.c-purple>rect,rect.c-purple,.c-purple>circle,circle.c-purple,.c-purple>ellipse,ellipse.c-purple,.c-purple>polygon,polygon.c-purple,.c-purple>path,path.c-purple{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}\n.c-purple>line,.c-purple>polyline,line.c-purple,polyline.c-purple{stroke:#534AB7;fill:none}\n.c-purple>.t,.c-purple>.th{fill:#3C3489}.c-purple>.ts{fill:#534AB7}\n.c-purple>.frame,.c-purple>.arr{stroke:#534AB7}\n.c-teal>rect,rect.c-teal,.c-teal>circle,circle.c-teal,.c-teal>ellipse,ellipse.c-teal,.c-teal>polygon,polygon.c-teal,.c-teal>path,path.c-teal{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1}\n.c-teal>line,.c-teal>polyline,line.c-teal,polyline.c-teal{stroke:#0F6E56;fill:none}\n.c-teal>.t,.c-teal>.th{fill:#085041}.c-teal>.ts{fill:#0F6E56}\n.c-teal>.frame,.c-teal>.arr{stroke:#0F6E56}\n.c-coral>rect,rect.c-coral,.c-coral>circle,circle.c-coral,.c-coral>ellipse,ellipse.c-coral,.c-coral>polygon,polygon.c-coral,.c-coral>path,path.c-coral{fill:#FAECE7;stroke:#993C1D;stroke-width:1}\n.c-coral>line,.c-coral>polyline,line.c-coral,polyline.c-coral{stroke:#993C1D;fill:none}\n.c-coral>.t,.c-coral>.th{fill:#712B13}.c-coral>.ts{fill:#993C1D}\n.c-coral>.frame,.c-coral>.arr{stroke:#993C1D}\n.c-pink>rect,rect.c-pink,.c-pink>circle,circle.c-pink,.c-pink>ellipse,ellipse.c-pink,.c-pink>polygon,polygon.c-pink,.c-pink>path,path.c-pink{fill:#FBEAF0;stroke:#993556;stroke-width:1}\n.c-pink>line,.c-pink>polyline,line.c-pink,polyline.c-pink{stroke:#993556;fill:none}\n.c-pink>.t,.c-pink>.th{fill:#72243E}.c-pink>.ts{fill:#993556}\n.c-pink>.frame,.c-pink>.arr{stroke:#993556}\n.c-gray>rect,rect.c-gray,.c-gray>circle,circle.c-gray,.c-gray>ellipse,ellipse.c-gray,.c-gray>polygon,polygon.c-gray,.c-gray>path,path.c-gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}\n.c-gray>line,.c-gray>polyline,line.c-gray,polyline.c-gray{stroke:#5F5E5A;fill:none}\n.c-gray>.t,.c-gray>.th{fill:#444441}.c-gray>.ts{fill:#5F5E5A}\n.c-gray>.frame,.c-gray>.arr{stroke:#5F5E5A}\n.c-blue>rect,rect.c-blue,.c-blue>circle,circle.c-blue,.c-blue>ellipse,ellipse.c-blue,.c-blue>polygon,polygon.c-blue,.c-blue>path,path.c-blue{fill:#E6F1FB;stroke:#185FA5;stroke-width:1}\n.c-blue>line,.c-blue>polyline,line.c-blue,polyline.c-blue{stroke:#185FA5;fill:none}\n.c-blue>.t,.c-blue>.th{fill:#0C447C}.c-blue>.ts{fill:#185FA5}\n.c-blue>.frame,.c-blue>.arr{stroke:#185FA5}\n.c-green>rect,rect.c-green,.c-green>circle,circle.c-green,.c-green>ellipse,ellipse.c-green,.c-green>polygon,polygon.c-green,.c-green>path,path.c-green{fill:#EAF3DE;stroke:#3B6D11;stroke-width:1}\n.c-green>line,.c-green>polyline,line.c-green,polyline.c-green{stroke:#3B6D11;fill:none}\n.c-green>.t,.c-green>.th{fill:#27500A}.c-green>.ts{fill:#3B6D11}\n.c-green>.frame,.c-green>.arr{stroke:#3B6D11}\n.c-amber>rect,rect.c-amber,.c-amber>circle,circle.c-amber,.c-amber>ellipse,ellipse.c-amber,.c-amber>polygon,polygon.c-amber,.c-amber>path,path.c-amber{fill:#FAEEDA;stroke:#854F0B;stroke-width:1}\n.c-amber>line,.c-amber>polyline,line.c-amber,polyline.c-amber{stroke:#854F0B;fill:none}\n.c-amber>.t,.c-amber>.th{fill:#633806}.c-amber>.ts{fill:#854F0B}\n.c-amber>.frame,.c-amber>.arr{stroke:#854F0B}\n.c-red>rect,rect.c-red,.c-red>circle,circle.c-red,.c-red>ellipse,ellipse.c-red,.c-red>polygon,polygon.c-red,.c-red>path,path.c-red{fill:#FCEBEB;stroke:#A32D2D;stroke-width:1}\n.c-red>line,.c-red>polyline,line.c-red,polyline.c-red{stroke:#A32D2D;fill:none}\n.c-red>.t,.c-red>.th{fill:#791F1F}.c-red>.ts{fill:#A32D2D}\n.c-red>.frame,.c-red>.arr{stroke:#A32D2D}\n:is(rect,circle,ellipse,polygon,path)[fill=\"none\"]{fill:none}\n.arr{stroke:#73726c;stroke-width:1.5;fill:none!important;stroke-linecap:round;stroke-linejoin:round}\n.leader{stroke:#888780;stroke-width:1;stroke-dasharray:3 3;fill:none!important}\n.frame{fill:none!important;stroke-width:2;stroke:#5F5E5A}\n.em{stroke-width:2.5!important}\n.hk-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}\n.hk-tile{flex:1 1 96px;min-width:0;padding:8px 10px;border-radius:8px;background:#F1EFE8;border:1px solid #E5E3DC}\n.hk-label{display:block;font-size:12px;color:#5F5E5A}\n.hk-value{display:block;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}\n.hk-tile.c-purple{background:#EEEDFE;border-color:#534AB733}.hk-tile.c-purple .hk-label{color:#534AB7}.hk-tile.c-purple .hk-value{color:#3C3489}\n.hk-tile.c-teal{background:#E1F5EE;border-color:#0F6E5633}.hk-tile.c-teal .hk-label{color:#0F6E56}.hk-tile.c-teal .hk-value{color:#085041}\n.hk-tile.c-coral{background:#FAECE7;border-color:#993C1D33}.hk-tile.c-coral .hk-label{color:#993C1D}.hk-tile.c-coral .hk-value{color:#712B13}\n.hk-tile.c-pink{background:#FBEAF0;border-color:#99355633}.hk-tile.c-pink .hk-label{color:#993556}.hk-tile.c-pink .hk-value{color:#72243E}\n.hk-tile.c-gray{background:#F1EFE8;border-color:#5F5E5A33}.hk-tile.c-gray .hk-label{color:#5F5E5A}.hk-tile.c-gray .hk-value{color:#444441}\n.hk-tile.c-blue{background:#E6F1FB;border-color:#185FA533}.hk-tile.c-blue .hk-label{color:#185FA5}.hk-tile.c-blue .hk-value{color:#0C447C}\n.hk-tile.c-green{background:#EAF3DE;border-color:#3B6D1133}.hk-tile.c-green .hk-label{color:#3B6D11}.hk-tile.c-green .hk-value{color:#27500A}\n.hk-tile.c-amber{background:#FAEEDA;border-color:#854F0B33}.hk-tile.c-amber .hk-label{color:#854F0B}.hk-tile.c-amber .hk-value{color:#633806}\n.hk-tile.c-red{background:#FCEBEB;border-color:#A32D2D33}.hk-tile.c-red .hk-label{color:#A32D2D}.hk-tile.c-red .hk-value{color:#791F1F}\n.hk-caption{margin:6px 0 0;text-align:center;font-size:12px;color:#5F5E5A}\n.hk-formula{margin:8px 0;text-align:center;font-variant-numeric:tabular-nums}\n.hk-dots{display:flex;gap:6px;justify-content:center;margin:8px 0}\n.hk-dots i{width:6px;height:6px;border-radius:50%;background:#D3D1C7}\n.hk-dots i.on{background:#534AB7}\n</style><script>\n(function(){\n  function post(msg){ try { parent.postMessage(msg, '*'); } catch (e) {} }\n  function report(){\n    // Before first layout this reads 0; a 0 would shrink the card to nothing.\n    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);\n    if (height > 0) post({ type: 'hk-anim-height', height: height });\n  }\n\n  var frame = window.requestAnimationFrame.bind(window), clock = performance.now.bind(performance);\n  var paused = false, pausedAt = 0, lost = 0, held = [];\n  function now(){ return clock() - lost - (paused ? clock() - pausedAt : 0); }\n  performance.now = now;\n  window.requestAnimationFrame = function(cb){\n    return frame(function(){ if (paused) held.push(cb); else cb(now()); });\n  };\n  function setPaused(p){\n    if (p === paused) return;\n    if (p) pausedAt = clock(); else lost += clock() - pausedAt;\n    paused = p;\n    try { document.getAnimations().forEach(function(a){ if (p) a.pause(); else a.play(); }); } catch (e) {}\n    if (!p) { var q = held; held = []; q.forEach(function(cb){ frame(function(){ cb(now()); }); }); }\n  }\n\n  // The drawing as a standalone SVG: the host stylesheet does not travel with it, so\n  // every computed paint and type property is written onto the element itself.\n  var PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-dashoffset',\n    'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor', 'dominant-baseline'];\n  function svgMarkup(){\n    var src = document.querySelector('svg.hk-fig');\n    if (!src) return null;\n    var copy = src.cloneNode(true), from = src.querySelectorAll('*'), to = copy.querySelectorAll('*');\n    for (var i = 0; i < from.length; i++) {\n      var cs = getComputedStyle(from[i]);\n      for (var j = 0; j < PROPS.length; j++) to[i].style.setProperty(PROPS[j], cs.getPropertyValue(PROPS[j]));\n    }\n    var vb = src.viewBox.baseVal;\n    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');\n    if (vb && vb.width) { copy.setAttribute('width', vb.width); copy.setAttribute('height', vb.height); }\n    return new XMLSerializer().serializeToString(copy);\n  }\n\n  document.addEventListener('DOMContentLoaded', function(){\n    report();\n    try { new ResizeObserver(report).observe(document.body); } catch (e) {}\n    var menu = document.querySelector('.hk-menu');\n    if (!document.querySelector('svg.hk-fig')) {\n      var svgItem = document.querySelector('[data-hk-format=\"svg\"]');\n      if (svgItem) svgItem.remove();\n    }\n    document.addEventListener('click', function(e){\n      var hit = e.target.closest ? e.target.closest('[data-hk-act],[data-hk-format]') : null;\n      var act = hit && hit.getAttribute('data-hk-act'), format = hit && hit.getAttribute('data-hk-format');\n      if (menu && act !== 'download') menu.hidden = true;\n      if (act === 'replay') post({ type: 'hk-anim-replay' });\n      else if (act === 'pause') {\n        setPaused(!paused);\n        hit.setAttribute('aria-pressed', String(paused));\n        hit.querySelector('span').textContent = hit.getAttribute(paused ? 'data-resume' : 'data-pause');\n      } else if (act === 'download') {\n        menu.hidden = !menu.hidden;\n        hit.setAttribute('aria-expanded', String(!menu.hidden));\n      } else if (format) post({ type: 'hk-anim-download', format: format, svg: format === 'svg' ? svgMarkup() : null });\n    });\n  });\n  window.addEventListener('load', report);\n})();\n</script></head><body><div class=\"hk-card\"><div class=\"hk-bar\" data-hk-chrome><div class=\"hk-tools\"><button type=\"button\" class=\"hk-btn\" data-hk-act=\"download\" aria-haspopup=\"menu\" aria-expanded=\"false\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\" class=\"\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 1.8v6.4M3.4 5.8 6 8.4l2.6-2.6M2 10.2h8\"/></svg><span>下载</span></button><div class=\"hk-menu\" role=\"menu\" hidden><button type=\"button\" data-hk-format=\"png\">图片 PNG<small>贴进笔记或 PPT</small></button><button type=\"button\" data-hk-format=\"svg\">矢量 SVG<small>放大不失真，可再编辑</small></button><button type=\"button\" data-hk-format=\"html\">网页 HTML<small>离线打开，保留动画</small></button></div></div></div><div class=\"hk-stage\"><h2 class=\"sr-only\">Vibe Coding 闭环工作流示意图：从自然语言到代码生成再到原型预览与反馈循环</h2>\n\n<div class=\"hk-row\" style=\"margin-bottom: 8px;\">\n  <div class=\"hk-tile c-purple\">\n    <span class=\"hk-label\">指令输入</span>\n    <span class=\"hk-value\">自然语言</span>\n  </div>\n  <div class=\"hk-tile c-gray\">\n    <span class=\"hk-label\">处理引擎</span>\n    <span class=\"hk-value\">AI 编码模型</span>\n  </div>\n  <div class=\"hk-tile c-blue\">\n    <span class=\"hk-label\">实时呈现</span>\n    <span class=\"hk-value\">应用原型</span>\n  </div>\n</div>\n\n<svg class=\"hk-fig\" viewBox=\"0 0 480 230\" role=\"img\" data-motion=\"none\">\n  <defs>\n    <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\">\n      <path d=\"M2 1L8 5L2 9\" fill=\"none\" stroke=\"context-stroke\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n    </marker>\n  </defs>\n\n  <!-- 左侧：用户提示对话框 -->\n  <g class=\"c-purple\">\n    <rect class=\"box\" x=\"20\" y=\"52\" width=\"124\" height=\"68\" rx=\"8\"/>\n    <!-- 对话小尖角 -->\n    <path d=\"M50 120 L40 128 L56 120 Z\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.2\"/>\n    <text class=\"th\" x=\"82\" y=\"77\" text-anchor=\"middle\">做一个</text>\n    <text class=\"th\" x=\"82\" y=\"99\" text-anchor=\"middle\">饮水追踪器</text>\n    <text class=\"ts\" x=\"82\" y=\"142\" text-anchor=\"middle\">用户指令</text>\n  </g>\n\n  <!-- 提示到AI的箭头 -->\n  <path class=\"arr c-gray\" d=\"M144 86 L188 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 中间：AI 齿轮图标 -->\n  <g class=\"c-gray\" transform=\"translate(216, 86)\">\n    <!-- 齿轮形状 -->\n    <path class=\"box\" d=\"M-6 -22 L6 -22 L8 -16 L16 -16 L19 -21 L28 -14 L23 -9 L25 -1 L31 2 L29 12 L22 13 L20 20 L27 26 L19 32 L14 26 L7 28 L4 34 L-6 34 L-8 28 L-15 27 L-20 32 L-28 25 L-22 19 L-24 12 L-30 9 L-29 -2 L-23 -4 L-20 -12 L-26 -17 L-18 -24 L-12 -19 L-5 -21 Z\" fill=\"#F1EFE8\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <circle cx=\"0\" cy=\"5\" r=\"9\" fill=\"#FFF\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <text class=\"th\" x=\"0\" y=\"9\" text-anchor=\"middle\">AI</text>\n    <text class=\"ts\" x=\"0\" y=\"56\" text-anchor=\"middle\">生成代码</text>\n  </g>\n\n  <!-- AI到原型的箭头 -->\n  <path class=\"arr c-gray\" d=\"M246 86 L292 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 右侧：手机预览屏幕 -->\n  <g class=\"c-blue\">\n    <!-- 手机外框 -->\n    <rect class=\"box\" x=\"300\" y=\"24\" width=\"94\" height=\"136\" rx=\"10\"/>\n    <!-- 听筒横线 -->\n    <line x1=\"337\" y1=\"32\" x2=\"357\" y2=\"32\" stroke=\"#185FA5\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    \n    <!-- 屏幕中大水滴按钮 -->\n    <g transform=\"translate(347, 84)\">\n      <path d=\"M0 -22 C-16 0, -18 14, 0 22 C18 14, 16 0, 0 -22 Z\" fill=\"#185FA5\"/>\n      <path d=\"M-3 -4 C-8 2, -7 8, -2 11\" fill=\"none\" stroke=\"#E6F1FB\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n      <text class=\"th\" x=\"0\" y=\"38\" text-anchor=\"middle\" fill=\"#0C447C\">+250ml</text>\n    </g>\n    <text class=\"ts\" x=\"347\" y=\"176\" text-anchor=\"middle\">实时原型</text>\n  </g>\n\n  <!-- 反馈回路：从原型回到提示框 -->\n  <g class=\"c-coral\">\n    <path class=\"arr\" d=\"M347 186 L347 206 L82 206 L82 154\" fill=\"none\" marker-end=\"url(#arrow)\"/>\n    <rect class=\"box\" x=\"180\" y=\"196\" width=\"76\" height=\"20\" rx=\"4\"/>\n    <text class=\"ts\" x=\"218\" y=\"211\" text-anchor=\"middle\">评估与反馈</text>\n  </g>\n</svg>\n\n<p class=\"hk-caption\">自然语言驱动编码与即时预览构成的持续迭代循环</p></div></div><script>\n(function(){\n  if (window.__hkHostBridge) return;\n  window.__hkHostBridge = 1;\n  var SEL = 'button,[role=\"button\"],[role=\"slider\"],[role=\"switch\"],[role=\"checkbox\"],input,select,textarea,a[href],label,[contenteditable=\"\"],[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"]),[draggable=\"true\"],[data-hk-interactive]';\n  var CURSORS = {\n    pointer: 1,\n    grab: 1,\n    grabbing: 1,\n    move: 1,\n    'ew-resize': 1,\n    'ns-resize': 1,\n    'nesw-resize': 1,\n    'nwse-resize': 1,\n    'col-resize': 1,\n    'row-resize': 1\n  };\n  function post(type, extra) {\n    try {\n      var de = document.documentElement;\n      var msg = {\n        type: type,\n        vw: de && de.clientWidth ? de.clientWidth : 1,\n        vh: de && de.clientHeight ? de.clientHeight : 1\n      };\n      if (extra) {\n        for (var k in extra) msg[k] = extra[k];\n      }\n      parent.postMessage(msg, '*');\n    } catch (e) {}\n  }\n  function addRect(out, r) {\n    if (r && r.width > 0 && r.height > 0) {\n      out.push({ x: r.left, y: r.top, w: r.width, h: r.height });\n    }\n  }\n  function hitRects() {\n    var out = [];\n    var els = document.querySelectorAll(SEL);\n    for (var i = 0; i < els.length; i++) addRect(out, els[i].getBoundingClientRect());\n    var all = document.body ? document.body.querySelectorAll('*') : [];\n    for (var j = 0; j < all.length; j++) {\n      try {\n        var cursor = getComputedStyle(all[j]).cursor;\n        if (CURSORS[cursor]) {\n          var r = all[j].getBoundingClientRect();\n          if (r.width > 4 && r.height > 4) addRect(out, r);\n        }\n      } catch (e) {}\n    }\n    return out;\n  }\n  function hasInteractiveCursor(target) {\n    var node = target;\n    while (node && node !== document.documentElement) {\n      try {\n        if (node.nodeType === 1 && CURSORS[getComputedStyle(node).cursor]) return true;\n      } catch (e) {}\n      node = node.parentElement;\n    }\n    return false;\n  }\n  function closestInteractive(target) {\n    try {\n      if (!target || !target.closest) return false;\n      if (target.closest(SEL)) return true;\n      return hasInteractiveCursor(target);\n    } catch (e) {\n      return false;\n    }\n  }\n  function targetAtPointer(e) {\n    try {\n      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return e.target;\n      return document.elementFromPoint(e.clientX, e.clientY) || e.target;\n    } catch (err) {\n      return e.target;\n    }\n  }\n  function postHover(e, dragState) {\n    var target = targetAtPointer(e);\n    var active = closestInteractive(target);\n    if (!active && dragState) active = true;\n    post('hk-anim-hover', {\n      interactive: active,\n      dragging: !!dragState\n    });\n  }\n  function isInteractiveTarget(target) {\n    return closestInteractive(target);\n  }\n  function reportRects() {\n    post('hk-anim-hitrects', { rects: hitRects() });\n  }\n  var dragging = false;\n  document.addEventListener('pointermove', function(e) {\n    postHover(e, dragging);\n  }, true);\n  document.addEventListener('pointerdown', function(e) {\n    dragging = isInteractiveTarget(targetAtPointer(e));\n    post('hk-anim-hover', { interactive: dragging, dragging: dragging });\n  }, true);\n  window.addEventListener('pointerup', function() {\n    dragging = false;\n    post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  document.addEventListener('mouseleave', function() {\n    if (!dragging) post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  try { new ResizeObserver(reportRects).observe(document.documentElement); } catch (e) {}\n  try {\n    if (document.body) {\n      new MutationObserver(reportRects).observe(document.body, {\n        childList: true,\n        subtree: true,\n        attributes: true\n      });\n    }\n  } catch (e) {}\n  var warmup = 0;\n  (function loop() {\n    reportRects();\n    if (warmup++ < 3) setTimeout(loop, 150);\n  })();\n  setInterval(reportRects, 350);\n  window.addEventListener('load', reportRects);\n})();\n</script></body></html>",
+                    "pending": false,
+                    "task": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。"
+                  },
+                  "columnIndex": 2,
+                  "h": 492,
+                  "id": "live_id_006",
+                  "kind": "board_animation",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 513
+                },
+                {
+                  "boardUid": 3,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 370,
+                  "id": "live_id_007",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "例子：每日饮水追踪器\n\n1. **你的指令**：“做一个极简网页，点一下按钮加 250ml，显示总量。”\n2. **AI 生成**：瞬间写好 HTML 和 JS。\n3. **你的检查**：发现按钮太小了，背景颜色太刺眼。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 1007
+                },
+                {
+                  "boardUid": 4,
+                  "columnIndex": 3,
+                  "decorations": [],
+                  "h": 253,
+                  "id": "live_id_008",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**迭代过程**\n\n- 你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\n- AI 修正：调整样式代码。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 2394,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 10,
+          "version": 1
+        }
+      },
+      "sequence": 70
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:31.441Z",
+      "payload": {
+        "step_id": 23,
+        "type": "action_step_complete"
+      },
+      "sequence": 71
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:42.098Z",
+      "payload": {
+        "step_id": 24,
+        "type": "action_step_complete"
+      },
+      "sequence": 72
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:42.386Z",
+      "payload": {
+        "spoken_text": "所以，Vibe Coding 的瓶颈不在于你不会写分号，而是在于你能不能清晰地评估：这个东西现在给我的“感觉”对吗？",
+        "step_id": 25,
+        "type": "speak"
+      },
+      "sequence": 73
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:42.387Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sequence": 15,
+        "speed": 1,
+        "step_id": 25,
+        "tts_cjk": 40,
+        "tts_latin": 10,
+        "type": "tts_segment"
+      },
+      "sequence": 74
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:26:51.654Z",
+      "payload": {
+        "step_id": 25,
+        "type": "action_step_complete"
+      },
+      "sequence": 75
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:26:51.942Z",
+      "payload": {
+        "master_concept_description": "你理解了人类在 AI 开发中作为“创意总监”和“评估者”的必要性，这是避免 AI 幻觉的关键。",
+        "master_concept_title": "Vibe Coding 的角色分工",
+        "step_id": 26,
+        "type": "reward_user"
+      },
+      "sequence": 76
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:27:31.333Z",
+      "payload": {
+        "step_id": 26,
+        "type": "action_step_complete"
+      },
+      "sequence": 77
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:27:31.622Z",
+      "payload": {
+        "spoken_text": "现在回到你刚才的想法：如果 AI 生成的按钮明明点击了没反应，但它告诉你“已经做好了”，这时候你觉得作为总监，你应该怎么做？是相信它的话，还是自己去点一下试试？",
+        "step_id": 27,
+        "type": "speak"
+      },
+      "sequence": 78
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:27:31.623Z",
+      "payload": {
+        "audio_url": "[omitted]",
+        "sentences": [
+          {
+            "cjk": 51,
+            "display": "现在回到你刚才的想法：如果 AI 生成的按钮明明点击了没反应，但它告诉你“已经做好了”，这时候你觉得作为总监，你应该怎么做？",
+            "latin": 2
+          },
+          {
+            "cjk": 16,
+            "display": "是相信它的话，还是自己去点一下试试？",
+            "latin": 0
+          }
+        ],
+        "sequence": 16,
+        "speed": 1,
+        "step_id": 27,
+        "tts_cjk": 67,
+        "tts_latin": 2,
+        "type": "tts_segment"
+      },
+      "sequence": 79
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:27:44.954Z",
+      "payload": {
+        "step_id": 27,
+        "type": "action_step_complete"
+      },
+      "sequence": 80
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:27:45.242Z",
+      "payload": {
+        "mode": "open",
+        "step_id": 28,
+        "type": "ask"
+      },
+      "sequence": 81
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:27:45.264Z",
+      "payload": {
+        "step_id": 28,
+        "type": "action_step_complete"
+      },
+      "sequence": 82
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:27:45.551Z",
+      "payload": {
+        "step_id": 29,
+        "type": "action_step_complete"
+      },
+      "sequence": 83
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:27:45.551Z",
+      "payload": {
+        "step_id": 29,
+        "type": "done"
+      },
+      "sequence": 84
+    },
+    {
+      "direction": "server_to_client",
+      "observed_at": "2026-11-09T23:27:45.972Z",
+      "payload": {
+        "can_continue": false,
+        "is_complete": true,
+        "session": false,
+        "status": "completed",
+        "type": "response_complete",
+        "voice_turn_id": null
+      },
+      "sequence": 85
+    },
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:27:45.978Z",
+      "payload": {
+        "type": "sync_whiteboard_state",
+        "whiteboard_state": {
+          "activePageId": "page-1",
+          "pages": [
+            {
+              "columnLayout": {
+                "activeIndex": 3,
+                "active_index": 0,
+                "columns": [
+                  {
+                    "nextY": 456,
+                    "w": 744,
+                    "x": 54
+                  },
+                  {
+                    "nextY": 331,
+                    "w": 744,
+                    "x": 834
+                  },
+                  {
+                    "nextY": 1379,
+                    "w": 744,
+                    "x": 1614
+                  },
+                  {
+                    "nextY": 385,
+                    "w": 744,
+                    "x": 2394
+                  }
+                ],
+                "lp": {
+                  "colCount": 3,
+                  "exportPixelW": 1308,
+                  "gridLeft": 30,
+                  "gridTop": 130,
+                  "tileGapX": 12,
+                  "tileGapY": 12,
+                  "tileW": 654,
+                  "usableH": 833,
+                  "usableW": 1988
+                }
+              },
+              "excalidrawElements": [],
+              "id": "page-1",
+              "overlayItems": [
+                {
+                  "boardUid": 0,
+                  "columnIndex": 0,
+                  "decorations": [],
+                  "h": 324,
+                  "id": "live_id_001",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "Vibe Coding：什么是“氛围感编程”？\n\n- 什么是 Vibe Coding？\n- 它和传统编程有什么区别？\n- 为什么现在人人都能成为开发者？",
+                    "importance": 2,
+                    "title": "课程概览",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 54,
+                  "y": 130
+                },
+                {
+                  "boardUid": 1,
+                  "columnIndex": 1,
+                  "decorations": [],
+                  "h": 199,
+                  "id": "live_id_002",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**Vibe Coding**：氛围感编程\n\n- 核心媒介：自然语言（人话）\n- 角色转变：从“打字员”变身“创意总监”",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 834,
+                  "y": 130
+                },
+                {
+                  "boardUid": 2,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 381,
+                  "id": "live_id_005",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "| 模式 | 人类的角色 | 风险 |\n|---|---|---|\n| 全自动 Vibe | 甩手掌柜 | 幻觉循环、代码臃肿 |\n| **人类主导 Vibe** | **领航员/评估者** | **可控、高质量**",
+                    "importance": 2,
+                    "title": "两种 Vibe Coding 模式",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 130
+                },
+                {
+                  "boardAnimation": {
+                    "html": "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>\n*{box-sizing:border-box}\nhtml,body{margin:0;background:#fcfcfc;color:#2C2C2A;font:14px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"PingFang SC\",\"Microsoft YaHei\",sans-serif;-webkit-font-smoothing:antialiased}\n@media (forced-colors:active){:root{forced-color-adjust:none}}\n.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}\n.hk-card{border:1px solid #E5E3DC;border-radius:12px;padding:8px 12px 12px}\n.hk-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}\n.hk-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489}\n.hk-tools{margin-left:auto;position:relative;display:flex;gap:6px;opacity:.55;transition:opacity .15s}\n.hk-card:hover .hk-tools,.hk-tools:focus-within{opacity:1}\n.hk-btn{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;color:#444441;font:inherit;cursor:pointer}\n.hk-btn:hover{border-color:#B4B2A9;color:#2C2C2A}\n.hk-bar svg{width:12px;height:12px;flex:none}\n.hk-btn[aria-pressed=\"true\"] .hk-i-pause,.hk-btn[aria-pressed=\"false\"] .hk-i-play{display:none}\n.hk-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:188px;padding:4px;border:1px solid #E5E3DC;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.08)}\n.hk-menu[hidden]{display:none}\n.hk-menu button{display:block;width:100%;padding:6px 10px;border:0;border-radius:6px;background:none;font:inherit;color:#2C2C2A;text-align:left;cursor:pointer}\n.hk-menu button:hover{background:#F1EFE8}\n.hk-menu small{display:block;font-size:11px;color:#5F5E5A}\n.hk-stage{position:relative}\n.hk-fig{display:block;width:100%;height:auto;overflow:hidden}\n/* A curve left with no class and no stroke is invisible. Zero specificity: a colour group's stroke still wins. */\n:where(.hk-fig path:not([stroke]):not([class])){stroke:#5F5E5A;stroke-width:1.5}\n.hk-readout{font-variant-numeric:tabular-nums}\n.t{font-size:14px;font-weight:400;fill:#2C2C2A}.th{font-size:14px;font-weight:500;fill:#2C2C2A}.ts{font-size:12px;font-weight:400;fill:#5F5E5A}\n.box{fill:#F1EFE8;stroke:#B4B2A9;stroke-width:1}\n.c-purple>rect,rect.c-purple,.c-purple>circle,circle.c-purple,.c-purple>ellipse,ellipse.c-purple,.c-purple>polygon,polygon.c-purple,.c-purple>path,path.c-purple{fill:#EEEDFE;stroke:#534AB7;stroke-width:1}\n.c-purple>line,.c-purple>polyline,line.c-purple,polyline.c-purple{stroke:#534AB7;fill:none}\n.c-purple>.t,.c-purple>.th{fill:#3C3489}.c-purple>.ts{fill:#534AB7}\n.c-purple>.frame,.c-purple>.arr{stroke:#534AB7}\n.c-teal>rect,rect.c-teal,.c-teal>circle,circle.c-teal,.c-teal>ellipse,ellipse.c-teal,.c-teal>polygon,polygon.c-teal,.c-teal>path,path.c-teal{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1}\n.c-teal>line,.c-teal>polyline,line.c-teal,polyline.c-teal{stroke:#0F6E56;fill:none}\n.c-teal>.t,.c-teal>.th{fill:#085041}.c-teal>.ts{fill:#0F6E56}\n.c-teal>.frame,.c-teal>.arr{stroke:#0F6E56}\n.c-coral>rect,rect.c-coral,.c-coral>circle,circle.c-coral,.c-coral>ellipse,ellipse.c-coral,.c-coral>polygon,polygon.c-coral,.c-coral>path,path.c-coral{fill:#FAECE7;stroke:#993C1D;stroke-width:1}\n.c-coral>line,.c-coral>polyline,line.c-coral,polyline.c-coral{stroke:#993C1D;fill:none}\n.c-coral>.t,.c-coral>.th{fill:#712B13}.c-coral>.ts{fill:#993C1D}\n.c-coral>.frame,.c-coral>.arr{stroke:#993C1D}\n.c-pink>rect,rect.c-pink,.c-pink>circle,circle.c-pink,.c-pink>ellipse,ellipse.c-pink,.c-pink>polygon,polygon.c-pink,.c-pink>path,path.c-pink{fill:#FBEAF0;stroke:#993556;stroke-width:1}\n.c-pink>line,.c-pink>polyline,line.c-pink,polyline.c-pink{stroke:#993556;fill:none}\n.c-pink>.t,.c-pink>.th{fill:#72243E}.c-pink>.ts{fill:#993556}\n.c-pink>.frame,.c-pink>.arr{stroke:#993556}\n.c-gray>rect,rect.c-gray,.c-gray>circle,circle.c-gray,.c-gray>ellipse,ellipse.c-gray,.c-gray>polygon,polygon.c-gray,.c-gray>path,path.c-gray{fill:#F1EFE8;stroke:#5F5E5A;stroke-width:1}\n.c-gray>line,.c-gray>polyline,line.c-gray,polyline.c-gray{stroke:#5F5E5A;fill:none}\n.c-gray>.t,.c-gray>.th{fill:#444441}.c-gray>.ts{fill:#5F5E5A}\n.c-gray>.frame,.c-gray>.arr{stroke:#5F5E5A}\n.c-blue>rect,rect.c-blue,.c-blue>circle,circle.c-blue,.c-blue>ellipse,ellipse.c-blue,.c-blue>polygon,polygon.c-blue,.c-blue>path,path.c-blue{fill:#E6F1FB;stroke:#185FA5;stroke-width:1}\n.c-blue>line,.c-blue>polyline,line.c-blue,polyline.c-blue{stroke:#185FA5;fill:none}\n.c-blue>.t,.c-blue>.th{fill:#0C447C}.c-blue>.ts{fill:#185FA5}\n.c-blue>.frame,.c-blue>.arr{stroke:#185FA5}\n.c-green>rect,rect.c-green,.c-green>circle,circle.c-green,.c-green>ellipse,ellipse.c-green,.c-green>polygon,polygon.c-green,.c-green>path,path.c-green{fill:#EAF3DE;stroke:#3B6D11;stroke-width:1}\n.c-green>line,.c-green>polyline,line.c-green,polyline.c-green{stroke:#3B6D11;fill:none}\n.c-green>.t,.c-green>.th{fill:#27500A}.c-green>.ts{fill:#3B6D11}\n.c-green>.frame,.c-green>.arr{stroke:#3B6D11}\n.c-amber>rect,rect.c-amber,.c-amber>circle,circle.c-amber,.c-amber>ellipse,ellipse.c-amber,.c-amber>polygon,polygon.c-amber,.c-amber>path,path.c-amber{fill:#FAEEDA;stroke:#854F0B;stroke-width:1}\n.c-amber>line,.c-amber>polyline,line.c-amber,polyline.c-amber{stroke:#854F0B;fill:none}\n.c-amber>.t,.c-amber>.th{fill:#633806}.c-amber>.ts{fill:#854F0B}\n.c-amber>.frame,.c-amber>.arr{stroke:#854F0B}\n.c-red>rect,rect.c-red,.c-red>circle,circle.c-red,.c-red>ellipse,ellipse.c-red,.c-red>polygon,polygon.c-red,.c-red>path,path.c-red{fill:#FCEBEB;stroke:#A32D2D;stroke-width:1}\n.c-red>line,.c-red>polyline,line.c-red,polyline.c-red{stroke:#A32D2D;fill:none}\n.c-red>.t,.c-red>.th{fill:#791F1F}.c-red>.ts{fill:#A32D2D}\n.c-red>.frame,.c-red>.arr{stroke:#A32D2D}\n:is(rect,circle,ellipse,polygon,path)[fill=\"none\"]{fill:none}\n.arr{stroke:#73726c;stroke-width:1.5;fill:none!important;stroke-linecap:round;stroke-linejoin:round}\n.leader{stroke:#888780;stroke-width:1;stroke-dasharray:3 3;fill:none!important}\n.frame{fill:none!important;stroke-width:2;stroke:#5F5E5A}\n.em{stroke-width:2.5!important}\n.hk-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}\n.hk-tile{flex:1 1 96px;min-width:0;padding:8px 10px;border-radius:8px;background:#F1EFE8;border:1px solid #E5E3DC}\n.hk-label{display:block;font-size:12px;color:#5F5E5A}\n.hk-value{display:block;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}\n.hk-tile.c-purple{background:#EEEDFE;border-color:#534AB733}.hk-tile.c-purple .hk-label{color:#534AB7}.hk-tile.c-purple .hk-value{color:#3C3489}\n.hk-tile.c-teal{background:#E1F5EE;border-color:#0F6E5633}.hk-tile.c-teal .hk-label{color:#0F6E56}.hk-tile.c-teal .hk-value{color:#085041}\n.hk-tile.c-coral{background:#FAECE7;border-color:#993C1D33}.hk-tile.c-coral .hk-label{color:#993C1D}.hk-tile.c-coral .hk-value{color:#712B13}\n.hk-tile.c-pink{background:#FBEAF0;border-color:#99355633}.hk-tile.c-pink .hk-label{color:#993556}.hk-tile.c-pink .hk-value{color:#72243E}\n.hk-tile.c-gray{background:#F1EFE8;border-color:#5F5E5A33}.hk-tile.c-gray .hk-label{color:#5F5E5A}.hk-tile.c-gray .hk-value{color:#444441}\n.hk-tile.c-blue{background:#E6F1FB;border-color:#185FA533}.hk-tile.c-blue .hk-label{color:#185FA5}.hk-tile.c-blue .hk-value{color:#0C447C}\n.hk-tile.c-green{background:#EAF3DE;border-color:#3B6D1133}.hk-tile.c-green .hk-label{color:#3B6D11}.hk-tile.c-green .hk-value{color:#27500A}\n.hk-tile.c-amber{background:#FAEEDA;border-color:#854F0B33}.hk-tile.c-amber .hk-label{color:#854F0B}.hk-tile.c-amber .hk-value{color:#633806}\n.hk-tile.c-red{background:#FCEBEB;border-color:#A32D2D33}.hk-tile.c-red .hk-label{color:#A32D2D}.hk-tile.c-red .hk-value{color:#791F1F}\n.hk-caption{margin:6px 0 0;text-align:center;font-size:12px;color:#5F5E5A}\n.hk-formula{margin:8px 0;text-align:center;font-variant-numeric:tabular-nums}\n.hk-dots{display:flex;gap:6px;justify-content:center;margin:8px 0}\n.hk-dots i{width:6px;height:6px;border-radius:50%;background:#D3D1C7}\n.hk-dots i.on{background:#534AB7}\n</style><script>\n(function(){\n  function post(msg){ try { parent.postMessage(msg, '*'); } catch (e) {} }\n  function report(){\n    // Before first layout this reads 0; a 0 would shrink the card to nothing.\n    var height = Math.ceil(document.documentElement.getBoundingClientRect().height);\n    if (height > 0) post({ type: 'hk-anim-height', height: height });\n  }\n\n  var frame = window.requestAnimationFrame.bind(window), clock = performance.now.bind(performance);\n  var paused = false, pausedAt = 0, lost = 0, held = [];\n  function now(){ return clock() - lost - (paused ? clock() - pausedAt : 0); }\n  performance.now = now;\n  window.requestAnimationFrame = function(cb){\n    return frame(function(){ if (paused) held.push(cb); else cb(now()); });\n  };\n  function setPaused(p){\n    if (p === paused) return;\n    if (p) pausedAt = clock(); else lost += clock() - pausedAt;\n    paused = p;\n    try { document.getAnimations().forEach(function(a){ if (p) a.pause(); else a.play(); }); } catch (e) {}\n    if (!p) { var q = held; held = []; q.forEach(function(cb){ frame(function(){ cb(now()); }); }); }\n  }\n\n  // The drawing as a standalone SVG: the host stylesheet does not travel with it, so\n  // every computed paint and type property is written onto the element itself.\n  var PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-dashoffset',\n    'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'text-anchor', 'dominant-baseline'];\n  function svgMarkup(){\n    var src = document.querySelector('svg.hk-fig');\n    if (!src) return null;\n    var copy = src.cloneNode(true), from = src.querySelectorAll('*'), to = copy.querySelectorAll('*');\n    for (var i = 0; i < from.length; i++) {\n      var cs = getComputedStyle(from[i]);\n      for (var j = 0; j < PROPS.length; j++) to[i].style.setProperty(PROPS[j], cs.getPropertyValue(PROPS[j]));\n    }\n    var vb = src.viewBox.baseVal;\n    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');\n    if (vb && vb.width) { copy.setAttribute('width', vb.width); copy.setAttribute('height', vb.height); }\n    return new XMLSerializer().serializeToString(copy);\n  }\n\n  document.addEventListener('DOMContentLoaded', function(){\n    report();\n    try { new ResizeObserver(report).observe(document.body); } catch (e) {}\n    var menu = document.querySelector('.hk-menu');\n    if (!document.querySelector('svg.hk-fig')) {\n      var svgItem = document.querySelector('[data-hk-format=\"svg\"]');\n      if (svgItem) svgItem.remove();\n    }\n    document.addEventListener('click', function(e){\n      var hit = e.target.closest ? e.target.closest('[data-hk-act],[data-hk-format]') : null;\n      var act = hit && hit.getAttribute('data-hk-act'), format = hit && hit.getAttribute('data-hk-format');\n      if (menu && act !== 'download') menu.hidden = true;\n      if (act === 'replay') post({ type: 'hk-anim-replay' });\n      else if (act === 'pause') {\n        setPaused(!paused);\n        hit.setAttribute('aria-pressed', String(paused));\n        hit.querySelector('span').textContent = hit.getAttribute(paused ? 'data-resume' : 'data-pause');\n      } else if (act === 'download') {\n        menu.hidden = !menu.hidden;\n        hit.setAttribute('aria-expanded', String(!menu.hidden));\n      } else if (format) post({ type: 'hk-anim-download', format: format, svg: format === 'svg' ? svgMarkup() : null });\n    });\n  });\n  window.addEventListener('load', report);\n})();\n</script></head><body><div class=\"hk-card\"><div class=\"hk-bar\" data-hk-chrome><div class=\"hk-tools\"><button type=\"button\" class=\"hk-btn\" data-hk-act=\"download\" aria-haspopup=\"menu\" aria-expanded=\"false\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\" class=\"\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 1.8v6.4M3.4 5.8 6 8.4l2.6-2.6M2 10.2h8\"/></svg><span>下载</span></button><div class=\"hk-menu\" role=\"menu\" hidden><button type=\"button\" data-hk-format=\"png\">图片 PNG<small>贴进笔记或 PPT</small></button><button type=\"button\" data-hk-format=\"svg\">矢量 SVG<small>放大不失真，可再编辑</small></button><button type=\"button\" data-hk-format=\"html\">网页 HTML<small>离线打开，保留动画</small></button></div></div></div><div class=\"hk-stage\"><h2 class=\"sr-only\">Vibe Coding 闭环工作流示意图：从自然语言到代码生成再到原型预览与反馈循环</h2>\n\n<div class=\"hk-row\" style=\"margin-bottom: 8px;\">\n  <div class=\"hk-tile c-purple\">\n    <span class=\"hk-label\">指令输入</span>\n    <span class=\"hk-value\">自然语言</span>\n  </div>\n  <div class=\"hk-tile c-gray\">\n    <span class=\"hk-label\">处理引擎</span>\n    <span class=\"hk-value\">AI 编码模型</span>\n  </div>\n  <div class=\"hk-tile c-blue\">\n    <span class=\"hk-label\">实时呈现</span>\n    <span class=\"hk-value\">应用原型</span>\n  </div>\n</div>\n\n<svg class=\"hk-fig\" viewBox=\"0 0 480 230\" role=\"img\" data-motion=\"none\">\n  <defs>\n    <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\">\n      <path d=\"M2 1L8 5L2 9\" fill=\"none\" stroke=\"context-stroke\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n    </marker>\n  </defs>\n\n  <!-- 左侧：用户提示对话框 -->\n  <g class=\"c-purple\">\n    <rect class=\"box\" x=\"20\" y=\"52\" width=\"124\" height=\"68\" rx=\"8\"/>\n    <!-- 对话小尖角 -->\n    <path d=\"M50 120 L40 128 L56 120 Z\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.2\"/>\n    <text class=\"th\" x=\"82\" y=\"77\" text-anchor=\"middle\">做一个</text>\n    <text class=\"th\" x=\"82\" y=\"99\" text-anchor=\"middle\">饮水追踪器</text>\n    <text class=\"ts\" x=\"82\" y=\"142\" text-anchor=\"middle\">用户指令</text>\n  </g>\n\n  <!-- 提示到AI的箭头 -->\n  <path class=\"arr c-gray\" d=\"M144 86 L188 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 中间：AI 齿轮图标 -->\n  <g class=\"c-gray\" transform=\"translate(216, 86)\">\n    <!-- 齿轮形状 -->\n    <path class=\"box\" d=\"M-6 -22 L6 -22 L8 -16 L16 -16 L19 -21 L28 -14 L23 -9 L25 -1 L31 2 L29 12 L22 13 L20 20 L27 26 L19 32 L14 26 L7 28 L4 34 L-6 34 L-8 28 L-15 27 L-20 32 L-28 25 L-22 19 L-24 12 L-30 9 L-29 -2 L-23 -4 L-20 -12 L-26 -17 L-18 -24 L-12 -19 L-5 -21 Z\" fill=\"#F1EFE8\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <circle cx=\"0\" cy=\"5\" r=\"9\" fill=\"#FFF\" stroke=\"#5F5E5A\" stroke-width=\"1.5\"/>\n    <text class=\"th\" x=\"0\" y=\"9\" text-anchor=\"middle\">AI</text>\n    <text class=\"ts\" x=\"0\" y=\"56\" text-anchor=\"middle\">生成代码</text>\n  </g>\n\n  <!-- AI到原型的箭头 -->\n  <path class=\"arr c-gray\" d=\"M246 86 L292 86\" marker-end=\"url(#arrow)\"/>\n\n  <!-- 右侧：手机预览屏幕 -->\n  <g class=\"c-blue\">\n    <!-- 手机外框 -->\n    <rect class=\"box\" x=\"300\" y=\"24\" width=\"94\" height=\"136\" rx=\"10\"/>\n    <!-- 听筒横线 -->\n    <line x1=\"337\" y1=\"32\" x2=\"357\" y2=\"32\" stroke=\"#185FA5\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    \n    <!-- 屏幕中大水滴按钮 -->\n    <g transform=\"translate(347, 84)\">\n      <path d=\"M0 -22 C-16 0, -18 14, 0 22 C18 14, 16 0, 0 -22 Z\" fill=\"#185FA5\"/>\n      <path d=\"M-3 -4 C-8 2, -7 8, -2 11\" fill=\"none\" stroke=\"#E6F1FB\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n      <text class=\"th\" x=\"0\" y=\"38\" text-anchor=\"middle\" fill=\"#0C447C\">+250ml</text>\n    </g>\n    <text class=\"ts\" x=\"347\" y=\"176\" text-anchor=\"middle\">实时原型</text>\n  </g>\n\n  <!-- 反馈回路：从原型回到提示框 -->\n  <g class=\"c-coral\">\n    <path class=\"arr\" d=\"M347 186 L347 206 L82 206 L82 154\" fill=\"none\" marker-end=\"url(#arrow)\"/>\n    <rect class=\"box\" x=\"180\" y=\"196\" width=\"76\" height=\"20\" rx=\"4\"/>\n    <text class=\"ts\" x=\"218\" y=\"211\" text-anchor=\"middle\">评估与反馈</text>\n  </g>\n</svg>\n\n<p class=\"hk-caption\">自然语言驱动编码与即时预览构成的持续迭代循环</p></div></div><script>\n(function(){\n  if (window.__hkHostBridge) return;\n  window.__hkHostBridge = 1;\n  var SEL = 'button,[role=\"button\"],[role=\"slider\"],[role=\"switch\"],[role=\"checkbox\"],input,select,textarea,a[href],label,[contenteditable=\"\"],[contenteditable=\"true\"],[tabindex]:not([tabindex=\"-1\"]),[draggable=\"true\"],[data-hk-interactive]';\n  var CURSORS = {\n    pointer: 1,\n    grab: 1,\n    grabbing: 1,\n    move: 1,\n    'ew-resize': 1,\n    'ns-resize': 1,\n    'nesw-resize': 1,\n    'nwse-resize': 1,\n    'col-resize': 1,\n    'row-resize': 1\n  };\n  function post(type, extra) {\n    try {\n      var de = document.documentElement;\n      var msg = {\n        type: type,\n        vw: de && de.clientWidth ? de.clientWidth : 1,\n        vh: de && de.clientHeight ? de.clientHeight : 1\n      };\n      if (extra) {\n        for (var k in extra) msg[k] = extra[k];\n      }\n      parent.postMessage(msg, '*');\n    } catch (e) {}\n  }\n  function addRect(out, r) {\n    if (r && r.width > 0 && r.height > 0) {\n      out.push({ x: r.left, y: r.top, w: r.width, h: r.height });\n    }\n  }\n  function hitRects() {\n    var out = [];\n    var els = document.querySelectorAll(SEL);\n    for (var i = 0; i < els.length; i++) addRect(out, els[i].getBoundingClientRect());\n    var all = document.body ? document.body.querySelectorAll('*') : [];\n    for (var j = 0; j < all.length; j++) {\n      try {\n        var cursor = getComputedStyle(all[j]).cursor;\n        if (CURSORS[cursor]) {\n          var r = all[j].getBoundingClientRect();\n          if (r.width > 4 && r.height > 4) addRect(out, r);\n        }\n      } catch (e) {}\n    }\n    return out;\n  }\n  function hasInteractiveCursor(target) {\n    var node = target;\n    while (node && node !== document.documentElement) {\n      try {\n        if (node.nodeType === 1 && CURSORS[getComputedStyle(node).cursor]) return true;\n      } catch (e) {}\n      node = node.parentElement;\n    }\n    return false;\n  }\n  function closestInteractive(target) {\n    try {\n      if (!target || !target.closest) return false;\n      if (target.closest(SEL)) return true;\n      return hasInteractiveCursor(target);\n    } catch (e) {\n      return false;\n    }\n  }\n  function targetAtPointer(e) {\n    try {\n      if (typeof e.clientX !== 'number' || typeof e.clientY !== 'number') return e.target;\n      return document.elementFromPoint(e.clientX, e.clientY) || e.target;\n    } catch (err) {\n      return e.target;\n    }\n  }\n  function postHover(e, dragState) {\n    var target = targetAtPointer(e);\n    var active = closestInteractive(target);\n    if (!active && dragState) active = true;\n    post('hk-anim-hover', {\n      interactive: active,\n      dragging: !!dragState\n    });\n  }\n  function isInteractiveTarget(target) {\n    return closestInteractive(target);\n  }\n  function reportRects() {\n    post('hk-anim-hitrects', { rects: hitRects() });\n  }\n  var dragging = false;\n  document.addEventListener('pointermove', function(e) {\n    postHover(e, dragging);\n  }, true);\n  document.addEventListener('pointerdown', function(e) {\n    dragging = isInteractiveTarget(targetAtPointer(e));\n    post('hk-anim-hover', { interactive: dragging, dragging: dragging });\n  }, true);\n  window.addEventListener('pointerup', function() {\n    dragging = false;\n    post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  document.addEventListener('mouseleave', function() {\n    if (!dragging) post('hk-anim-hover', { interactive: false, dragging: false });\n  }, true);\n  try { new ResizeObserver(reportRects).observe(document.documentElement); } catch (e) {}\n  try {\n    if (document.body) {\n      new MutationObserver(reportRects).observe(document.body, {\n        childList: true,\n        subtree: true,\n        attributes: true\n      });\n    }\n  } catch (e) {}\n  var warmup = 0;\n  (function loop() {\n    reportRects();\n    if (warmup++ < 3) setTimeout(loop, 150);\n  })();\n  setInterval(reportRects, 350);\n  window.addEventListener('load', reportRects);\n})();\n</script></body></html>",
+                    "pending": false,
+                    "task": "左侧：一个对话框，写着“做一个饮水追踪器”。中间：一个齿轮图标代表 AI。右侧：一个手机屏幕，上面有一个大水滴按钮。有一条从右侧回到左侧的箭头，标着“反馈”。"
+                  },
+                  "columnIndex": 2,
+                  "h": 492,
+                  "id": "live_id_006",
+                  "kind": "board_animation",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 513
+                },
+                {
+                  "boardUid": 3,
+                  "columnIndex": 2,
+                  "decorations": [],
+                  "h": 370,
+                  "id": "live_id_007",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "例子：每日饮水追踪器\n\n1. **你的指令**：“做一个极简网页，点一下按钮加 250ml，显示总量。”\n2. **AI 生成**：瞬间写好 HTML 和 JS。\n3. **你的检查**：发现按钮太小了，背景颜色太刺眼。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 1614,
+                  "y": 1007
+                },
+                {
+                  "boardUid": 4,
+                  "columnIndex": 3,
+                  "decorations": [],
+                  "h": 253,
+                  "id": "live_id_008",
+                  "keypoint": {
+                    "column": 1,
+                    "content": "**迭代过程**\n\n- 你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\n- AI 修正：调整样式代码。",
+                    "importance": 2,
+                    "title": "",
+                    "type": "formula"
+                  },
+                  "kind": "note_card",
+                  "w": 744,
+                  "x": 2394,
+                  "y": 130
+                }
+              ]
+            }
+          ],
+          "revision": 11,
+          "version": 1
+        }
+      },
+      "sequence": 86
+    }
+  ],
+  "limits": [
+    "Audio binaries and audio URLs omitted",
+    "Names and UUIDs pseudonymized",
+    "Source is actual client-visible events, not hidden backend prompts",
+    "Existing historical opening stored separately in session-001"
+  ],
+  "operator_inputs": [
+    {
+      "direction": "client_to_server",
+      "observed_at": "2026-11-09T23:25:18.703Z",
+      "origin": "agent_operator_for_reference_capture_not_actual_learner",
+      "payload": {
+        "lecture_outline_id": "live_id_003:live_id_004",
+        "message": "我理解成只要把想法说出来，AI就能全自动做好，不用我检查。这样理解对吗？能给我一个具体例子吗？",
+        "type": "user_message"
+      },
+      "sequence": 38
+    }
+  ],
+  "source": "actual_live_original_whiteboard_websocket",
+  "started_at": "2026-11-09T23:23:06.494Z",
+  "visible_observations": [
+    {
+      "observed_at": "2026-11-09T23:24:29.512Z",
+      "page_text": "学习节大纲\n\nVibe Coding 与 AI 辅助开发\n理解 Vibe Coding\n\n本节课首先介绍由 AI 研究员 Andrej Karpathy 推广的革命性概念——“Vibe Coding”。解释传统软件开发总是需要极高的认知成本：必须将人类的创意想法转化为严谨的、机器可读的语法，如分号、花括号和内存管理。与之形成鲜明对比的是 “Vibe Coding”，其主要的创作媒介是自然语言。强调这并不是为了偷懒，而是一场深刻的范式转移：创作者从手动敲击的“打字员”转变为高层级的“创意总监”。这种介绍立即降低了非技术学习者的准入门槛，让他们明白缺乏编程经验并不是劣势，而是一个摆脱语法负担、掌握系统设计的契机。\n\n为了让这一点更加具体，在物理或虚拟白板上画一个对比表格。左列标注为“传统软件工程”，并画出其工作流：构思、语法解析、手动调试和编译。右列标注为 “Vibe Coding”，并画出其工作流：战略意图、自然语言提示词编写、AI 生成和系统评估。逐步讲解该表格，展示开发的瓶颈是如何转移的。在传统编程中，人们花数小时寻找缺失的逗号；而在 Vibe Coding 中，人们花数小时完善指令的清晰度。使用盖房子的比喻：传统程序员是亲手砌每一块砖，而 Vibe Coder 则是指挥自动化施工队的建筑师。\n\n接着，通过定义“全自动 Vibe Coding”与“人类主导的 Vibe Coding”来剖析自动化的光谱。解释全自动 Vibe Coding 是一种理想状态，即 AI 代理试图在完全没有人类监督的情况下构建整个应用。指出这种极端情况的危险性：如果没有人类反馈循环，AI 代理往往会陷入递归幻觉循环，编写极其复杂的代码来修补微小的错误。对比之下，“人类主导的 Vibe Coding”才是本课程的核心。在这个模型中，人类充当领航员和关键评估者，引导 AI，设定设计边界，并不断检查应用程序的表现是否符合预期的“氛围 (Vibe)”。这种区分可以防止初学者产生“期望 AI 能神奇地读懂他们的心”这一常见误区。\n\n最后，以一个基于交互式场景的反思结束。请观众想象他们想构建一个简单的每日习惯追踪器。引导他们想象传统开发者会如何从编写数据库模式和设置本地服务器开始。然后，展示 Vibe Coder 会如何简单地写下：“创建一个简洁、极简的网页，让我可以点击一个按钮来记录我的饮水量。”这种强烈的对比强化了本讲座的核心收获：只要学会如何有效地引导和评估 AI 助手，Vibe Coding 就能让任何人以思考的速度制作原型。\n\n参考资料\n\n此学习节暂无参考资料。\n\n课程概览\n\nVibe Coding：什么是“氛围感编程”？\n\n什么是 Vibe Coding？\n它和传统编程有什么区别？\n为什么现在人人都能成为开发者？\n\nVibe Coding：氛围感编程\n\n核心媒介：自然语言（人话）\n角色转变：从“打字员”变身“创意总监”\n100%\n1\n/\n1\nVibe Coding 与 AI 辅助开发\n已回到上次讲到的地方，点 ▶ 接着讲，或者直接提问。\n知道了\n到这里你能感觉到角色的这种变化吗？\n语音输入已开启\n对话历史\n16:54\n\n[学习者]，你好！欢迎来到今天的课堂。我是你的导师。今天我们要聊一个听起来特别酷、甚至带点“玄学”色彩，但实际上正在改变我们每个人写代码方式的概念——Vibe Coding。\n\n课程概览\n16:54\n\n这节课我们要回答三个问题。第一个问题：到底什么是 Vibe Coding？它是某种具体的编程语言吗？今天我们会把它的定义讲清楚。\n\n16:54\n\n第二个问题：它和我们以前在学校里学的、或者在电影里看到的那些噼里啪啦敲代码的“传统编程”有什么本质区别？\n\n16:54\n\n第三个问题：为什么我们说 Vibe Coding 出现后，即便你完全没有编程经验，也能以思考的速度把想法变成现实？这个我们最后讲。\n\n07:23\n\n好，我们继续。刚刚说到，为什么要学这个？\n\n07:23\n\n因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。这能让你从繁重的体力活中解脱出来，专注于最核心的创意。\n\n07:23\n\n学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。那我们现在就进入第一个知识点。\n\n07:23\n\n我们先来看一个很有趣的现象：Vibe Coding 这个词最近在技术圈特别火，它是被一位叫安德烈·卡帕斯的 AI 专家推广开的。\n\n板书\n07:23\n\n简单来说，Vibe Coding 就是“氛围感编程”。在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。\n\n07:24\n\n但现在，你的主要创作工具变成了你每天都在说的“自然语言”。你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。\n\n07:24\n\n这就像是盖房子：传统程序员是亲手砌每一块砖的泥瓦匠，而 [ [\n𝑉\n𝑖\n𝑏\n𝑒\n𝐶\n𝑜\n𝑑\n𝑒\n𝑟\nVibeCoder Vibe Coder 则是指挥自动化施工队的建筑师。\n\n07:24\n\n到这里你能感觉到角色的这种变化吗？\n\n模型正在讲解中\n语音输入模式已开启，模型正在聆听",
+      "trigger": "ask"
+    },
+    {
+      "observed_at": "2026-11-09T23:24:30.247Z",
+      "page_text": "学习节大纲\n\nVibe Coding 与 AI 辅助开发\n理解 Vibe Coding\n\n本节课首先介绍由 AI 研究员 Andrej Karpathy 推广的革命性概念——“Vibe Coding”。解释传统软件开发总是需要极高的认知成本：必须将人类的创意想法转化为严谨的、机器可读的语法，如分号、花括号和内存管理。与之形成鲜明对比的是 “Vibe Coding”，其主要的创作媒介是自然语言。强调这并不是为了偷懒，而是一场深刻的范式转移：创作者从手动敲击的“打字员”转变为高层级的“创意总监”。这种介绍立即降低了非技术学习者的准入门槛，让他们明白缺乏编程经验并不是劣势，而是一个摆脱语法负担、掌握系统设计的契机。\n\n为了让这一点更加具体，在物理或虚拟白板上画一个对比表格。左列标注为“传统软件工程”，并画出其工作流：构思、语法解析、手动调试和编译。右列标注为 “Vibe Coding”，并画出其工作流：战略意图、自然语言提示词编写、AI 生成和系统评估。逐步讲解该表格，展示开发的瓶颈是如何转移的。在传统编程中，人们花数小时寻找缺失的逗号；而在 Vibe Coding 中，人们花数小时完善指令的清晰度。使用盖房子的比喻：传统程序员是亲手砌每一块砖，而 Vibe Coder 则是指挥自动化施工队的建筑师。\n\n接着，通过定义“全自动 Vibe Coding”与“人类主导的 Vibe Coding”来剖析自动化的光谱。解释全自动 Vibe Coding 是一种理想状态，即 AI 代理试图在完全没有人类监督的情况下构建整个应用。指出这种极端情况的危险性：如果没有人类反馈循环，AI 代理往往会陷入递归幻觉循环，编写极其复杂的代码来修补微小的错误。对比之下，“人类主导的 Vibe Coding”才是本课程的核心。在这个模型中，人类充当领航员和关键评估者，引导 AI，设定设计边界，并不断检查应用程序的表现是否符合预期的“氛围 (Vibe)”。这种区分可以防止初学者产生“期望 AI 能神奇地读懂他们的心”这一常见误区。\n\n最后，以一个基于交互式场景的反思结束。请观众想象他们想构建一个简单的每日习惯追踪器。引导他们想象传统开发者会如何从编写数据库模式和设置本地服务器开始。然后，展示 Vibe Coder 会如何简单地写下：“创建一个简洁、极简的网页，让我可以点击一个按钮来记录我的饮水量。”这种强烈的对比强化了本讲座的核心收获：只要学会如何有效地引导和评估 AI 助手，Vibe Coding 就能让任何人以思考的速度制作原型。\n\n参考资料\n\n此学习节暂无参考资料。\n\n课程概览\n\nVibe Coding：什么是“氛围感编程”？\n\n什么是 Vibe Coding？\n它和传统编程有什么区别？\n为什么现在人人都能成为开发者？\n\nVibe Coding：氛围感编程\n\n核心媒介：自然语言（人话）\n角色转变：从“打字员”变身“创意总监”\n100%\n1\n/\n1\nVibe Coding 与 AI 辅助开发\n已回到上次讲到的地方，点 ▶ 接着讲，或者直接提问。\n知道了\n到这里你能感觉到角色的这种变化吗？\n语音输入已开启\n对话历史\n16:54\n\n[学习者]，你好！欢迎来到今天的课堂。我是你的导师。今天我们要聊一个听起来特别酷、甚至带点“玄学”色彩，但实际上正在改变我们每个人写代码方式的概念——Vibe Coding。\n\n课程概览\n16:54\n\n这节课我们要回答三个问题。第一个问题：到底什么是 Vibe Coding？它是某种具体的编程语言吗？今天我们会把它的定义讲清楚。\n\n16:54\n\n第二个问题：它和我们以前在学校里学的、或者在电影里看到的那些噼里啪啦敲代码的“传统编程”有什么本质区别？\n\n16:54\n\n第三个问题：为什么我们说 Vibe Coding 出现后，即便你完全没有编程经验，也能以思考的速度把想法变成现实？这个我们最后讲。\n\n07:23\n\n好，我们继续。刚刚说到，为什么要学这个？\n\n07:23\n\n因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。这能让你从繁重的体力活中解脱出来，专注于最核心的创意。\n\n07:23\n\n学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。那我们现在就进入第一个知识点。\n\n07:23\n\n我们先来看一个很有趣的现象：Vibe Coding 这个词最近在技术圈特别火，它是被一位叫安德烈·卡帕斯的 AI 专家推广开的。\n\n板书\n07:23\n\n简单来说，Vibe Coding 就是“氛围感编程”。在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。\n\n07:24\n\n但现在，你的主要创作工具变成了你每天都在说的“自然语言”。你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。\n\n07:24\n\n这就像是盖房子：传统程序员是亲手砌每一块砖的泥瓦匠，而 [ [\n𝑉\n𝑖\n𝑏\n𝑒\n𝐶\n𝑜\n𝑑\n𝑒\n𝑟\nVibeCoder Vibe Coder 则是指挥自动化施工队的建筑师。\n\n07:24\n\n到这里你能感觉到角色的这种变化吗？\n\n轮到你回答\n模型正在讲解中\n语音输入模式已开启，模型正在聆听",
+      "trigger": "response_complete"
+    },
+    {
+      "observed_at": "2026-11-09T23:27:45.242Z",
+      "page_text": "学习节大纲\n\nVibe Coding 与 AI 辅助开发\n理解 Vibe Coding\n\n本节课首先介绍由 AI 研究员 Andrej Karpathy 推广的革命性概念——“Vibe Coding”。解释传统软件开发总是需要极高的认知成本：必须将人类的创意想法转化为严谨的、机器可读的语法，如分号、花括号和内存管理。与之形成鲜明对比的是 “Vibe Coding”，其主要的创作媒介是自然语言。强调这并不是为了偷懒，而是一场深刻的范式转移：创作者从手动敲击的“打字员”转变为高层级的“创意总监”。这种介绍立即降低了非技术学习者的准入门槛，让他们明白缺乏编程经验并不是劣势，而是一个摆脱语法负担、掌握系统设计的契机。\n\n为了让这一点更加具体，在物理或虚拟白板上画一个对比表格。左列标注为“传统软件工程”，并画出其工作流：构思、语法解析、手动调试和编译。右列标注为 “Vibe Coding”，并画出其工作流：战略意图、自然语言提示词编写、AI 生成和系统评估。逐步讲解该表格，展示开发的瓶颈是如何转移的。在传统编程中，人们花数小时寻找缺失的逗号；而在 Vibe Coding 中，人们花数小时完善指令的清晰度。使用盖房子的比喻：传统程序员是亲手砌每一块砖，而 Vibe Coder 则是指挥自动化施工队的建筑师。\n\n接着，通过定义“全自动 Vibe Coding”与“人类主导的 Vibe Coding”来剖析自动化的光谱。解释全自动 Vibe Coding 是一种理想状态，即 AI 代理试图在完全没有人类监督的情况下构建整个应用。指出这种极端情况的危险性：如果没有人类反馈循环，AI 代理往往会陷入递归幻觉循环，编写极其复杂的代码来修补微小的错误。对比之下，“人类主导的 Vibe Coding”才是本课程的核心。在这个模型中，人类充当领航员和关键评估者，引导 AI，设定设计边界，并不断检查应用程序的表现是否符合预期的“氛围 (Vibe)”。这种区分可以防止初学者产生“期望 AI 能神奇地读懂他们的心”这一常见误区。\n\n最后，以一个基于交互式场景的反思结束。请观众想象他们想构建一个简单的每日习惯追踪器。引导他们想象传统开发者会如何从编写数据库模式和设置本地服务器开始。然后，展示 Vibe Coder 会如何简单地写下：“创建一个简洁、极简的网页，让我可以点击一个按钮来记录我的饮水量。”这种强烈的对比强化了本讲座的核心收获：只要学会如何有效地引导和评估 AI 助手，Vibe Coding 就能让任何人以思考的速度制作原型。\n\n参考资料\n\n此学习节暂无参考资料。\n\n课程概览\n\nVibe Coding：什么是“氛围感编程”？\n\n什么是 Vibe Coding？\n它和传统编程有什么区别？\n为什么现在人人都能成为开发者？\n\nVibe Coding：氛围感编程\n\n核心媒介：自然语言（人话）\n角色转变：从“打字员”变身“创意总监”\n\n两种 Vibe Coding 模式\n\n模式\t人类的角色\t风险\n全自动 Vibe\t甩手掌柜\t幻觉循环、代码臃肿\n人类主导 Vibe\t领航员/评估者\t可控、高质量\n\n例子：每日饮水追踪器\n\n你的指令：“做一个极简网页，点一下按钮加 250ml，显示总量。”\nAI 生成：瞬间写好 HTML 和 JS。\n你的检查：发现按钮太小了，背景颜色太刺眼。\n\n迭代过程\n\n你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\nAI 修正：调整样式代码。\n100%\n1\n/\n1\nVibe Coding 与 AI 辅助开发\n已回到上次讲到的地方，点 ▶ 接着讲，或者直接提问。\n知道了\n是相信它的话，还是自己去点一下试试？\n语音输入已开启\n对话历史\n16:54\n\n[学习者]，你好！欢迎来到今天的课堂。我是你的导师。今天我们要聊一个听起来特别酷、甚至带点“玄学”色彩，但实际上正在改变我们每个人写代码方式的概念——Vibe Coding。\n\n课程概览\n16:54\n\n这节课我们要回答三个问题。第一个问题：到底什么是 Vibe Coding？它是某种具体的编程语言吗？今天我们会把它的定义讲清楚。\n\n16:54\n\n第二个问题：它和我们以前在学校里学的、或者在电影里看到的那些噼里啪啦敲代码的“传统编程”有什么本质区别？\n\n16:54\n\n第三个问题：为什么我们说 Vibe Coding 出现后，即便你完全没有编程经验，也能以思考的速度把想法变成现实？这个我们最后讲。\n\n07:23\n\n好，我们继续。刚刚说到，为什么要学这个？\n\n07:23\n\n因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。这能让你从繁重的体力活中解脱出来，专注于最核心的创意。\n\n07:23\n\n学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。那我们现在就进入第一个知识点。\n\n07:23\n\n我们先来看一个很有趣的现象：Vibe Coding 这个词最近在技术圈特别火，它是被一位叫安德烈·卡帕斯的 AI 专家推广开的。\n\n板书\n07:23\n\n简单来说，Vibe Coding 就是“氛围感编程”。在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。\n\n07:24\n\n但现在，你的主要创作工具变成了你每天都在说的“自然语言”。你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。\n\n07:24\n\n这就像是盖房子：传统程序员是亲手砌每一块砖的泥瓦匠，而 [ [\n𝑉\n𝑖\n𝑏\n𝑒\n𝐶\n𝑜\n𝑑\n𝑒\n𝑟\nVibeCoder Vibe Coder 则是指挥自动化施工队的建筑师。\n\n07:24\n\n到这里你能感觉到角色的这种变化吗？\n\n轮到你回答\n我理解成只要把想法说出来，AI就能全自动做好，不用我检查。这样理解对吗？能给我一个具体例子吗？\n07:25\n\n你的这个理解非常典型，很多刚接触的人都会这么想。但我要先给你泼一盆冷水：如果你追求的是“全自动、不检查”，那这就不是氛围感编程，而是在玩一场很容易翻车的“开盲盒”。\n\n两种 Vibe Coding 模式\n07:25\n\n看这张对比表。如果你当“甩手掌柜”，让 AI 全自动做，AI 很容易陷入“递归幻觉”。简单说，它写错了一个小地方，为了修这个错，它会写出更复杂的代码来掩盖，最后整个程序会变成一团谁也看不懂的乱麻。\n\n07:25\n\n所以，我们这节课核心要学的是“人类主导”的模式。你不是打字员，但你是领航员。\n\n07:26\n\n你说想要一个具体例子，那我们现在就来模拟一个：假设你想做一个最简单的“每日饮水追踪器”。\n\n示意图\n板书\n07:26\n\n你对 AI 说：做一个极简网页，点一下按钮加 250ml。AI 几秒钟就吐出了代码。这时候，必须由你来做“氛围感”的裁判。\n\n07:26\n\n你一看预览，发现按钮像指甲盖那么大，颜色还是那种难看的亮绿色。这时候你得说话。\n\n板书\n07:26\n\n你得告诉它：按钮大一点，用深蓝色，要有呼吸灯效果。AI 才会根据你的审美去修正。这就是为什么你必须检查：AI 能帮你写逻辑，但它不知道你心中的“氛围”到底对不对。\n\n07:26\n\n所以，Vibe Coding 的瓶颈不在于你不会写分号，而是在于你能不能清晰地评估：这个东西现在给我的“感觉”对吗？\n\nVibe Coding 的角色分工\n07:27\n\n现在回到你刚才的想法：如果 AI 生成的按钮明明点击了没反应，但它告诉你“已经做好了”，这时候你觉得作为总监，你应该怎么做？是相信它的话，还是自己去点一下试试？\n\n模型正在讲解中\n语音输入模式已开启，模型正在聆听",
+      "trigger": "ask"
+    },
+    {
+      "observed_at": "2026-11-09T23:27:45.972Z",
+      "page_text": "学习节大纲\n\nVibe Coding 与 AI 辅助开发\n理解 Vibe Coding\n\n本节课首先介绍由 AI 研究员 Andrej Karpathy 推广的革命性概念——“Vibe Coding”。解释传统软件开发总是需要极高的认知成本：必须将人类的创意想法转化为严谨的、机器可读的语法，如分号、花括号和内存管理。与之形成鲜明对比的是 “Vibe Coding”，其主要的创作媒介是自然语言。强调这并不是为了偷懒，而是一场深刻的范式转移：创作者从手动敲击的“打字员”转变为高层级的“创意总监”。这种介绍立即降低了非技术学习者的准入门槛，让他们明白缺乏编程经验并不是劣势，而是一个摆脱语法负担、掌握系统设计的契机。\n\n为了让这一点更加具体，在物理或虚拟白板上画一个对比表格。左列标注为“传统软件工程”，并画出其工作流：构思、语法解析、手动调试和编译。右列标注为 “Vibe Coding”，并画出其工作流：战略意图、自然语言提示词编写、AI 生成和系统评估。逐步讲解该表格，展示开发的瓶颈是如何转移的。在传统编程中，人们花数小时寻找缺失的逗号；而在 Vibe Coding 中，人们花数小时完善指令的清晰度。使用盖房子的比喻：传统程序员是亲手砌每一块砖，而 Vibe Coder 则是指挥自动化施工队的建筑师。\n\n接着，通过定义“全自动 Vibe Coding”与“人类主导的 Vibe Coding”来剖析自动化的光谱。解释全自动 Vibe Coding 是一种理想状态，即 AI 代理试图在完全没有人类监督的情况下构建整个应用。指出这种极端情况的危险性：如果没有人类反馈循环，AI 代理往往会陷入递归幻觉循环，编写极其复杂的代码来修补微小的错误。对比之下，“人类主导的 Vibe Coding”才是本课程的核心。在这个模型中，人类充当领航员和关键评估者，引导 AI，设定设计边界，并不断检查应用程序的表现是否符合预期的“氛围 (Vibe)”。这种区分可以防止初学者产生“期望 AI 能神奇地读懂他们的心”这一常见误区。\n\n最后，以一个基于交互式场景的反思结束。请观众想象他们想构建一个简单的每日习惯追踪器。引导他们想象传统开发者会如何从编写数据库模式和设置本地服务器开始。然后，展示 Vibe Coder 会如何简单地写下：“创建一个简洁、极简的网页，让我可以点击一个按钮来记录我的饮水量。”这种强烈的对比强化了本讲座的核心收获：只要学会如何有效地引导和评估 AI 助手，Vibe Coding 就能让任何人以思考的速度制作原型。\n\n参考资料\n\n此学习节暂无参考资料。\n\n课程概览\n\nVibe Coding：什么是“氛围感编程”？\n\n什么是 Vibe Coding？\n它和传统编程有什么区别？\n为什么现在人人都能成为开发者？\n\nVibe Coding：氛围感编程\n\n核心媒介：自然语言（人话）\n角色转变：从“打字员”变身“创意总监”\n\n两种 Vibe Coding 模式\n\n模式\t人类的角色\t风险\n全自动 Vibe\t甩手掌柜\t幻觉循环、代码臃肿\n人类主导 Vibe\t领航员/评估者\t可控、高质量\n\n例子：每日饮水追踪器\n\n你的指令：“做一个极简网页，点一下按钮加 250ml，显示总量。”\nAI 生成：瞬间写好 HTML 和 JS。\n你的检查：发现按钮太小了，背景颜色太刺眼。\n\n迭代过程\n\n你的反馈：“按钮大一点，用深蓝色背景，要有呼吸灯效果。”\nAI 修正：调整样式代码。\n100%\n1\n/\n1\nVibe Coding 与 AI 辅助开发\n已回到上次讲到的地方，点 ▶ 接着讲，或者直接提问。\n知道了\n是相信它的话，还是自己去点一下试试？\n语音输入已开启\n对话历史\n16:54\n\n[学习者]，你好！欢迎来到今天的课堂。我是你的导师。今天我们要聊一个听起来特别酷、甚至带点“玄学”色彩，但实际上正在改变我们每个人写代码方式的概念——Vibe Coding。\n\n课程概览\n16:54\n\n这节课我们要回答三个问题。第一个问题：到底什么是 Vibe Coding？它是某种具体的编程语言吗？今天我们会把它的定义讲清楚。\n\n16:54\n\n第二个问题：它和我们以前在学校里学的、或者在电影里看到的那些噼里啪啦敲代码的“传统编程”有什么本质区别？\n\n16:54\n\n第三个问题：为什么我们说 Vibe Coding 出现后，即便你完全没有编程经验，也能以思考的速度把想法变成现实？这个我们最后讲。\n\n07:23\n\n好，我们继续。刚刚说到，为什么要学这个？\n\n07:23\n\n因为在以往，如果你想做一个简单的 App 或网页，你得先花几个月去啃那些复杂的语法；但有了 Vibe Coding，只要你有好的想法，并能把它清晰地描述出来，你就能立刻看到成果。这能让你从繁重的体力活中解脱出来，专注于最核心的创意。\n\n07:23\n\n学完这节课，你不仅能理解这种新的开发模式，还能学会如何指挥 AI 助手帮你写出真正能运行的程序。那我们现在就进入第一个知识点。\n\n07:23\n\n我们先来看一个很有趣的现象：Vibe Coding 这个词最近在技术圈特别火，它是被一位叫安德烈·卡帕斯的 AI 专家推广开的。\n\n板书\n07:23\n\n简单来说，Vibe Coding 就是“氛围感编程”。在以前，写程序就像是跟一个只认死理、脾气还特别古怪的机器打交道，你少写一个分号，它就罢工。\n\n07:24\n\n但现在，你的主要创作工具变成了你每天都在说的“自然语言”。你不需要再去纠结那个花括号该往哪摆，你的工作重心从“怎么写”变成了“想要什么”。\n\n07:24\n\n这就像是盖房子：传统程序员是亲手砌每一块砖的泥瓦匠，而 [ [\n𝑉\n𝑖\n𝑏\n𝑒\n𝐶\n𝑜\n𝑑\n𝑒\n𝑟\nVibeCoder Vibe Coder 则是指挥自动化施工队的建筑师。\n\n07:24\n\n到这里你能感觉到角色的这种变化吗？\n\n轮到你回答\n我理解成只要把想法说出来，AI就能全自动做好，不用我检查。这样理解对吗？能给我一个具体例子吗？\n07:25\n\n你的这个理解非常典型，很多刚接触的人都会这么想。但我要先给你泼一盆冷水：如果你追求的是“全自动、不检查”，那这就不是氛围感编程，而是在玩一场很容易翻车的“开盲盒”。\n\n两种 Vibe Coding 模式\n07:25\n\n看这张对比表。如果你当“甩手掌柜”，让 AI 全自动做，AI 很容易陷入“递归幻觉”。简单说，它写错了一个小地方，为了修这个错，它会写出更复杂的代码来掩盖，最后整个程序会变成一团谁也看不懂的乱麻。\n\n07:25\n\n所以，我们这节课核心要学的是“人类主导”的模式。你不是打字员，但你是领航员。\n\n07:26\n\n你说想要一个具体例子，那我们现在就来模拟一个：假设你想做一个最简单的“每日饮水追踪器”。\n\n示意图\n板书\n07:26\n\n你对 AI 说：做一个极简网页，点一下按钮加 250ml。AI 几秒钟就吐出了代码。这时候，必须由你来做“氛围感”的裁判。\n\n07:26\n\n你一看预览，发现按钮像指甲盖那么大，颜色还是那种难看的亮绿色。这时候你得说话。\n\n板书\n07:26\n\n你得告诉它：按钮大一点，用深蓝色，要有呼吸灯效果。AI 才会根据你的审美去修正。这就是为什么你必须检查：AI 能帮你写逻辑，但它不知道你心中的“氛围”到底对不对。\n\n07:26\n\n所以，Vibe Coding 的瓶颈不在于你不会写分号，而是在于你能不能清晰地评估：这个东西现在给我的“感觉”对吗？\n\nVibe Coding 的角色分工\n07:27\n\n现在回到你刚才的想法：如果 AI 生成的按钮明明点击了没反应，但它告诉你“已经做好了”，这时候你觉得作为总监，你应该怎么做？是相信它的话，还是自己去点一下试试？\n\n轮到你回答\n模型正在讲解中\n语音输入模式已开启，模型正在聆听",
+      "trigger": "response_complete"
+    }
+  ]
+}

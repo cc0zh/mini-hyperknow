@@ -1,6 +1,6 @@
 # ClassroomFlow
 
-TLC reached 21 states and 50 steps. The chart draws 9 states and 17 arrows.
+TLC reached 22 states and 53 steps. The chart draws 9 states and 17 arrows.
 The chart does not draw 10 steps that stay in one chart state.
 
 ## CompletionRequiresSummary breaks

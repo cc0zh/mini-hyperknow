@@ -1,6 +1,6 @@
 {
   "id": "course-flow",
-  "sync_commit": "c7a05d71dce441f1ddad8c8be2651f3c3cb39450",
+  "sync_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
   "workspace_dirty_at_sync": true,
   "spec": "assets/CourseFlow.tla",
   "config": "assets/CourseFlow.cfg",

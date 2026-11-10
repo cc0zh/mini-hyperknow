@@ -1,0 +1,47 @@
+---
+title: "课程停止与继续生成"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: Breaks CommittedUnitsPreserved
+    lg1: Path to the CommittedUnitsPreserved bug
+  }
+  class lg0 breaks
+  class lg1 bugPath
+  state "原任务生成" as s0 {
+    s1: 已保存0个单元
+    s2: 已保存1个单元
+  }
+  state "原任务已停止" as s3 {
+    s4: 已保存0个单元
+    s5: 已保存1个单元
+  }
+  state "接续生成" as s6 {
+    s7: 已保存0个单元
+    s8: 已保存1个单元
+    s9: 重试重置了已保存单元
+  }
+  state "接续任务已停止" as s10 {
+    s11: 已保存0个单元
+    s12: 已保存1个单元
+  }
+  s13: 课程全部保存完成
+  [*] --> s1
+  s1 --> s4: 停止当前任务
+  s1 --> s1: 开始未保存单元
+  s4 --> s7: 显式继续剩余内容
+  s1 --> s2: 保存完整单元
+  s2 --> s5: 停止当前任务
+  s7 --> s11: 停止当前任务
+  s5 --> s9: 显式继续剩余内容
+  s7 --> s8: 保存完整单元
+  s2 --> s13: 保存完整单元
+  s8 --> s12: 停止当前任务
+  s9 --> s8: 保存完整单元
+  s8 --> s13: 保存完整单元
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s1 bugPath
+  class s2 bugPath
+  class s5 bugPath
+  class s9 breaks
+  class s9 bugPath

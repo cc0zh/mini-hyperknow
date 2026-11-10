@@ -1,0 +1,169 @@
+{
+  "captured_at": "2026-11-09T23:04:10.363Z",
+  "method": "public_asset_GET_credentials_omit_via_browser",
+  "scope": "frontend_protocol_only_not_backend_generation_or_learning_effect",
+  "offset_unit": "zero_based_JavaScript_UTF16_code_units",
+  "contains_account_or_course_data": false,
+  "artifacts": [
+    {
+      "url": "https://agent.hyperknow.io/assets/js/WhiteboardPage-BCbBjYe4.js",
+      "http_status": 200,
+      "bytes": 181094,
+      "sha256": "9f0b1126d7b08db301b947a037e15261ebf7e7f158e69f06d9a0672f5c98779c",
+      "extracts": [
+        {
+          "needle": "resume_or_start_course_session",
+          "found": true,
+          "offset": 4286,
+          "excerpt": "{var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"resume_or_start_course_session\",course_session_id:e}))}sendMessage(e,t,n,r,i,a){var s;(null==(s=this.ws)?void 0:s.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"user_message\",message:e,pivot:a||void 0,lecture_outline_id:t||void 0,attachments:(null==n?void 0:n.length)?n:void 0,answer:r??void 0,audio_b64:(null==i"
+        },
+        {
+          "needle": "user_message",
+          "found": true,
+          "offset": 4465,
+          "excerpt": "{var s;(null==(s=this.ws)?void 0:s.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"user_message\",message:e,pivot:a||void 0,lecture_outline_id:t||void 0,attachments:(null==n?void 0:n.length)?n:void 0,answer:r??void 0,audio_b64:(null==i?void 0:i.audioB64)||void 0,audio_mime:(null==i?void 0:i.mime)||void 0,audio_duration_ms:(null==i?void 0:i.durationMs)||void 0,voice_turn_id:(null==i?void 0:i.turnId)||void 0}))}s"
+        },
+        {
+          "needle": "action_step_complete",
+          "found": true,
+          "offset": 5239,
+          "excerpt": "{var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"action_step_complete\",step_id:e}))}sendNarrationPause(e){var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"narration_pause\",paused:e}))}sendTurnPause(e){var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"turn_pause\",paused:e}))}inter"
+        },
+        {
+          "needle": "can_continue",
+          "found": true,
+          "offset": 65039,
+          "excerpt": "s();const r=tt.current&&!0===o.resumed&&!0!==o.session&&!et.current&&null===n&&(\"boolean\"==typeof o.can_continue?o.can_continue:function(e){for(let t=e.length-1;t>=0;t-=1){const n=e[t];if(!n||\"assistant\"!==n.role)continue;const r=t>0?e[t-1]:void 0;if(!r||\"user\"!==r.role||!String(r.content??\"\").startsWith(\"[Interrupted the lecture]\"))return!0===n.interrupted}return!1}(t));if(tt.current=!1,ct(r),dt.current=!0===o.can_continue,ut"
+        },
+        {
+          "needle": "response_complete",
+          "found": true,
+          "offset": 13755,
+          "excerpt": "\"reference_reading_started\",\"reference_reading_completed\",\"reference_reading_failed\"]),zt=new Set([\"response_complete\",\"error\",\"insufficient_funds\",\"session_paused\",\"session_ready\",\"session_taken_over\"]),Wt=\"page-1\",qt=()=>i.t(\"whiteboard.status.sessionComplete\");function Ht(e){return JSON.parse(JSON.stringify(e))}function Kt(e){const t=e,n=t.columnIndex??t.column_index,r=Number(n);return Number.isInteger(r)&&r>=0?r:null}funct"
+        },
+        {
+          "needle": "case\"ask\"",
+          "found": true,
+          "offset": 75627,
+          "excerpt": "hiteboard.action.graph\"),actionDetail:t,content:i.t(\"whiteboard.action.graphShort\")}),qa(t,e);break}case\"ask\":{const e=o.step_id,t=Vt(o);t&&(Pe(t),Ga({type:\"action\",actionKind:\"ask\",actionLabel:tn(t),actionDetail:nn(t),content:tn(t)})),window.setTimeout(()=>Ai(e),20);break}case\"reward_user\":{const e=o.step_id,t=String(o.master_concept_title??\"\").trim(),n=String(o.master_concept_description??\"\").trim();t&&n?(Ya({masterConceptTi"
+        },
+        {
+          "needle": "case\"board\"",
+          "found": true,
+          "offset": 72691,
+          "excerpt": "chedToNewPage\"),content:t||i.t(\"whiteboard.action.newPage\")}),window.setTimeout(()=>Ai(e),60);break}case\"board\":{const e=o.step_id,t=\"number\"==typeof o.board_uid?o.board_uid:void 0,n=o[Mt],r=String(o.board_content??n??\"\"),a=o.title,s=Rn.current;Rn.current=void 0,rs(o.page_id);const c=()=>{null!=e&&kt(()=>Ai(e))},l=r.trim();if(!l){kt(c);break}if(Ga({type:\"action\",actionKind:\"board\",actionLabel:a&&a.trim()||i.t(\"whiteboard.actio"
+        },
+        {
+          "needle": "keypoint_complete",
+          "found": true,
+          "offset": 13172,
+          "excerpt": "ak\",\"tts_segment\",\"new_column\",\"new_page\",\"board\",\"highlight\",\"circle\",\"graph\",\"ask\",\"reward_user\",\"keypoint_complete\",\"done\",\"image_gen_pending\",\"generated_image\",\"image_gen_failed\",\"animation_pending\",\"generated_animation\",\"animation_failed\",\"figure_pending\",\"generated_figure\",\"figure_failed\",\"reference_reading_started\",\"reference_reading_completed\",\"reference_reading_failed\"]),Ft=new Set([\"group\",\"speak\",\"tts_segment\",\"new_"
+        },
+        {
+          "needle": "generated_figure",
+          "found": true,
+          "offset": 13334,
+          "excerpt": "\",\"image_gen_failed\",\"animation_pending\",\"generated_animation\",\"animation_failed\",\"figure_pending\",\"generated_figure\",\"figure_failed\",\"reference_reading_started\",\"reference_reading_completed\",\"reference_reading_failed\"]),Ft=new Set([\"group\",\"speak\",\"tts_segment\",\"new_column\",\"new_page\",\"board\",\"highlight\",\"circle\",\"graph\",\"ask\",\"reward_user\",\"keypoint_complete\",\"image_gen_pending\",\"animation_pending\",\"figure_pending\",\"referenc"
+        },
+        {
+          "needle": "generated_animation",
+          "found": true,
+          "offset": 13276,
+          "excerpt": "oint_complete\",\"done\",\"image_gen_pending\",\"generated_image\",\"image_gen_failed\",\"animation_pending\",\"generated_animation\",\"animation_failed\",\"figure_pending\",\"generated_figure\",\"figure_failed\",\"reference_reading_started\",\"reference_reading_completed\",\"reference_reading_failed\"]),Ft=new Set([\"group\",\"speak\",\"tts_segment\",\"new_column\",\"new_page\",\"board\",\"highlight\",\"circle\",\"graph\",\"ask\",\"reward_user\",\"keypoint_complete\",\"image_g"
+        },
+        {
+          "needle": "pivot:",
+          "found": true,
+          "offset": 4489,
+          "excerpt": ")?void 0:s.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"user_message\",message:e,pivot:a||void 0,lecture_outline_id:t||void 0,attachments:(null==n?void 0:n.length)?n:void 0,answer:r??void 0,audio_b64:(null==i?void 0:i.audioB64)||void 0,audio_mime:(null==i?void 0:i.mime)||void 0,audio_duration_ms:(null==i?void 0:i.durationMs)||void 0,voice_turn_id:(null==i?void 0:i.turnId)||void 0}))}setLectureOutline(e){var "
+        },
+        {
+          "needle": "sync_whiteboard_state",
+          "found": true,
+          "offset": 7380,
+          "excerpt": "{var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"sync_whiteboard_state\",whiteboard_state:e}))}pauseSession(e){var t;(null==(t=this.ws)?void 0:t.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"pause_session\",whiteboard_state:e}))}resumeGeneration(){var e;(null==(e=this.ws)?void 0:e.readyState)===WebSocket.OPEN&&this.ws.send(JSON.stringify({type:\"resume_generati"
+        }
+      ]
+    },
+    {
+      "url": "https://agent.hyperknow.io/assets/js/WhiteboardPage-DobdV2DK.js",
+      "http_status": 200,
+      "bytes": 287,
+      "sha256": "62be9097349e3024860e351b59209e00fe95a2cf0feb827bc32f0347188842c2",
+      "extracts": [
+        {
+          "needle": "resume_or_start_course_session",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "user_message",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "action_step_complete",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "can_continue",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "response_complete",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "case\"ask\"",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "case\"board\"",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "keypoint_complete",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "generated_figure",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "generated_animation",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "pivot:",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        },
+        {
+          "needle": "sync_whiteboard_state",
+          "found": false,
+          "offset": -1,
+          "excerpt": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "classroom-regeneration-masked-by-teacher",
+  "outcome": "bug",
+  "kind": "real-code-counterexample",
+  "introduced_commit": "e42d4cfe5eb79bec9e03ee18794328a6fd295038",
+  "property": "RegenerationBlocksOldScriptCommands",
+  "command": "uv run --frozen python scripts/verify_classroom_regeneration.py",
+  "expected_exit_while_unfixed": 1,
+  "not_covered_by": "CompletionRequiresSummary",
+  "steps": [
+    "Save one valid script in a temporary SQLite database.",
+    "Queue regeneration. Confirm old-script questions are rejected.",
+    "Create a newer lesson_basis run through prepare_teacher_lesson.",
+    "Ask a question against the old script. It is incorrectly accepted.",
+    "Finish regeneration and replace the script. The pending question is no longer visible."
+  ],
+  "harm": "A stored student question disappears from the current lesson interaction list.",
+  "sources": [
+    "src/hyperknow/lesson_storage.py::_lesson",
+    "src/hyperknow/lesson_storage.py::_anchor",
+    "src/hyperknow/lesson_storage.py::prepare_teacher_lesson",
+    "src/hyperknow/lesson_storage.py::ask_question",
+    "src/hyperknow/lesson_storage.py::finish_lesson"
+  ]
+}
