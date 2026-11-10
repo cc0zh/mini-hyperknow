@@ -74,6 +74,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] 在 `teacher.py` 提案新增 `TeachingPreparationDraft`、`TeachingPreparation` 和独立校验器。保留旧 `TeachingBasisDraft` 的读取，不把旧引用字段改成默认空值伪装迁移。
 - [ ] 在 `lesson_domain.py` 提案新增 `teacher_preparation_context()`。从目标、课时提纲、概念与必要背景装配，不经过旧 `lesson_context()` 的来源门禁。研究材料若选用只作可选材料，其缺失和失配不能挡新备课。
 - [ ] 同步 `prompts/classroom.py`、`generation.py` 的 schema、校验、结构修复与文案，允许教师用自身知识补充。不删研究、蓝图和题组的证据规则。
+- [ ] 新准备版本分流到去来源门禁的现有回合校验与上下文读取，避免仍索引旧 `basis.references` 而失败。PR02 落地前继续使用既有原子回合形状，不伪造新段落和引用，旧历史生成不自动迁移。
 - [ ] 在 `lesson_storage.py` 按显式格式版本读取旧聚合和新聚合。新字段使用判别联合，未知版本给出格式说明，不篡改原文。格式号 `2` 是提案，开工先检查冲突。
 - [ ] 提供绑定 `client_command_id`、预期版本和旧聚合身份的显式重新准备命令。新准备成功前保留旧课堂，失败、取消或中断不能丢内容。成功事务中归档原聚合后才切活动版本。
 - [ ] 同步 `main.py`、`types.ts` 和 `Classroom.tsx`。新材料面板不再要求来源数量，历史来源仍可读。进入、刷新和 GET 不转换、不建 run、不收费。
@@ -131,6 +132,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] 修改 `pyproject.toml`。以实际 diff 和对应检查回执为证据。
 - [ ] 修改 `tests/test_teacher_classroom.py`。以实际 diff 和对应检查回执为证据。
 - [ ] 修改 `tests/test_assistance_domain.py`。以实际 diff 和对应检查回执为证据。
+- [ ] 修改 `web/src/lib/types.ts` 与 `web/src/pages/Classroom.tsx` 的新版状态分流。以生成后停在待展示且不误用旧累计画布为证据。
 
 **Build.**
 
@@ -138,6 +140,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] 一个展示单元可以只有讲解、只有板书或两者都有。保存稳定的 segment、unit 与 object 身份，不用 board version 或每六个操作切帧来生成身份。
 - [ ] `BoardLedger` 只以已展示板书初始化。校验单元顺序、对象归属、唯一身份、对象级 focus 和引用，禁止引用未来或被废弃后缀的对象。
 - [ ] 段落、候选板书与必要持续记录一起校验并事务保存，状态只表示 `saved_pending_display`。不得保存即进入已授课或等待答案。第一版只在段落末尾交出作答权，避免隐藏后半段泄露答案。
+- [ ] 本片 UI 只提供“教学段落已保存，待展示能力接通”的安全状态，不把候选板书送入旧累计画布，也不允许该段落未处置时重复生成。它是可检查的过渡交付，不提前声称 PR03 的实际展示已实现。
 - [ ] `_teacher_context()` 改成冻结本次实际 `ClassroomContext`。区分原话、暂时判断和未知，装入已展示前缀、实际提示程度、失败与待展示内容及连续事项。摘要不能取代原始记录。
 - [ ] 需要补读时只提供当前课时、指定记录身份的有界只读入口，不给模型路径或跨课权限。上下文不足时明确停止，不截掉必要待答证据。
 - [ ] 复用 `SkillRegistry` 和即时协助按需加载机制，提案新增独立可信目录 `src/hyperknow/teacher_strategies/`。先交付少量策略，最终数量由开工课例门槛决定，不先建策略平台。
@@ -158,11 +161,11 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] Lane 1. Regression lane against trunk. 同一真实课堂基线与本片对比段落入口，基线无段落则记录缺失并只验新增状态。Save `data/validation/teacher-classroom-run/live/PR02/lane-1.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 - [ ] Lane 2. 段落只处理当前目标且不会一次显示整堂课。Save `data/validation/teacher-classroom-run/live/PR02/lane-2.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 - [ ] Lane 3. 纯讲解单元不制造空白板。Save `data/validation/teacher-classroom-run/live/PR02/lane-3.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
-- [ ] Lane 4. 新单元关联真实稳定对象并可定位。Save `data/validation/teacher-classroom-run/live/PR02/lane-4.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
+- [ ] Lane 4. 段落保存后页面显示待展示，候选对象不进入旧累计画布。Save `data/validation/teacher-classroom-run/live/PR02/lane-4.png`. Pass when 待展示提示与权威段落身份一致，页面未暴露候选后缀。
 - [ ] Lane 5. 已保存待展示的后缀没有进入已讲历史。Save `data/validation/teacher-classroom-run/live/PR02/lane-5.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 - [ ] Lane 6. 教师只按需加载策略且课堂目标不重置。Save `data/validation/teacher-classroom-run/live/PR02/lane-6.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 - [ ] Lane 7. 用户策略路径注入没有文件或新权限。Save `data/validation/teacher-classroom-run/live/PR02/lane-7.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
-- [ ] Lane 8. 切换策略后原输入和待答仍能追溯。Save `data/validation/teacher-classroom-run/live/PR02/lane-8.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
+- [ ] Lane 8. 保存后刷新不会重置原输入与已存在的待答记录。Save `data/validation/teacher-classroom-run/live/PR02/lane-8.png`. Pass when 页面与权威记录仍对应，未保存段落不能激活新的待答。
 - [ ] Lane 9. 刷新复用保存段落且无付费请求。Save `data/validation/teacher-classroom-run/live/PR02/lane-9.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 - [ ] Lane 10. 过大或无效段落明确失败且不显示半块板书。Save `data/validation/teacher-classroom-run/live/PR02/lane-10.png`. Pass when 对应断言在真实界面和权威记录一致，证据不足写 blocked。
 
@@ -414,7 +417,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 **You see.**
 
-- [ ] 本片依赖前五片和预算批准。固定同一知识点、准备版本和展示前缀，逐项执行附录 F 的 T1 至 T7。学生原话、教法变化、板书和恢复状态在界面与权威记录对应，不能用旧证据代跑。
+- [ ] 本片依赖前五片。每片的 live 检查可先使用对应授权的最小真实模型产物，PR06 才汇总全量七分支与 retry 完成，不意味着真实验证全部拖到最后。固定同一知识点、准备版本和展示前缀，执行附录 F，不能用旧证据代跑。
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
