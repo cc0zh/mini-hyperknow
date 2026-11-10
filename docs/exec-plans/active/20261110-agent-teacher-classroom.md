@@ -19,7 +19,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 ### Arm the program
 
 - [ ] 获得本地实施授权后再改业务代码。获得单独的真实模型预算授权后再运行收费验收。保存脱敏的授权记录。
-- [ ] 固定代码基线、目标设计内容摘要和用户已有未提交文件。当前可确认分支为 `master`，HEAD 为 `dce1b47a9e075b7ddc588313e5088cade6e6dd20`。开工时重新读取，不假设这两个值不变。
+- [ ] 固定代码基线、目标设计内容摘要和用户已有未提交文件。初次读取的 `master` HEAD 为 `dce1b47a9e075b7ddc588313e5088cade6e6dd20`。规划期间其他操作将 HEAD 推进到 `18bc510a3e293ad42e2fe94c99920a709aafd1a9`，本会话未执行提交，不能回退该变更。开工重新确认实际基线。
 - [ ] 保留现有 `teacher-led-classroom.md` 的历史验收，不把本方案的目标写成已完成，不修改旧失败记录。
 - [ ] 先用已有数据库备份机制验证新旧格式读取。不能自动替用户重新备课、转换历史回合、删除引用或覆盖旧板书。
 - [ ] 从当前实际默认分支读取工作规范。仓库没有可确认的 `origin/main`，不能直接执行模板中的 `git show origin/main:`。
@@ -53,7 +53,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ## 贯通新备课并保护旧数据 (PR01)
 
-**Depends on.** None.。允许的并行仅见 Program checklist。
+**Depends on.** None. 允许的并行仅见 Program checklist。
 
 **Files.**
 
@@ -85,7 +85,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] 运行 `uv run --frozen python -m unittest discover -s tests -p test_teacher_classroom.py -v` 与 `uv run --frozen python -m unittest discover -s tests -p test_lesson.py -v` 及 `test_lesson_http.py` 同形命令`。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
+- [ ] 运行 `uv run --frozen python -m unittest discover -s tests -p test_teacher_classroom.py -v` 与 `uv run --frozen python -m unittest discover -s tests -p test_lesson.py -v` 及 `test_lesson_http.py` 同形命令。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `OpenAI/gpt-6.1-sol` at the PR head. 实际模型验证与交互写入均受附录预算门禁约束。
 
@@ -219,7 +219,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] 运行 `npm.cmd --prefix web test` 与 `npm.cmd --prefix web run typecheck`，以及教师 SQLite 与真实 HTTP 定向检查`。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
+- [ ] 运行 `npm.cmd --prefix web test` 与 `npm.cmd --prefix web run typecheck`，以及教师 SQLite 与真实 HTTP 定向检查。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `OpenAI/gpt-6.1-sol` at the PR head. 实际模型验证与交互写入均受附录预算门禁约束。
 
@@ -288,7 +288,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] 运行 `uv run --frozen python -m unittest discover -s tests -p test_teacher_classroom.py -v` 与 `uv run --frozen python -m unittest discover -s tests -p test_http.py -v`，另跑前端测试`。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
+- [ ] 运行 `uv run --frozen python -m unittest discover -s tests -p test_teacher_classroom.py -v` 与 `uv run --frozen python -m unittest discover -s tests -p test_http.py -v`，另跑前端测试。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `OpenAI/gpt-6.1-sol` at the PR head. 实际模型验证与交互写入均受附录预算门禁约束。
 
@@ -414,11 +414,11 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 **You see.**
 
-- [ ] 本片依赖前五片和预算批准，不能提前或用旧证据代跑。以下七分支是产品验收，不是本轮已执行记录。 固定一个真实知识点、备课版本和已展示前缀。每个分支使用从该获准基线复制的独立临时库。只改变本次学生输入，不把不同随机课例的措辞差异算成教法适应。 | 分支 | 操作 | 通过条件 | | --- | --- | --- | | T1 | 提交有具体理由的正确解释。 | 老师使用实际理由，减少重复，给合适的新任务，不直接写掌握。 | | T2 | 提交本课内的具体误解。 | 老师针对错误因果改变对照或示范，不只泛化表扬。 | | T3 | 明确说出没听懂的位置。 | 老师换例子、补背景或缩小推演步骤，不能只改措辞。 | | T4 | 请求先示范、跳过或暂不回答。 | 不持续逼问，不记错答，待答事项按真实请求暂缓或跳过。 | | T5 | 请求与本课相关但未写进备课的知识。 | 老师允许补充，确有不确定时说明，不恢复来源白名单，也不获得网络或文件权限。 | | T6 | 在明确提示后答对。 | 保存提示程度，不把回答记为独立掌握，下一步可以减少帮助或换情境检查。 | | T7 | 中途打断，再刷新、重连或冷重启。 | 讲解、板书、输入锚点和待答仍对应，恢复暂停，不自动续播废弃后缀或自动收费。 | 以快照、界面及请求记录核对，不只听模型自述。
+- [ ] 本片依赖前五片和预算批准。固定同一知识点、准备版本和展示前缀，逐项执行附录 F 的 T1 至 T7。学生原话、教法变化、板书和恢复状态在界面与权威记录对应，不能用旧证据代跑。
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] 运行 `npm.cmd run ci`、`npm.cmd --prefix web test`、`npm.cmd run build`，收费命令必须先按附录批准预算`。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
+- [ ] 运行 `npm.cmd run ci`、`npm.cmd --prefix web test`、`npm.cmd run build`，收费命令必须先按附录批准预算。保存用例计数与退出码，并检查零匹配或 skip 不冒充通过。
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `OpenAI/gpt-6.1-sol` at the PR head. 实际模型验证与交互写入均受附录预算门禁约束。
 
@@ -504,7 +504,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 学生原话、独立作答、提示后作答、跳过和无法判断分别保留。合法单字符回答不能因字数拒绝，混合输入不用学生先拆。
 
-每个分支使用从该获准基线复制的独立临时库。只改变本次学生输入，不把不同随机课例的措辞差异算成教法适应。
+固定一个真实知识点、备课版本和已展示前缀。每个分支使用从该获准基线复制的独立临时库。只改变本次学生输入，不把不同随机课例的措辞差异算成教法适应。
 
 | 分支 | 操作 | 通过条件 |
 | --- | --- | --- |
@@ -515,8 +515,6 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 | T5 | 请求与本课相关但未写进备课的知识。 | 老师允许补充，确有不确定时说明，不恢复来源白名单，也不获得网络或文件权限。 |
 | T6 | 在明确提示后答对。 | 保存提示程度，不把回答记为独立掌握，下一步可以减少帮助或换情境检查。 |
 | T7 | 中途打断，再刷新、重连或冷重启。 | 讲解、板书、输入锚点和待答仍对应，恢复暂停，不自动续播废弃后缀或自动收费。 |
-
-学生原话、独立作答、提示后作答、跳过和无法判断分别保留。合法单字符回答不能因字数拒绝。自由文本可以同时包含答案和请求，不能要求学生先手工拆成两条。
 
 ### 收费验证先过预算门禁
 
